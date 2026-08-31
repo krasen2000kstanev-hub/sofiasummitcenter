@@ -1,0 +1,25 @@
+body{
+    --c-primary: #dcdcdc;
+    --c-primary-b: #000000;
+    --c-primary-c: #128deb;
+    --c-primary-d: #0E1D58;
+
+    --c-background: linear-gradient(to right top, #050937, #0E1D58, #132E82, #2069bb, #128deb);
+    --c-background-b: #ffffff;
+    --c-background-c: #C2C2C0;
+
+    --c-emphasis: #D2B173;
+
+
+    --c-black: rgba(0, 0, 0, 0.75);
+    --c-white: rgba(255, 255, 255, 0.8);
+
+    --r-border-radius-small: 4px;
+    --r-border-radius-medium: 8px;
+    --r-border-radius-big: 16px;
+
+    --bs-: rgb(0 0 0 / 20%) 0 1px 11px;
+
+
+}
+
