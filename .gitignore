@@ -1,10 +1,12 @@
-# Keep the WordPress hosting backup out of the GitHub Pages repository.
+# Keep hosting backups and local configuration out of the GitHub Pages repository.
 *.zip
 *-installer-backup.php
 dup-installer/
-wp-admin/
-wp-includes/
 cgi-bin/
 *.sql
 wp-config.php
-wp-content/wflogs/
+
+# Legacy hosting files kept locally but not published.
+wp-admin/
+wp-includes/
+wp-content/
