@@ -1,0 +1,1024 @@
+# Translation of Plugins - Duplicator &#8211; Backups &amp; Migration Plugin &#8211; Cloud Backups, Scheduled Backups, &amp; More - Stable (latest release) in Bulgarian
+# This file is distributed under the same license as the Plugins - Duplicator &#8211; Backups &amp; Migration Plugin &#8211; Cloud Backups, Scheduled Backups, &amp; More - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-05-06 21:33:33+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: bg\n"
+"Project-Id-Version: Plugins - Duplicator &#8211; Backups &amp; Migration Plugin &#8211; Cloud Backups, Scheduled Backups, &amp; More - Stable (latest release)\n"
+
+#: deactivation.php:259 deactivation.php:261
+msgid "Processing"
+msgstr "Обработване"
+
+#: template/admin_pages/settings/general/general.php:159
+msgid "Save General Settings"
+msgstr "Съхраняване на общи настройки"
+
+#: template/admin_pages/settings/general/general.php:26
+msgid "General Settings Saved"
+msgstr "Общите настройки са съхранени"
+
+#: template/mocks/schedule/schedules.php:16
+msgid "Schedules"
+msgstr "Графици"
+
+#: src/Controllers/StorageController.php:61
+#: src/Controllers/StorageController.php:62
+msgid "Google Drive"
+msgstr "Google Drive"
+
+#: src/Controllers/StorageController.php:56
+#: src/Controllers/StorageController.php:57
+msgid "Amazon S3"
+msgstr "Amazon S3"
+
+#: views/packages/main/s1.setup1.php:252
+msgid "WordPress Root Path:"
+msgstr "Път към главната директория на WordPress:"
+
+#: views/packages/main/s2.scan1.php:220
+msgid "This can take several minutes."
+msgstr "Ще бъдат необходими няколко минути."
+
+#: views/packages/main/s2.scan1.php:219
+msgid "Keep this window open during the scan process."
+msgstr "Оставете този прозорец отворен, докато трае сканирането."
+
+#: classes/class.server.php:645 views/packages/main/s2.scan3.php:757
+msgid "Disabled"
+msgstr "Изключен"
+
+#: classes/class.server.php:642
+msgid "Suhosin Extension"
+msgstr "Разширение за Suhosin"
+
+#: views/packages/main/s1.setup2.php:507
+msgid "example: DatabaseUserName (value is optional)"
+msgstr "пример: DatabaseUserName (стойността не е задължителна)"
+
+#: views/packages/main/s1.setup2.php:494
+msgid "example: DatabaseName (value is optional)"
+msgstr "пример: DatabaseName (стойността не е задължителна)"
+
+#: views/packages/main/s1.setup2.php:481
+msgid "example: 3306 (value is optional)"
+msgstr "пример: 3306 (стойността не е задължителна)"
+
+#: views/packages/main/s1.setup2.php:468
+msgid "example: localhost (value is optional)"
+msgstr "пример: localhost (стойността не е задължителна)"
+
+#: views/packages/main/s1.setup1.php:214
+msgid "MySQL version 5.0+ or better is required and the PHP MySQLi extension (note the trailing 'i') is also required.  Contact your server administrator and request that mysqli extension and MySQL Server 5.0+ be installed."
+msgstr "Изисква се MySQL версия 5.0+ или по-висока, както и разширението PHP MySQLi (обърнете внимание на 'i' в края). Свържете се с администратора на сървъра и помолете за инсталиране на разширението mysqli и MySQL Server 5.0+."
+
+#: views/tools/diagnostics/inc.validator.php:17
+msgid "This will run the scan validation check.  This may take several minutes.  Do you want to Continue?"
+msgstr "Ще стартира проверка за валидация на сканирането. Тя може да отнеме няколко минути. Желаете ли да продължите?"
+
+#: views/tools/diagnostics/inc.validator.php:16
+msgid "Run Validator"
+msgstr "Стартиране на валидатора"
+
+#: views/tools/diagnostics/inc.data.php:83
+msgid "Clear Build Cache?"
+msgstr "Да се изчисти ли кешът?"
+
+#: views/packages/main/packages.php:370
+msgid "Selection Required"
+msgstr "Изисква се избор"
+
+#: views/packages/main/packages.php:364
+msgid "Bulk Action Required"
+msgstr "Изисква се групово действие"
+
+#: classes/ui/class.ui.dialog.php:90 deactivation.php:156
+msgid "Cancel"
+msgstr "Отмяна"
+
+#: classes/ui/class.ui.dialog.php:89
+msgid "OK"
+msgstr "OK"
+
+#: classes/ui/class.ui.dialog.php:86
+msgid "Processing please wait..."
+msgstr "Тече обработка. Моля, изчакайте."
+
+#: views/settings/packages.php:421
+msgid "By Day"
+msgstr "По ден"
+
+#: views/settings/packages.php:414
+msgid "By Month"
+msgstr "По месец"
+
+#: views/settings/packages.php:407
+msgid "By Year"
+msgstr "По година"
+
+#: views/packages/main/s2.scan2.php:196
+msgid "Multisite: N/A"
+msgstr "Multisite: N/A"
+
+#: views/packages/main/s2.scan2.php:187
+msgid "Multisite: Unsupported"
+msgstr "Multisite: не се поддържа"
+
+#: views/packages/main/s2.scan3.php:422
+msgid "Database Size:"
+msgstr "Размер на базата от данни:"
+
+#: views/packages/main/s2.scan2.php:79
+msgid "Get faster builds with Duplicator Pro with access to shell_exec zip."
+msgstr "За по-бързо изграждане използвайте Duplicator Pro с достъп до shell_exec zip."
+
+#: views/settings/packages.php:315
+msgid "enable only for large archives"
+msgstr "активиране само за големи архиви"
+
+#: views/settings/packages.php:236
+msgid "PHP Query Limit Size"
+msgstr "Органичение за размера на PHP заявката"
+
+#: views/settings/packages.php:356
+msgid "recommended"
+msgstr "препоръчителното"
+
+#: views/settings/packages.php:121
+msgid "Please contact the host or server administrator to enable this feature."
+msgstr "Свържете се с хостинга или с администратора на сървъра за активиране на тази функционалност."
+
+#: views/tools/diagnostics/logging.php:216
+msgid "Top 20"
+msgstr "Топ 20"
+
+#: views/settings/packages.php:403
+msgid "Created Format"
+msgstr "Формат на създаване"
+
+#: template/admin_pages/settings/misc/misc.php:161
+msgid "Enable debug options throughout user interface"
+msgstr "Активиране на възможностите за отстраняване на грешки в потребителския интерфейс"
+
+#: template/admin_pages/settings/misc/misc.php:158
+msgid "Debugging"
+msgstr "Отстраняване на грешки"
+
+#: template/admin_pages/settings/misc/misc.php:154
+msgid "Debug"
+msgstr "Отстраняване на грешки"
+
+#: views/tools/diagnostics/inc.validator.php:46
+#: views/tools/diagnostics/inc.validator.php:160
+msgid "Run Scan Integrity Validation"
+msgstr "Стартиране на валидация на сканирането"
+
+#: views/tools/diagnostics/inc.validator.php:28
+msgid "Scan Validator"
+msgstr "Валидатор на сканиране"
+
+#: views/settings/about-info.php:63
+msgid "Rate Duplicator"
+msgstr "Оценете Duplicator"
+
+#: views/packages/main/s1.setup1.php:189
+msgid "If Duplicator does not have enough permissions then you will need to manually create the paths above. &nbsp; "
+msgstr "Ако Duplicator няма достатъчно права, ще се наложи ръчно да създадете пътищата по-горе. &nbsp; "
+
+#: views/packages/main/s2.scan1.php:429
+msgid "- On some budget hosts scanning over 30k files can lead to timeout/gateway issues. Consider scanning only your main WordPress site and avoid trying to backup other external directories."
+msgstr "- При някои по-евтини хостинги сканирането на над 30 хиляди файла може да причини прекъсвания. Опитайте да сканирате само главния WordPress сайт, без да архивирате други външни директории."
+
+#: views/packages/main/s2.scan1.php:428
+msgid "Common Issues:"
+msgstr "Често срещани проблеми:"
+
+#: views/packages/main/s2.scan1.php:426
+msgid "3. This message will go away once the correct filters are applied."
+msgstr "3. Това съобщение ще изчезне след прилагане на правилните филтри."
+
+#: views/packages/main/s2.scan1.php:425
+msgid "2. Continue to add/remove filters to isolate which path is causing issues."
+msgstr "2. Продължете да добавяте и премахвате филтри, за да изолирате пътя, който причинява проблеми."
+
+#: views/packages/main/s2.scan1.php:424
+msgid "1. Go back and create a root path directory filter to validate the site is scan-able."
+msgstr "1. Върнете се и създайте филтър с пътя към главната директория, за да проверите дали сайтът може да се сканира."
+
+#: views/packages/main/s2.scan1.php:423
+msgid "Unable to perform a full scan, please try the following actions:"
+msgstr "Пълното сканиране е невъзможно. Опитайте следното:"
+
+#: views/packages/main/s1.setup2.php:390
+msgid "optional"
+msgstr "незадължителни"
+
+#: views/packages/main/s1.setup2.php:390
+msgid "All values in this section are"
+msgstr "Всички стойности в този раздел са"
+
+#: views/settings/packages.php:127 views/tools/diagnostics/logging.php:183
+msgid "Duplicator recommends going with the high performance pro plan or better from our recommended list"
+msgstr "Duplicator препоръчва професионалния план или някой по-добър от списъка с препоръки"
+
+#: views/settings/packages.php:126 views/tools/diagnostics/logging.php:182
+msgid "Host Recommendation:"
+msgstr "Препоръка за хостинг:"
+
+#: views/packages/main/s2.scan3.php:468
+msgid "lower_case_table_names"
+msgstr "lower_case_table_names"
+
+#: views/packages/main/s2.scan3.php:461
+msgid "1. Run a %1$s on the table to improve the overall size and performance."
+msgstr "1. Пуснете %1$s на таблицата за подобряване на цялостния размер и производителността."
+
+#: views/packages/main/packages.php:314
+msgid "Error Processing"
+msgstr "Обработка на грешки"
+
+#: views/packages/main/s1.setup2.php:341
+msgid "no_field_options"
+msgstr "no_field_options"
+
+#: views/packages/main/s1.setup2.php:337
+msgid "no_key_options"
+msgstr "no_key_options"
+
+#: views/packages/main/s1.setup2.php:333
+msgid "no_table_options"
+msgstr "no_table_options"
+
+#: views/packages/main/s1.setup2.php:329
+msgid "mysql40"
+msgstr "mysql40"
+
+#: views/packages/main/s1.setup2.php:308
+msgid "Compatibility Mode:"
+msgstr "Режим на съвместимост:"
+
+#: views/packages/main/s1.setup2.php:306
+msgid "Compatibility Mode"
+msgstr "Режим на съвместимост: "
+
+#: views/packages/main/s1.setup2.php:235
+msgid "Enable Table Filters:"
+msgstr "Разрешаване на филтри за таблици:"
+
+#: template/parts/DashboardWidget/recommended-section.php:45
+msgid "Learn More"
+msgstr "Научете повече"
+
+#: views/packages/details/detail.php:392 views/packages/main/s2.scan3.php:775
+msgid "Extensions"
+msgstr "Добавки"
+
+#: views/packages/details/detail.php:515 views/packages/details/detail.php:519
+#: views/packages/details/detail.php:523
+msgid "- not set -"
+msgstr "- не е зададена стойност -"
+
+#: views/packages/details/detail.php:386 views/packages/details/detail.php:396
+#: views/packages/details/detail.php:405 views/packages/details/detail.php:453
+msgid "- no filters -"
+msgstr "- без филтри -"
+
+#: views/packages/details/detail.php:436 views/packages/main/s2.scan3.php:746
+msgid "MySQL Compatibility Mode Enabled"
+msgstr "Активиран е режим на съвместимост за MySQL"
+
+#: template/parts/filters/package_components.php:130
+#: views/packages/details/detail.php:378 views/packages/details/detail.php:443
+#: views/packages/main/s1.setup2.php:226
+msgid "Filters"
+msgstr "филтри"
+
+#: views/settings/packages.php:260
+msgid "ZipArchive"
+msgstr "ZipArchive"
+
+#: views/packages/details/detail.php:362
+msgid "FILES"
+msgstr "ФАЙЛОВЕ"
+
+#: views/packages/details/detail.php:336 views/packages/main/s1.setup2.php:166
+msgid "Additional Storage:"
+msgstr "Допълнително място за съхранение:"
+
+#: views/packages/details/detail.php:162
+msgid "in-complete"
+msgstr "непълно"
+
+#: views/packages/details/detail.php:162
+msgid "completed"
+msgstr "приключено"
+
+#: views/packages/details/detail.php:366
+msgid "Build Mode"
+msgstr "Режим на изграждане на пакет"
+
+#: views/packages/details/detail.php:114
+msgid "Full Name"
+msgstr "Имена"
+
+#: views/packages/details/detail.php:161
+msgid "Status"
+msgstr "Състояние"
+
+#: classes/class.server.php:402 views/packages/details/detail.php:142
+msgid "PHP"
+msgstr "PHP"
+
+#: views/packages/details/detail.php:146
+msgid "Mysql"
+msgstr "Mysql"
+
+#: views/packages/details/detail.php:139 views/packages/details/detail.php:143
+#: views/packages/details/detail.php:148 views/packages/details/detail.php:149
+#: views/packages/details/detail.php:166
+msgid "- unknown -"
+msgstr "- неизвестно -"
+
+#: views/packages/details/detail.php:158
+msgid "error running"
+msgstr "грешки"
+
+#: views/packages/details/detail.php:157
+msgid "Runtime"
+msgstr "Изпълнение"
+
+#: views/packages/details/detail.php:123
+msgid "- no notes -"
+msgstr "- без бележки -"
+
+#: views/packages/details/detail.php:106
+msgid "ID"
+msgstr "Код"
+
+#: views/packages/details/controller.php:73
+msgid "Transfer"
+msgstr "Прехвърляне"
+
+#: src/Utils/Upsell.php:65
+msgid "Custom Search & Replace"
+msgstr "Потребителско търсене и заместване"
+
+#: views/packages/main/s2.scan3.php:756
+msgid "File Filters"
+msgstr "Филтри за файлове"
+
+#: src/Utils/Upsell.php:35 src/Utils/Upsell.php:64
+msgid "Email Alerts"
+msgstr "Известия по имейл"
+
+#: template/admin_pages/about_us/lite_vs_pro/main.php:48
+msgid "Feature"
+msgstr "Възможност"
+
+#: views/tools/diagnostics/logging.php:199
+#: views/tools/diagnostics/logging.php:204
+msgid "Options"
+msgstr "Опции"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: duplicator.php src/Views/DashboardWidget.php:46
+#: template/mail/email_summary.php:28
+msgid "Duplicator"
+msgstr "Duplicator"
+
+#: views/tools/diagnostics/logging.php:209
+msgid "Auto Refresh"
+msgstr "Автоматично презареждане"
+
+#: views/tools/diagnostics/logging.php:206
+msgid "Refresh"
+msgstr "Презареждане"
+
+#: views/tools/diagnostics/logging.php:173
+msgid "The process that PHP runs under does not have enough permissions to create files.  Please contact your hosting provider for more details"
+msgstr "Процесът, под който работи PHP, няма достатъчно права за създаване на файлове. Свържете се с хостинг доставчика си за повече подробности."
+
+#: views/tools/diagnostics/logging.php:172
+msgid "The snapshots directory does not have the correct permissions to write files.  Try setting the permissions to 755"
+msgstr "Директорията snapshots няма права за запис на файлове. Опитайте да настроите правата на 755"
+
+#: views/tools/diagnostics/logging.php:171
+msgid "The web server does not support returning .log file extentions"
+msgstr "Уеб сървърът не поддържа връщане на файлови разширения .log"
+
+#: views/tools/diagnostics/logging.php:170
+msgid "Reasons for log file not showing"
+msgstr "Причини журналът да не се показва"
+
+#: views/tools/diagnostics/logging.php:168
+msgid "Log file not found or unreadable"
+msgstr "Журналът не е намерен или не може да се прочете"
+
+#: views/tools/diagnostics/inc.phpinfo.php:26
+msgid "PHP Information"
+msgstr "Информация за PHP"
+
+#: classes/class.server.php:456
+msgid "Server Disk"
+msgstr "Диск на сървъра"
+
+#: classes/class.server.php:685
+msgid "Max Allowed Packets"
+msgstr "Максимално разрешени пакети"
+
+#: classes/class.server.php:679
+msgid "Wait Timeout"
+msgstr "Време за изчакване"
+
+#: classes/class.server.php:396 views/packages/details/detail.php:138
+#: views/packages/main/s2.scan2.php:116
+msgid "WordPress"
+msgstr "WordPress"
+
+#: classes/class.server.php:390 views/packages/details/detail.php:92
+#: views/settings/controller.php:30 views/tools/controller.php:24
+msgid "General"
+msgstr "Основен"
+
+#: views/packages/details/detail.php:380 views/packages/details/detail.php:444
+msgid "On"
+msgstr "Включено"
+
+#: classes/class.server.php:628 views/packages/details/detail.php:380
+#: views/packages/details/detail.php:444
+msgid "Off"
+msgstr "Изключено"
+
+#: classes/class.server.php:552 views/packages/main/s2.scan2.php:122
+msgid "WordPress Version"
+msgstr "Версия на WordPress"
+
+#: classes/class.server.php:645 template/admin_pages/settings/misc/misc.php:168
+#: template/parts/DashboardWidget/sections-section.php:51
+#: views/packages/main/s2.scan3.php:46 views/packages/main/s2.scan3.php:416
+#: views/packages/main/s2.scan3.php:757
+msgid "Enabled"
+msgstr "Включено"
+
+#: classes/class.server.php:484
+msgid "Operating System"
+msgstr "Операционна система"
+
+#: classes/class.server.php:557
+msgid "Language"
+msgstr "Език"
+
+#: template/parts/DashboardWidget/sections-section.php:56
+#: views/packages/main/s1.setup2.php:563
+msgid "Next"
+msgstr "Следваща"
+
+#: views/packages/main/s1.setup2.php:562
+msgid "Reset"
+msgstr "Изчистване"
+
+#: classes/class.server.php:637
+msgid "Shell Exec Zip"
+msgstr "Shell Exec Zip"
+
+#: classes/class.server.php:634 classes/class.server.php:639
+msgid "Not Supported"
+msgstr "Не се поддържа"
+
+#: classes/class.server.php:634 classes/class.server.php:639
+msgid "Is Supported"
+msgstr "Поддържа се"
+
+#: classes/class.server.php:604
+msgid "Memory In Use"
+msgstr "Използвана памет"
+
+#: classes/class.server.php:567 classes/class.server.php:598
+msgid "Memory Limit"
+msgstr "Ограничение на паметта"
+
+#: classes/class.server.php:562 classes/class.server.php:674
+#: views/packages/main/s1.setup2.php:512
+msgid "Charset"
+msgstr "Кодова таблица"
+
+#: classes/class.server.php:524
+msgid "Client IP"
+msgstr "IP на клиента"
+
+#: classes/class.server.php:519
+msgid "Server IP"
+msgstr "IP на сървъра"
+
+#: classes/class.server.php:514
+msgid "Loaded PHP INI"
+msgstr "Зареден PHP INI"
+
+#: views/packages/main/s2.scan3.php:11
+msgid "Root Path"
+msgstr "Път към главната директория"
+
+#: classes/class.server.php:504
+msgid "Server Time"
+msgstr "Сървърно време"
+
+#: classes/class.server.php:489
+msgid "Timezone"
+msgstr "Часова зона"
+
+#: classes/class.server.php:479 classes/class.server.php:534
+msgid "Duplicator Version"
+msgstr "Версия на Duplicator"
+
+#: views/tools/diagnostics/inc.settings.php:13
+msgid "Server Settings"
+msgstr "Настройки на сървъра"
+
+#: views/tools/diagnostics/inc.data.php:49
+msgid "Removes all build data from:"
+msgstr "Премахва всички данни за изграждане на пакети от:"
+
+#: views/tools/diagnostics/inc.data.php:46
+msgid "Clear Build Cache"
+msgstr "Изчистване на кеша"
+
+#: views/tools/diagnostics/inc.data.php:26
+msgid "Removes all reserved installer files."
+msgstr "Премахва всички запазени файлове от инсталатора."
+
+#: views/tools/diagnostics/information.php:46
+msgid "Build cache removed."
+msgstr "Премахнат кеш."
+
+#: views/settings/packages.php:226
+msgid "Query Limit Size"
+msgstr "Ограничение за размера на заявката"
+
+#: views/settings/packages.php:318
+msgid "This will attempt to keep a network connection established for large archives."
+msgstr "Тази настройка ще се опитва да поддържа установена мрежова връзка за големи архиви."
+
+#: views/settings/packages.php:314
+msgid "Attempt Network Keep Alive"
+msgstr "Опит за поддържане на жива мрежова връзка"
+
+#: template/admin_pages/settings/misc/misc.php:108
+msgid "Delete Entire Storage Directory"
+msgstr "Изтриване на цялата директория за съхранение"
+
+#: template/admin_pages/settings/misc/misc.php:104
+msgid "Delete Plugin Settings"
+msgstr "Изтриване на настройките на разширението"
+
+#: template/admin_pages/settings/misc/misc.php:100
+msgid "Uninstall"
+msgstr "Деинсталиране"
+
+#: template/admin_pages/settings/misc/misc.php:88
+msgid "Plugin"
+msgstr "Разширение"
+
+#: views/packages/main/s3.build.php:390
+msgid "Build Folder:"
+msgstr "Директория за изграждане:"
+
+#: views/packages/main/s2.scan1.php:452 views/packages/main/s2.scan3.php:65
+#: views/packages/main/s2.scan3.php:77 views/packages/main/s2.scan3.php:621
+#: views/packages/main/s3.build.php:386
+msgid "Notice"
+msgstr "Забележка"
+
+#: views/packages/main/s3.build.php:163
+msgid "Build Status"
+msgstr "Състояние на изграждането"
+
+#: views/packages/main/s2.scan3.php:1129
+msgid "Unable to report on database stats"
+msgstr "Невъзможно предоставяне на отчет за състоянието на базата от данни"
+
+#: views/packages/main/s2.scan3.php:1103
+msgid "Unable to report on any tables"
+msgstr "Невъзможно предоставяне на отчет за никоя таблица"
+
+#: views/packages/main/s2.scan1.php:279
+msgid "Rescan"
+msgstr "Повторно сканиране"
+
+#: views/packages/main/s2.scan1.php:180 views/packages/main/s2.scan1.php:278
+msgid "Back"
+msgstr "Обратно"
+
+#: views/packages/main/s2.scan1.php:170 views/packages/main/s2.scan1.php:234
+#: views/packages/main/s3.build.php:519
+msgid "Error Message:"
+msgstr "Съобщение за грешка:"
+
+#: views/packages/main/s2.scan1.php:231 views/packages/main/s3.build.php:502
+msgid "Server Status:"
+msgstr "Състояние на сървъра:"
+
+#: views/packages/main/s2.scan1.php:168 views/packages/main/s2.scan1.php:229
+msgid "Please try again!"
+msgstr "Опитайте отново!"
+
+#: views/packages/main/s2.scan1.php:228
+msgid "Scan Error"
+msgstr "Грешка при сканиране"
+
+#: views/packages/main/s2.scan1.php:261
+msgid "Scan checks are not required to pass, however they could cause issues on some systems."
+msgstr "Проверките при сканиране не е задължително да минат успешно, но биха могли да причинят проблеми на някои системи."
+
+#: views/packages/main/s2.scan3.php:740
+msgid "Build Mode:"
+msgstr "Режим на изграждане на пакет:"
+
+#: views/packages/main/s2.scan3.php:738
+msgid "Host:"
+msgstr "Хост:"
+
+#: views/packages/main/s2.scan3.php:737
+msgid "Name:"
+msgstr "Име:"
+
+#: views/packages/main/s2.scan3.php:440
+msgid "Records"
+msgstr "Записи"
+
+#: views/packages/details/detail.php:449 views/packages/main/s2.scan3.php:439
+msgid "Tables"
+msgstr "Таблици"
+
+#: views/packages/main/s2.scan3.php:781
+msgid "No file extension filters have been set."
+msgstr "Не са зададени филтри за разширения на файлове."
+
+#: views/packages/main/s2.scan3.php:160
+msgid "Large Files"
+msgstr "Големи файлове"
+
+#: views/packages/main/s2.scan3.php:287 views/packages/main/s2.scan3.php:301
+msgid "Name Checks"
+msgstr "Проверки на имена"
+
+#: views/packages/main/s2.scan3.php:99
+msgid "Directory Count"
+msgstr "Брой директории"
+
+#: views/packages/main/s2.scan3.php:98
+msgid "File Count"
+msgstr "Брой файлове"
+
+#: views/packages/main/s2.scan2.php:127
+msgid "Core Files"
+msgstr "Главни файлове"
+
+#: classes/class.server.php:609
+msgid "Max Execution Time"
+msgstr "Максимално време за изпълнение"
+
+#: views/packages/details/detail.php:437 views/packages/main/s1.setup2.php:314
+#: views/packages/main/s2.scan2.php:64 views/packages/main/s2.scan2.php:75
+#: views/packages/main/s2.scan2.php:81 views/packages/main/s2.scan3.php:747
+msgid "details"
+msgstr "подробности"
+
+#: classes/class.server.php:509 views/packages/main/s2.scan2.php:51
+msgid "Web Server"
+msgstr "Уеб сървър"
+
+#: views/packages/main/s2.scan1.php:243
+msgid "Scan Complete"
+msgstr "Приключено сканиране"
+
+#: views/packages/main/s2.scan1.php:218 views/packages/main/s3.build.php:155
+msgid "Please Wait..."
+msgstr "Почакайте..."
+
+#: views/packages/main/s2.scan1.php:216
+msgid "Scanning Site"
+msgstr "Сканиране на сайта"
+
+#: views/packages/main/s1.setup2.php:473
+msgid "Host Port"
+msgstr "Порт на хоста"
+
+#: classes/class.server.php:529 views/packages/details/detail.php:514
+#: views/packages/main/s1.setup2.php:460
+msgid "Host"
+msgstr "Хост"
+
+#: views/packages/details/detail.php:510 views/packages/main/s1.setup2.php:457
+msgid " MySQL Server"
+msgstr " MySQL сървър"
+
+#: views/packages/main/s1.setup2.php:236
+msgid "Checked tables will not be added to the database script.  Excluding certain tables can possibly cause your site or plugins to not work correctly after install!"
+msgstr "Отбелязаните таблици няма да бъдат добавени към скрипта за базата от данни. Изключването на определени таблици може да попречи на правилната работа на сайта или на някои разширения след инсталацията!"
+
+#: views/packages/main/s1.setup2.php:244
+msgid "Exclude All"
+msgstr "Изключване на всички"
+
+#: views/packages/main/s1.setup2.php:243
+msgid "Include All"
+msgstr "Включване на всички"
+
+#: views/packages/main/s1.setup2.php:233
+msgid "Enable Table Filters"
+msgstr "Включване на филтри за таблици"
+
+#: template/mocks/storage/storage.php:79 views/packages/main/packages.php:93
+msgid "Bulk Actions"
+msgstr "Масови действия"
+
+#: template/mocks/storage/storage.php:109 views/packages/details/detail.php:287
+#: views/packages/details/detail.php:426 views/packages/main/s1.setup2.php:122
+msgid "Type"
+msgstr "Вид"
+
+#: template/mocks/storage/storage.php:84 views/packages/main/packages.php:101
+msgid "Apply"
+msgstr "Прилагане"
+
+#: classes/class.server.php:669 template/admin_pages/settings/misc/misc.php:92
+#: views/packages/details/detail.php:130
+msgid "Version"
+msgstr "Версия"
+
+#: template/mocks/storage/storage.php:119 views/packages/details/detail.php:294
+#: views/packages/main/s1.setup2.php:132
+msgid "Default"
+msgstr "По подразбиране"
+
+#: template/mocks/storage/storage.php:81 views/packages/main/packages.php:96
+msgid "Delete"
+msgstr "Изтриване"
+
+#: classes/class.server.php:583 views/packages/main/s1.setup1.php:112
+#: views/packages/main/s2.scan2.php:56
+msgid "PHP Version"
+msgstr "Версия на PHP"
+
+#: template/parts/filters/package_components.php:145
+msgid "cache"
+msgstr "cache"
+
+#: template/parts/filters/package_components.php:140
+msgid "root path"
+msgstr "root path"
+
+#: views/packages/details/detail.php:382 views/packages/main/s2.scan3.php:764
+#: views/packages/main/s2.scan3.php:829
+msgid "Directories"
+msgstr "Директории"
+
+#: template/parts/filters/package_components.php:82
+#: views/packages/details/detail.php:518 views/packages/main/s1.setup2.php:214
+#: views/packages/main/s1.setup2.php:486 views/packages/main/s2.scan3.php:410
+#: views/packages/main/s2.scan3.php:735 views/settings/packages.php:92
+msgid "Database"
+msgstr "База от данни"
+
+#: views/packages/details/detail.php:169 views/packages/details/detail.php:401
+#: views/packages/main/s1.setup2.php:213 views/packages/main/s2.scan3.php:36
+#: views/packages/main/s2.scan3.php:786 views/packages/main/s2.scan3.php:838
+msgid "Files"
+msgstr "Файлове"
+
+#: views/packages/main/s1.setup2.php:196
+msgid "Database filter enabled"
+msgstr "Разрешен филтър за база от данни"
+
+#: views/packages/main/s1.setup2.php:192
+msgid "File filter enabled"
+msgstr "Разрешен филтър за файлове"
+
+#: template/mocks/storage/storage.php:122 views/packages/details/detail.php:307
+#: views/packages/main/s1.setup2.php:145
+msgid "Local"
+msgstr "Локален"
+
+#: views/packages/main/s1.setup2.php:123
+msgid "Location"
+msgstr "Място"
+
+#: src/Core/Bootstrap.php:306 src/Core/Bootstrap.php:307
+#: template/mocks/storage/storage.php:59 views/packages/details/detail.php:278
+#: views/packages/main/s1.setup2.php:104 views/settings/controller.php:42
+msgid "Storage"
+msgstr "Съхранение"
+
+#: views/packages/main/s1.setup1.php:257
+msgid "Remove Files Now"
+msgstr "Премахване на файловете сега"
+
+#: views/packages/main/s1.setup1.php:239
+msgid "Reserved Files"
+msgstr "Запазени файлове"
+
+#: views/packages/main/s1.setup1.php:219
+#: views/tools/diagnostics/inc.data.php:27
+msgid "more info"
+msgstr "още информация"
+
+#: views/packages/main/s1.setup1.php:208
+msgid "MySQLi Support"
+msgstr "Поддръжка на MySQLi"
+
+#: views/packages/main/s1.setup1.php:204
+msgid "MySQL Version"
+msgstr "Версия на MySQL"
+
+#: views/packages/main/s1.setup1.php:198
+msgid "Server Support"
+msgstr "Поддръжка на сървъра"
+
+#: views/packages/main/s1.setup1.php:164
+msgid "Required Paths"
+msgstr "Изисквани пътища"
+
+#: views/packages/main/s1.setup1.php:140 views/packages/main/s1.setup1.php:145
+#: views/packages/main/s1.setup1.php:150
+msgid "Function"
+msgstr "Функция"
+
+#: views/packages/main/s1.setup1.php:135
+msgid "Safe Mode Off"
+msgstr "Защитеният режим е изключен"
+
+#: views/packages/main/s1.setup1.php:118
+msgid "Zip Archive Enabled"
+msgstr "Активиран Zip архив"
+
+#: views/packages/main/s1.setup1.php:106
+msgid "PHP Support"
+msgstr "Поддръжка на PHP"
+
+#: views/packages/main/s1.setup1.php:100
+msgid "System requirements must pass for the Duplicator to work properly.  Click each link for details."
+msgstr "Duplicator трябва да премине теста за системни изисквания, за да работи правилно. Отворете всяка от връзките за подробности."
+
+#: views/packages/main/s1.setup1.php:91
+msgid "Requirements:"
+msgstr "Изисквания:"
+
+#: views/packages/main/s1.setup1.php:67 views/packages/main/s2.scan1.php:196
+#: views/packages/main/s2.scan1.php:280 views/packages/main/s3.build.php:113
+msgid "Build"
+msgstr "Изграждане"
+
+#: views/packages/main/s1.setup1.php:66 views/packages/main/s2.scan1.php:195
+#: views/packages/main/s3.build.php:112
+msgid "Scan"
+msgstr "Сканиране"
+
+#: views/packages/details/detail.php:474 views/packages/main/s1.setup1.php:65
+#: views/packages/main/s1.setup2.php:401 views/packages/main/s2.scan1.php:194
+#: views/packages/main/s2.scan2.php:10 views/packages/main/s3.build.php:111
+msgid "Setup"
+msgstr "Настройка"
+
+#: views/packages/details/detail.php:554
+msgid "LOG"
+msgstr "LOG"
+
+#: views/packages/details/detail.php:418
+msgid "DATABASE"
+msgstr "DATABASE"
+
+#: views/packages/details/detail.php:242
+msgid "Download Links"
+msgstr "Връзки за изтегляне"
+
+#: views/packages/main/s2.scan3.php:541
+msgid "Total Size"
+msgstr "Общ размер"
+
+#: views/packages/details/detail.php:122 views/packages/main/s1.setup2.php:93
+#: views/packages/main/s2.scan3.php:730
+msgid "Notes"
+msgstr "Бележки"
+
+#: views/packages/details/detail.php:110
+msgid "Hash"
+msgstr "Хеш"
+
+#: classes/class.server.php:593 views/packages/details/detail.php:165
+#: views/packages/details/detail.php:522 views/packages/main/s1.setup2.php:499
+msgid "User"
+msgstr "Потребител"
+
+#: views/packages/main/s3.build.php:186
+msgid "Archive"
+msgstr "Архив"
+
+#: views/packages/details/detail.php:190 views/packages/details/detail.php:223
+#: views/packages/details/detail.php:466 views/packages/main/packages.php:289
+#: views/packages/main/s1.setup2.php:371 views/packages/main/s3.build.php:183
+#: views/settings/packages.php:327
+msgid "Installer"
+msgstr "Инсталатор"
+
+#: template/mocks/storage/storage.php:108 views/packages/details/detail.php:98
+#: views/packages/details/detail.php:286 views/packages/details/detail.php:422
+#: views/packages/main/packages.php:194 views/packages/main/s1.setup2.php:84
+#: views/packages/main/s1.setup2.php:121 views/packages/main/s2.scan3.php:729
+msgid "Name"
+msgstr "Име"
+
+#: views/packages/main/packages.php:193 views/packages/main/s2.scan3.php:97
+#: views/packages/main/s2.scan3.php:438
+msgid "Size"
+msgstr "Размер"
+
+#: views/packages/details/controller.php:70
+msgid "Details"
+msgstr "Подробности"
+
+#: views/packages/details/detail.php:126 views/packages/main/packages.php:192
+msgid "Created"
+msgstr "Създаден"
+
+#: template/parts/DashboardWidget/package-create-section.php:46
+#: views/packages/main/packages.php:142 views/packages/main/s3.build.php:138
+msgid "Create New"
+msgstr "Създаване на нов"
+
+#: views/tools/diagnostics/support.php:74
+msgid "Change Log"
+msgstr "Журнал на промените"
+
+#: views/tools/diagnostics/support.php:71
+msgid "FAQs"
+msgstr "Въпроси"
+
+#: views/tools/diagnostics/support.php:66
+msgid "User Guide"
+msgstr "Ръководство за потребителя"
+
+#: views/tools/diagnostics/support.php:63
+msgid "Quick Start"
+msgstr "Бързо начало"
+
+#: views/tools/diagnostics/support.php:58
+msgid "Choose A Section"
+msgstr "Избор на раздел"
+
+#: views/tools/diagnostics/support.php:54
+msgid "Complete Online Documentation"
+msgstr "Пълна онлайн документация"
+
+#: views/tools/diagnostics/support.php:51
+msgid "Knowledgebase"
+msgstr "База от знания"
+
+#: views/tools/diagnostics/support.php:35
+msgid "Migrating WordPress is a complex process and the logic to make all the magic happen smoothly may not work quickly with every site.  With over 30,000 plugins and a very complex server eco-system some migrations may run into issues.  This is why the Duplicator includes a detailed knowledgebase that can help with many common issues.  Resources to additional support, approved hosting, and alternatives to fit your needs can be found below."
+msgstr "Мигрирането на WordPress е сложен процес и логиката зад магията може да не проработти бързо при всеки сайт. При над 30 хиляди разширения и много сложна екосистема от сървъри някои миграции може да срещнат проблеми. Затова Duplicator съдържа подробна база от знания, която може да помогне при много често срещани случаи. По-долу ще намерите допълнителна поддръжка, одобрен хостинг и алтернативи за вашите нужди."
+
+#: src/Controllers/AboutUsController.php:154 src/Utils/Upsell.php:22
+#: src/Utils/Upsell.php:48 template/admin_pages/welcome/features.php:28
+msgid "Scheduled Backups"
+msgstr "Архиви по график"
+
+#: src/Controllers/AboutUsController.php:137
+msgid "Migration Wizard"
+msgstr "Помощник за миграция"
+
+#: src/Controllers/AboutUsController.php:129
+msgid "Backup Files & Database"
+msgstr "Архив на файловете и базата от данни"
+
+#: views/settings/about-info.php:91
+msgid "Spread the Word"
+msgstr "Разкажете за нас"
+
+#: src/Core/Bootstrap.php:576
+msgid "Manage"
+msgstr "Управление"
+
+#: src/Core/Bootstrap.php:326 src/Core/Bootstrap.php:327
+#: views/tools/controller.php:21
+msgid "Tools"
+msgstr "Инструменти"
+
+#: src/Core/Bootstrap.php:340 src/Core/Bootstrap.php:341
+#: template/admin_pages/settings/general/general.php:91
+#: template/mocks/storage/storage.php:87 views/settings/controller.php:23
+msgid "Settings"
+msgstr "Настройки"
+
+#: views/packages/main/packages.php:105
+msgid "Get Help"
+msgstr "Получаване на помощ"
+
+#: classes/utilities/class.u.php:513
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Нямате права за достъп до тази страница."
