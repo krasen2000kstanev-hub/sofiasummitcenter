@@ -9,12 +9,14 @@ h1 em,h2 em,.section h2 em{color:#092452!important}
 .section-intro>p:last-child,.hero .lede,.card p,.space-card p{color:#49658e!important}
 .button,.btn{background:#2452b8!important;color:#fff!important;border-color:#2452b8!important;font-weight:700}
 .button.secondary,.btn.secondary{background:#fff!important;color:#173b8f!important;border:1px solid #9bb9e8!important}
+.btn-ghost{background:#fff!important;color:#173b8f!important;border:1px solid #9bb9e8!important}
 .event-card,.space-card,.card{background:#fff!important;color:#092452!important;border-color:#d7e4f8!important;box-shadow:0 8px 24px rgba(20,72,145,.1)!important}
 .event-card h3,.event-card p,.event-card a{color:#092452!important}
 .event-card p,.space-card p{color:#49658e!important}
 .stats,.stat{border-color:#cbdcf4!important}
 .stat strong,.card-number{color:#2452b8!important}
 .stat,.stat p,.stat span{color:#49658e!important}
+.fact,.fact .desc,.fact span{color:#49658e!important}
 .feature-band{background:#dceaff!important;color:#092452!important}
 .contact{background:#173b8f!important;color:#fff!important}
 .contact *{color:#fff!important}
