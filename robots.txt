@@ -2,3 +2,11 @@ User-agent: *
 Allow: /
 
 Sitemap: https://sofiasummit.bg/sitemap.xml
+
+# Legacy URLs from the previous site structure
+Disallow: /konferentni-zali
+Disallow: /vremenen-ofis
+Disallow: /obuchenia
+Disallow: /ofisi
+Disallow: /organizirane-na-sabitiya
+Disallow: /sofia-summit-center
