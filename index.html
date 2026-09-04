@@ -162,9 +162,11 @@
   .fact-wide{grid-column:1/-1;text-align:center;border-right:none;padding:34px 20px;font-size:65px;font-weight:600;line-height:1.25;}
   @media(max-width:480px){.fact-wide{font-size:1.6rem;}}
   .gallery-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-  .gallery-item{margin:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .gallery-item{display:block;margin:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);text-decoration:none;color:inherit;transition:transform .15s ease,box-shadow .15s ease}
+  .gallery-item:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(23,27,46,.14)}
   .gallery-item img{display:block;width:100%;height:220px;object-fit:cover}
-  .gallery-item figcaption{padding:14px 16px;color:var(--ink-soft);font-size:.9rem}
+  .gallery-item figcaption{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:14px 16px;color:var(--ink-soft);font-size:.9rem}
+  .gallery-more{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;padding:10px 14px;border-radius:var(--radius);font-weight:700;font-size:.86rem}
   @media(max-width:900px){.gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:560px){.gallery-grid{grid-template-columns:1fr}.gallery-item img{height:210px}}
   @media (max-width:760px){
@@ -461,10 +463,12 @@
         <p>Разгледайте моменти и атмосфера от събитията в Sofia Summit Center.</p>
       </div>
       <div class="gallery-grid">
-        <figure class="gallery-item"><img src="wp-content/uploads/SofiaSummitCenter.jpg" alt="Събитие в Sofia Summit Center"><figcaption>Събития в Sofia Summit Center</figcaption></figure>
-        <figure class="gallery-item"><img src="wp-content/uploads/конферентна-зала-11.jpg" alt="Конферентна зала по време на събитие"><figcaption>Конференции и презентации</figcaption></figure>
-        <figure class="gallery-item"><img src="wp-content/uploads/конферентна-зала-10.jpg" alt="Пространство за събития"><figcaption>Пространство за различни формати</figcaption></figure>
-        <figure class="gallery-item"><img src="wp-content/uploads/заседателна-зала-04.jpg" alt="Зала за срещи и работни разговори"><figcaption>Срещи и работни разговори</figcaption></figure>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/hrsreshha/" target="_blank" rel="noopener"><img src="assets/gallery/event-01.jpg" alt="HR Среща"><figcaption><span>HR Среща</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/snimki/" target="_blank" rel="noopener"><img src="assets/gallery/event-02.jpg" alt="Misia100"><figcaption><span>Misia100</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener"><img src="assets/gallery/event-03.jpg" alt="HR:RushForPractice Sofia S8 Final"><figcaption><span>HR:RushForPractice Sofia S8 Final</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/beyou/" target="_blank" rel="noopener"><img src="assets/gallery/event-04.jpg" alt="Be You"><figcaption><span>Be You</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/sreshtamejdubisnesaimladite/" target="_blank" rel="noopener"><img src="assets/gallery/event-05.jpg" alt="Среща между бизнеса и младите 5.0"><figcaption><span>Среща между бизнеса и младите 5.0</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
+        <a class="gallery-item" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener"><img src="assets/gallery/event-06.jpg" alt="HR:RushForPracticeSofia"><figcaption><span>HR:RushForPracticeSofia</span><span class="gallery-more">Виж повече ↗</span></figcaption></a>
       </div>
     </div>
   </section>
