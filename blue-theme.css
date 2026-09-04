@@ -60,3 +60,20 @@ main > .motion-section:not(.is-visible) .motion-item{opacity:0;transform:transla
 .service .ic{transition:transform .35s cubic-bezier(.2,.7,.2,1),color .25s ease}
 @media(hover:hover){.service:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(20,72,145,.13)!important;border-color:#8fb4eb!important}.service:hover .ic{transform:translateY(-3px) scale(1.08);color:#2452b8}}
 .event-tags span{position:relative;overflow:hidden;transition:transform .22s ease,background-color .22s ease,border-color .22s ease,box-shadow .22s ease}.event-tags span::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.7) 50%,transparent 75%);transform:translateX(-130%);transition:transform .55s ease}.event-tags span:hover{transform:translateY(-3px) scale(1.025);background:#fff;border-color:#78aaff;box-shadow:0 8px 16px rgba(36,82,184,.14)}.event-tags span:hover::after{transform:translateX(130%)}
+.partners-section{background:#e7f0ff!important}
+.partners-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+.partner-card{min-height:170px;padding:24px;background:#fff;border:1px solid #d7e4f8;border-radius:8px;display:grid;place-items:center;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.partner-card img{display:block;max-width:92%;max-height:135px;width:auto;height:auto;object-fit:contain}
+.partner-card-dark{background:#123b86;border-color:#2452b8}
+.partner-card-dark img{max-height:135px}
+.partner-card-dark img[src*="hr-rush"]{transform:scale(2.05)}
+.partner-card img[src*="easycredit"]{transform:scale(1.8)}
+.partner-card img[src*="razvii-se"]{transform:scale(1.55)}
+.partner-card img[src*="your-people"]{transform:scale(1.25)}
+.partner-card img[src*="fund-manager"]{transform:scale(1.15)}
+.partner-card img[src*="kaufland"]{transform:scale(1.15)}
+.partner-card img[src*="olympic"]{transform:scale(1.25)}
+.partner-card img[src*="pleggi-logo"]{transform:scale(1.3)}
+@media(hover:hover){.partner-card:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(20,72,145,.14);border-color:#8fb4eb}}
+@media(max-width:900px){.partners-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.partners-grid{grid-template-columns:1fr}.partner-card{min-height:140px}}
