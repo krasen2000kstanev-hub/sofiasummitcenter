@@ -13,7 +13,7 @@
     var sections=document.querySelectorAll('main > section, footer');
     sections.forEach(function(section,index){
       section.classList.add('motion-section');
-      section.querySelectorAll('.sechead,.hero-photo,.space-card,.event-card,.fact,.event-tags span,.contact-grid > *,.form-wrap').forEach(function(item,i){
+      section.querySelectorAll('.sechead,.hero-photo,.space-card,.event-card,.fact,.event-tags span,.partner-card,.contact-grid > *,.form-wrap').forEach(function(item,i){
         item.classList.add('motion-item');
         item.style.setProperty('--motion-delay',Math.min(i*70,420)+'ms');
       });
