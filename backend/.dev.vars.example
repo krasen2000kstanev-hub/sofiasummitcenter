@@ -1,0 +1,5 @@
+ADMIN_USER=admin
+ADMIN_PASSWORD=change-me
+DSK_WEBHOOK_SECRET=replace-with-dsk-secret
+RESEND_API_KEY=re_xxxxxxxxx
+EMAIL_FROM=Sofia Summit Center <no-reply@sofiasummit.bg>

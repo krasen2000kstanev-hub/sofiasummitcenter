@@ -564,6 +564,8 @@
   .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
   .reveal.in-view{opacity:1;transform:translateY(0);}
   @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+
+.legal-page-link{text-decoration:none;scroll-margin-top:100px}.legal-page-link>span:last-child{color:var(--pink)}
 </style>
 
 <header>
@@ -961,8 +963,8 @@
         <div class="st-col">
           <span class="kicker">Записване</span>
           <h3>Регистрирай данните си</h3>
-          <p class="reg-intro">Попълни формата, за да знаем кой ще присъства, дали имаш промо код и (за VIP) кои master class-ове избираш. Това <strong>не е плащане</strong> — самият билет купуваш отделно, чрез бутоните вдясно, през страницата на Банка ДСК.</p>
-          <form class="reg-form" id="regForm" action="" method="POST" target="_blank" novalidate>
+          <p class="reg-intro">Попълни формата, избери билет и продължи към защитената платежна страница на Банка ДСК. Данните за картата се въвеждат единствено в платформата на ДСК.</p>
+          <form class="reg-form" id="regForm" action="" method="POST" novalidate>
             <div class="reg-grid">
               <label class="reg-field"><span>Име и фамилия*</span>
                 <input type="text" name="fullName" autocomplete="name" required>
@@ -977,12 +979,13 @@
                 <input type="text" name="promoCode" autocomplete="off" placeholder="ако имаш">
               </label>
               <label class="reg-field"><span>Брой участници</span>
-                <select id="attendeeCount" name="attendeesCount">
-                  <option value="1">1 (само аз)</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
+                <input type="number" id="attendeeCount" name="attendeesCount" min="1" max="100" step="1" value="1" inputmode="numeric" required>
+              </label>
+              <label class="reg-field"><span>Тип билет*</span>
+                <select name="ticketType" required>
+                  <option value="standard">Standard</option>
+                  <option value="standard_recording">Standard + запис</option>
+                  <option value="vip">VIP</option>
                 </select>
               </label>
             </div>
@@ -1018,33 +1021,27 @@
             <div class="reg-extra" id="regExtraAttendees" hidden></div>
             <label class="reg-consent">
               <input type="checkbox" name="agreeTerms" required>
-              <span>Съгласен/на съм с <a href="#legal-terms">Общите условия</a> и <a href="#legal-privacy">Политиката за поверителност</a>*</span>
+              <span>Съгласен/на съм с <a href="terms.html">Общите условия</a> и <a href="privacy.html">Политиката за поверителност</a>*</span>
             </label>
             <button class="reg-submit" id="regSubmitBtn" type="submit" aria-disabled="true" disabled>Изпрати данните</button>
-            <p class="reg-note" id="regFormNote">Формата за записване ще бъде активна скоро.</p>
+            <p class="reg-note" id="regFormNote">След изпращане ще бъдеш пренасочен/а към ДСК за плащане.</p>
           </form>
         </div>
         <div class="st-col">
           <span class="kicker">Места</span>
           <h3>Билети</h3>
-          <p class="seats-note">Местата са ограничени до 80 — резервирай своя навреме.</p>
-          <div class="promo-box">
-            <label for="promoApplyInput">Имаш промокод?</label>
-            <div class="promo-apply-row">
-              <input type="text" id="promoApplyInput" autocomplete="off" placeholder="Въведи промокод">
-              <button type="button" id="promoApplyBtn" class="btn btn-ghost">Приложи</button>
-            </div>
-            <p class="promo-apply-note" id="promoApplyNote" hidden></p>
-          </div>
+          <p class="seats-note">Местата са ограничени до 100 — резервирай своя навреме.</p>
+          <div class="promo-box"><p>Промокодът се въвежда във формата и се проверява автоматично преди плащане.</p></div>
           <div class="tix-grid">
             <div class="tix-card">
               <div class="tix-name">Standard</div>
               <div class="tix-price mono" id="priceStandard">89<span class="cur">€</span></div>
               <ul class="tix-list">
+                <li><strong>Подаръци на стойност над 100 € за всеки билет</strong></li>
                 <li>Достъп до всички лекции</li>
                 <li>Практически сесии</li>
                 <li>Видеозапис</li>
-                <li>Networking и подаръци</li>
+                <li>Networking</li>
               </ul>
               <a class="tix-cta" id="buyStandardBtn" href="#" rel="noopener">Купи Standard билет</a>
             </div>
@@ -1052,10 +1049,11 @@
               <div class="tix-name">Standard + запис</div>
               <div class="tix-price mono" id="priceStandardRecording">114<span class="cur">€</span></div>
               <ul class="tix-list">
+                <li><strong>Подаръци на стойност над 100 € за всеки билет</strong></li>
                 <li>Достъп до всички лекции</li>
                 <li>Практически сесии</li>
                 <li>Видеозапис</li>
-                <li>Networking и подаръци</li>
+                <li>Networking</li>
                 <li>Запис от всички мастър класове</li>
               </ul>
               <p class="mc-note">Standard билет + видеозапис от всички мастър класове (+25€) — платено директно тук, без допълнителна стъпка.</p>
@@ -1066,6 +1064,7 @@
               <div class="tix-name">VIP</div>
               <div class="tix-price mono" id="priceVip">129<span class="cur">€</span></div>
               <ul class="tix-list">
+                <li><strong>Подаръци на стойност над 100 € за всеки билет</strong></li>
                 <li>Всичко от Standard</li>
                 <li>Приоритетни места</li>
                 <li>Подземен паркинг</li>
@@ -1082,7 +1081,7 @@
             <div><span class="ic">◆</span>After party</div>
             <div><span class="ic">▶</span>Видеозапис</div>
           </div>
-          <p class="pay-note">Плащането се извършва чрез защитената платежна страница на Банка ДСК. Преди покупка виж <a href="#legal-terms">Общите условия</a>, <a href="#legal-privacy">Политиката за поверителност</a> и <a href="#legal-refund">условията за отказ и прехвърляне</a>.</p>
+          <p class="pay-note">Плащането се извършва чрез защитената платежна страница на Банка ДСК. Преди покупка виж <a href="terms.html">Общите условия</a>, <a href="privacy.html">Политиката за поверителност</a> и <a href="refund.html">условията за отказ и прехвърляне</a>.</p>
         </div>
       </div>
     </div>
@@ -1189,11 +1188,11 @@
         </details>
         <details class="faq-item">
           <summary class="faq-q"><span class="faq-q-text">Мога ли да прехвърля билета си?</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">Да, билет може да бъде прехвърлен на друго лице. Точните стъпки и срокове предстои да бъдат публикувани в <a href="#legal-refund">условията за отказ и прехвърляне</a> — дотогава пиши ни на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
+          <p class="faq-a">Да, билет може да бъде прехвърлен на друго лице. Точните стъпки и срокове предстои да бъдат публикувани в <a href="refund.html">условията за отказ и прехвърляне</a> — дотогава пиши ни на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
         </details>
         <details class="faq-item">
           <summary class="faq-q"><span class="faq-q-text">Каква е политиката за отказ и възстановяване?</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">Пълната политика за отказ, анулиране и възстановяване предстои да бъде публикувана в <a href="#legal-refund">раздела с условия за отказ и прехвърляне</a>, съгласувано с условията на Банка ДСК. При нужда от отказ преди това, свържи се с нас на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
+          <p class="faq-a">Пълната политика за отказ, анулиране и възстановяване предстои да бъде публикувана в <a href="refund.html">раздела с условия за отказ и прехвърляне</a>, съгласувано с условията на Банка ДСК. При нужда от отказ преди това, свържи се с нас на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
         </details>
         <details class="faq-item">
           <summary class="faq-q"><span class="faq-q-text">Ще бъдат ли правени снимки и видеозаписи?</span><span class="faq-icon"></span></summary>
@@ -1225,26 +1224,11 @@
         <h2>Условия и политики</h2>
       </div>
       <div class="faq-list legal-list">
-        <details class="faq-item" id="legal-recording">
-          <summary class="faq-q"><span class="faq-q-text">Уведомление за фото, видео и аудио заснемане</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">По време на NAIL BUSINESS RE:START ще бъде правено професионално фото, видео и аудио заснемане. Материалите могат да бъдат използвани за представяне и популяризиране на събитието и организаторите — включително в социални мрежи и рекламни канали. Индивидуалните интервюта с посетители са доброволни — участието в тях не е задължително. Лекторите предоставят отделни декларации за заснемане. Ако не желаеш да бъдеш заснет/а индивидуално, моля свържи се предварително с организаторите на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
-        </details>
-        <details class="faq-item" id="legal-terms">
-          <summary class="faq-q"><span class="faq-q-text">Общи условия</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">[ЧЕРНОВА — да се допълни от организатора] Тук ще бъдат публикувани пълните общи условия за участие в NAIL BUSINESS RE:START, включително правилата за закупуване на билет чрез платежната страница на Банка ДСК. До публикуването на пълния текст, при въпроси се свържи с нас на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a>.</p>
-        </details>
-        <details class="faq-item" id="legal-privacy">
-          <summary class="faq-q"><span class="faq-q-text">Политика за поверителност</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">[ЧЕРНОВА — да се допълни от организатора] Тук ще бъде публикувана политиката за обработка на лични данни (администратор на данни, правно основание, срокове на съхранение, права на субектите на данни по ОРЗД/GDPR). Плащането за билети се извършва изцяло през защитената страница на Банка ДСК — този сайт не съхранява данни за банкови карти.</p>
-        </details>
-        <details class="faq-item" id="legal-cookies">
-          <summary class="faq-q"><span class="faq-q-text">Политика за бисквитки</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">Този сайт използва само технически необходими бисквитки по подразбиране. Аналитични бисквитки се зареждат единствено след изрично съгласие, което можеш да дадеш или откажеш от банера при първо посещение — изборът е също толкова лесен, колкото приемането. Можеш да промениш решението си по всяко време през линка „Настройки на бисквитките“ в долната част на сайта.</p>
-        </details>
-        <details class="faq-item" id="legal-refund">
-          <summary class="faq-q"><span class="faq-q-text">Отказ, анулиране и прехвърляне на билет</span><span class="faq-icon"></span></summary>
-          <p class="faq-a">[ЧЕРНОВА — да се допълни от организатора] Точните условия за отказ от билет, възстановяване на сума и прехвърляне на билет на друго лице ще бъдат публикувани тук, съгласувано с условията на Банка ДСК. До тогава, при нужда от отказ или прехвърляне, свържи се с нас на <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a> или <a href="tel:+359894202086">+359 89 420 2086</a>.</p>
-        </details>
+        <a class="faq-item faq-q legal-page-link" id="legal-recording" href="recording.html"><span class="faq-q-text">Уведомление за фото, видео и аудио заснемане</span><span aria-hidden="true">→</span></a>
+        <a class="faq-item faq-q legal-page-link" id="legal-terms" href="terms.html"><span class="faq-q-text">Общи условия</span><span aria-hidden="true">→</span></a>
+        <a class="faq-item faq-q legal-page-link" id="legal-privacy" href="privacy.html"><span class="faq-q-text">Политика за поверителност</span><span aria-hidden="true">→</span></a>
+        <a class="faq-item faq-q legal-page-link" id="legal-cookies" href="cookies.html"><span class="faq-q-text">Политика за бисквитки</span><span aria-hidden="true">→</span></a>
+        <a class="faq-item faq-q legal-page-link" id="legal-refund" href="refund.html"><span class="faq-q-text">Отказ, анулиране и прехвърляне на билет</span><span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -1280,11 +1264,11 @@
       <span class="foot-contact">Контакт: <a href="mailto:tsvetelin@pleggi.com">tsvetelin@pleggi.com</a> · <a href="tel:+359894202086">+359 89 420 2086</a></span>
     </div>
     <ul class="foot-legal">
-      <li><a href="#legal-terms">Общи условия</a></li>
-      <li><a href="../../privacy.html">Политика за поверителност</a></li>
-      <li><a href="#legal-cookies">Политика за бисквитки</a></li>
-      <li><a href="#legal-recording">Уведомление за заснемане</a></li>
-      <li><a href="#legal-refund">Отказ и прехвърляне</a></li>
+      <li><a href="terms.html">Общи условия</a></li>
+      <li><a href="privacy.html">Политика за поверителност</a></li>
+      <li><a href="cookies.html">Политика за бисквитки</a></li>
+      <li><a href="recording.html">Уведомление за заснемане</a></li>
+      <li><a href="refund.html">Отказ и прехвърляне</a></li>
       <li><a href="#" id="cookieFooterLink">Настройки на бисквитките</a></li>
     </ul>
     <ul class="foot-social">
@@ -1329,7 +1313,7 @@
 
 <div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Настройки за бисквитки" hidden>
   <div class="cookie-banner-inner">
-    <p>Използваме само технически необходими бисквитки по подразбиране. Аналитични бисквитки се зареждат само с твое съгласие. Виж <a href="#legal-cookies">Политиката за бисквитки</a>.</p>
+    <p>Използваме само технически необходими бисквитки по подразбиране. Аналитични бисквитки се зареждат само с твое съгласие. Виж <a href="cookies.html">Политиката за бисквитки</a>.</p>
     <div class="cookie-actions">
       <button type="button" class="btn btn-ghost" id="cookieSettingsBtn" aria-expanded="false" aria-controls="cookieSettingsPanel">Настройки</button>
       <button type="button" class="btn btn-ghost" id="cookieReject">Отказвам</button>
@@ -1351,6 +1335,7 @@
   // =====================================================================
   var SITE_CONFIG = {
     eventName: 'NAIL BUSINESS RE:START',
+    apiBaseUrl: 'https://api.sofiasummit.bg',
     // ISO 8601 with explicit Europe/Sofia offset. Set to '' if a date is
     // not yet confirmed — the countdown and structured data both hide
     // automatically when this is empty or invalid.
@@ -1689,12 +1674,25 @@
     }
   }, 'cookie-banner');
 
-  // ---------- DSK payment buttons (Bank DSK handles the actual checkout) ----------
+  // ---------- ticket selection (registration creates the DSK payment session) ----------
   safeRun(function(){
-    wirePaymentButton('buyStandardBtn', SITE_CONFIG.dskStandardPaymentUrl, 'select_standard_ticket', 'standard');
-    wirePaymentButton('buyStandardRecordingBtn', SITE_CONFIG.dskStandardRecordingPaymentUrl, 'select_standard_recording_ticket', 'standard_recording');
-    wirePaymentButton('buyVipBtn', SITE_CONFIG.dskVipPaymentUrl, 'select_vip_ticket', 'vip');
-  }, 'dsk-payment-buttons');
+    var select = document.querySelector('[name="ticketType"]');
+    var form = document.getElementById('regForm');
+    if (!select || !form) return;
+    var ticketMap = { buyStandardBtn: 'standard', buyStandardRecordingBtn: 'standard_recording', buyVipBtn: 'vip' };
+    Object.keys(ticketMap).forEach(function(id){
+      var button = document.getElementById(id);
+      if (!button) return;
+      button.removeAttribute('href');
+      button.textContent = 'Избери билет';
+      button.addEventListener('click', function(e){
+        e.preventDefault();
+        select.value = ticketMap[id];
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        select.focus({ preventScroll: true });
+      });
+    });
+  }, 'ticket-selection');
 
   // ---------- promo codes: live price preview + optional discounted payment link ----------
   // A code only ever changes what a "Купи ..." button DOES if the organizer
@@ -1778,11 +1776,8 @@
   }, 'promo-codes');
 
   // ---------- registration (attendee info) form ----------
-  // This form is NOT a payment/checkout: it only forwards name/email/phone/
-  // promo code/master class choice/attendee count to an external form
-  // service (Formspree, Google Forms, ...) chosen and owned by the
-  // organizer. This file never receives or stores that data itself — there
-  // is no server here to store it on. See README.md for setup.
+  // Registration is sent to the event API. The API creates a pending order,
+  // validates capacity and promo codes, then returns the configured DSK link.
   safeRun(function initRegistrationForm(){
     var form = document.getElementById('regForm');
     var submitBtn = document.getElementById('regSubmitBtn');
@@ -1791,18 +1786,41 @@
     var extraWrap = document.getElementById('regExtraAttendees');
     if (!form || !submitBtn) return;
 
-    if (isSafeHttpsUrl(SITE_CONFIG.registrationFormAction)) {
-      form.action = SITE_CONFIG.registrationFormAction;
+    if (isSafeHttpsUrl(SITE_CONFIG.apiBaseUrl)) {
       submitBtn.removeAttribute('aria-disabled');
       submitBtn.disabled = false;
-      if (note) note.hidden = true;
-      form.addEventListener('submit', function(){
-        trackEvent('submit_registration_form', {});
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        if (!countSelect.reportValidity()) return;
+        renderExtraAttendees(countSelect.value);
+        submitBtn.disabled = true;
+        if (note) { note.hidden = false; note.textContent = 'Обработваме регистрацията…'; }
+        var fd = new FormData(form);
+        var attendeesCount = Number(fd.get('attendeesCount') || 1);
+        var attendees = [{ fullName: fd.get('fullName'), email: fd.get('email'), phone: fd.get('phone') }];
+        for (var i = 2; i <= attendeesCount; i++) attendees.push({ fullName: fd.get('attendee' + i + 'Name'), email: fd.get('attendee' + i + 'Email'), phone: fd.get('attendee' + i + 'Phone') });
+        var payload = {
+          eventSlug: 'nail-business-restart', ticketType: fd.get('ticketType'), fullName: fd.get('fullName'),
+          email: fd.get('email'), phone: fd.get('phone'), promoCode: fd.get('promoCode'),
+          attendeesCount: attendeesCount, attendees: attendees, masterClasses: fd.getAll('masterClass'), agreeTerms: fd.get('agreeTerms') === 'on'
+        };
+        try {
+          var response = await fetch(SITE_CONFIG.apiBaseUrl + '/api/orders', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+          var result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Неуспешна регистрация.');
+          trackEvent('submit_registration_form', { orderId: result.orderId, ticket: payload.ticketType });
+          if (result.paymentUrl) {
+            window.location.href = result.paymentUrl;
+          } else {
+            if (note) note.textContent = 'Регистрацията е запазена, но плащането още не е активирано.';
+            submitBtn.disabled = false;
+          }
+        } catch (error) {
+          if (note) note.textContent = error.message || 'Възникна грешка. Моля, опитайте отново.';
+          submitBtn.disabled = false;
+        }
       });
     } else {
-      // No valid external form configured yet: keep the button disabled and
-      // never let the form submit anywhere (matches the "never point to a
-      // blank/invalid destination" rule used for the DSK ticket buttons).
       submitBtn.setAttribute('aria-disabled', 'true');
       submitBtn.disabled = true;
       if (note) { note.hidden = false; note.textContent = 'Формата за записване ще бъде активна скоро.'; }
@@ -1811,11 +1829,12 @@
 
     function renderExtraAttendees(count){
       if (!extraWrap) return;
-      extraWrap.innerHTML = '';
-      var n = Math.max(1, Math.min(5, parseInt(count, 10) || 1));
+      var n = Number(count);
+      if (!Number.isInteger(n) || n < 1 || n > 100) return;
+      while (extraWrap.children.length > n - 1) extraWrap.lastElementChild.remove();
       if (n <= 1) { extraWrap.hidden = true; return; }
       extraWrap.hidden = false;
-      for (var i = 2; i <= n; i++) {
+      for (var i = extraWrap.children.length + 2; i <= n; i++) {
         var block = document.createElement('div');
         block.className = 'reg-attendee-block';
         block.innerHTML =
@@ -1829,7 +1848,8 @@
       }
     }
     if (countSelect) {
-      countSelect.addEventListener('change', function(e){ renderExtraAttendees(e.target.value); });
+      countSelect.addEventListener('input', function(e){ renderExtraAttendees(e.target.value); });
+      renderExtraAttendees(countSelect.value);
     }
   }, 'registration-form');
 
@@ -1926,17 +1946,6 @@
       (document.head || document.body).appendChild(ldScript);
     }
   }, 'json-ld');
-
-  // ---------- legal accordion deep-links from the footer ----------
-  safeRun(function(){
-    document.querySelectorAll('a[href^="#legal-"]').forEach(function(a){
-      a.addEventListener('click', function(){
-        var id = a.getAttribute('href').slice(1);
-        var details = document.getElementById(id);
-        if (details && details.tagName === 'DETAILS') details.open = true;
-      });
-    });
-  }, 'legal-deep-links');
 
   // ---------- scroll reveal ----------
   safeRun(function(){

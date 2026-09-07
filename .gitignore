@@ -8,3 +8,10 @@ cgi-bin/
 *.sql
 wp-config.php
 wp-content/wflogs/
+
+# Event API schema is source; local credentials are not.
+!backend/schema.sql
+backend/.dev.vars
+backend/.env
+backend/.env.*
+backend/.wrangler/
