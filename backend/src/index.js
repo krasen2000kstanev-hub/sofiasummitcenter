@@ -86,7 +86,7 @@ async function createOrder(request, env) {
   const email = clean(body.email, 160).toLowerCase();
   const phone = clean(body.phone, 40);
   const count = Number(body.attendeesCount ?? ((body.attendees || []).length || 1));
-  if (!Number.isInteger(count) || count < 1 || count > 10000) return json({ error: 'Въведете валиден цял брой участници.' }, 400, headers);
+  if (!Number.isInteger(count) || count < 1 || count > 100) return json({ error: 'Въведете валиден цял брой участници.' }, 400, headers);
   if (!name || !email.includes('@') || !phone || body.agreeTerms !== true) return json({ error: 'Моля, попълнете задължителните полета и приемете условията.' }, 400, headers);
 
   const event = await env.DB.prepare('SELECT * FROM events WHERE slug = ? AND status = ?').bind(eventSlug, 'active').first();
