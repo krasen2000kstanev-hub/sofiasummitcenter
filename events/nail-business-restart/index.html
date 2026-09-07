@@ -1865,6 +1865,20 @@
     }
   }, 'registration-form');
 
+  safeRun(function initLegalPageLinks(){
+    var pages = { 'legal-terms':'terms.html', 'legal-privacy':'privacy.html', 'legal-cookies':'cookies.html' };
+    Object.keys(pages).forEach(function(id){
+      var item = document.getElementById(id);
+      if (!item) return;
+      var summary = item.querySelector('summary');
+      if (!summary) return;
+      summary.addEventListener('click', function(e){
+        e.preventDefault();
+        window.open(pages[id], '_blank', 'noopener');
+      });
+    });
+  }, 'legal-page-links');
+
   safeRun(function(){
     if (ticketsSection && 'IntersectionObserver' in window) {
       var ticketsSeen = false;
