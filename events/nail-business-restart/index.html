@@ -375,6 +375,7 @@
   .tix-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
   .tix-list li{display:flex;align-items:baseline;gap:9px;font-size:.86rem;color:var(--muted);}
   .tix-list li::before{content:"✓";color:var(--pink);font-weight:700;}
+  .tix-list li.gift-perk{order:-1;color:var(--pink);font-weight:800;text-transform:uppercase;}
   .tix-cta{
     margin-top:auto;text-align:center;padding:13px;border-radius:3px;font-weight:700;
     font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;
@@ -1049,7 +1050,7 @@
                 <li>Практически сесии</li>
                 <li>Видеозапис</li>
                 <li>Networking и подаръци</li>
-                <li>Подаръчен пакет на стойност 100€</li>
+                <li class="gift-perk">Подаръчен пакет на стойност 100€</li>
               </ul>
               <a class="tix-cta" id="buyStandardBtn" href="#" rel="noopener">Купи Standard билет</a>
             </div>
@@ -1062,7 +1063,7 @@
                 <li>Видеозапис</li>
                 <li>Networking и подаръци</li>
                 <li>Запис от всички мастър класове</li>
-                <li>Подаръчен пакет на стойност 100€</li>
+                <li class="gift-perk">Подаръчен пакет на стойност 100€</li>
               </ul>
               <p class="mc-note">Standard билет + видеозапис от всички мастър класове (+25€) — платено директно тук, без допълнителна стъпка.</p>
               <a class="tix-cta" id="buyStandardRecordingBtn" href="#" rel="noopener">Купи Standard + запис</a>
@@ -1078,7 +1079,7 @@
                 <li>After party с лекторите</li>
                 <li>Master class по избор</li>
                 <li>Видеозапис от събитието</li>
-                <li>Подаръчен пакет на стойност 100€</li>
+                <li class="gift-perk">Подаръчен пакет на стойност 100€</li>
               </ul>
               <p class="mc-note">Своя master class посочваш след покупката — организаторите ще се свържат с теб за потвърждение.</p>
               <a class="tix-cta" id="buyVipBtn" href="#" rel="noopener">Купи VIP билет</a>
