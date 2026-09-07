@@ -1,35 +1,49 @@
-# Sofia Summit Center
+# NAIL BUSINESS RE:START
 
-Website source for Sofia Summit Center, a meeting and event venue in Studentski grad, Sofia. The public-facing content is primarily in Bulgarian.
+Статична страница за събитието на Sofia Summit Center.
 
-## What is included
+## Публикувана версия
 
-- A responsive static landing page in [`index.html`](index.html), styled by [`styles.css`](styles.css) and enhanced with [`script.js`](script.js).
-- Venue sections for conference rooms, temporary offices, events and meetings, services, venue information and contact details.
-- Local image assets and downloadable venue materials under `wp-content/uploads/`.
-- A WordPress installation with the custom `SofiaSummit` theme in `wp-content/themes/sofiasummit/`.
-- WordPress templates for the home page, services, halls, events, news, team, partners, contact and privacy policy pages.
-- Installed WordPress plugins, including Advanced Custom Fields, Contact Form 7, Cookie Notice, Jetpack Boost, Yoast SEO and WP Super Cache.
+- Събитие: https://sofiasummit.bg/events/nail-business-restart/
+- GitHub repository: https://github.com/krasen2000kstanev-hub/sofiasummitcenter
+- Публикуване: GitHub Pages, branch `main`
 
-## Running the static page locally
+## Файлова структура
 
-The static page has no build step or package installation. Serve the repository directory with any local web server, then open the local address in a browser. Opening `index.html` directly also works for basic inspection, but a local server is recommended so asset paths behave like production.
+- `index.html` — локален preview на event страницата.
+- `events/nail-business-restart/index.html` — публикуваният event front-end.
+- `events/nail-business-restart/terms.html` — общи условия.
+- `events/nail-business-restart/privacy.html` — политика за поверителност.
+- `events/nail-business-restart/cookies.html` — политика за бисквитки.
+- `events/nail-business-restart/recording.html` — уведомление за заснемане.
+- `events/nail-business-restart/refund.html` — отказ, анулиране и прехвърляне.
 
-## WordPress deployment
+Юридическите страници използват общ формат: тъмен header, лого, бял content card и връщане към секцията `#legal`.
 
-For the CMS-backed site, deploy the WordPress files to a PHP-enabled host, configure the database and `wp-config.php`, and activate the `SofiaSummit` theme from the WordPress admin area. The theme requires PHP 5.6 or newer according to its metadata; use a currently supported PHP version in production when the hosting environment allows it.
+## Регистрационна форма
 
-The repository intentionally excludes sensitive or environment-specific files such as `wp-config.php`, SQL exports, WordPress core administration directories, and hosting backup archives. Do not commit passwords, API keys or access tokens.
+Формата събира име, имейл, телефон, промокод, тип билет, брой участници и допълнителните имена/имейли/телефони. Данните се изпращат към AWS API:
 
-## Repository notes
+`https://xbig7zbeqh.execute-api.eu-central-1.amazonaws.com`
 
-- `.nojekyll` is present for static hosting scenarios such as GitHub Pages.
-- The root `index.html` is the lightweight static presentation site; the WordPress files provide the CMS implementation and content-management workflow.
-- Uploaded media includes venue photography, logos, service imagery and the Sofia Summit Center digital presentation PDF.
+Изборът на master class е активен за `Standard + запис` и `VIP`, но е деактивиран за `Standard`. Броят участници е цяло число от 1 до 100.
 
-## Contact
+## Билети
 
-Sofia Summit Center
-ул. „8-ми декември“ 13, София
-+359 894 202 086
-tsvetelin@pleggi.com
+Има три варианта: Standard — 89 EUR, Standard + запис — 114 EUR и VIP — 129 EUR.
+
+Подаръчният пакет на стойност 100 EUR е показан най-отгоре във всеки билет. DSK payment URL адресите още трябва да бъдат добавени в `SITE_CONFIG`, когато бъдат предоставени от Банка ДСК. До тогава бутоните за плащане остават безопасно неактивни.
+
+Промокодовете се добавят в `SITE_CONFIG.promoCodes`. За всяка намалена цена е нужен съответен реален DSK payment URL.
+
+## Локален preview
+
+Стартирай локален статичен сървър от директорията на проекта и отвори:
+
+`http://127.0.0.1:8765/events/nail-business-restart/`
+
+## Публикуване
+
+Публикуваното repository е локалното `.publish-repo`. След промени копирай актуалните файлове в `.publish-repo/events/nail-business-restart/`, направи commit, изпрати го в `origin main` и провери live страницата.
+
+Не записвай AWS ключове, GitHub токени или други секрети в repository-то.
