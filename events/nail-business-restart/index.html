@@ -1866,7 +1866,7 @@
       }
     }
     function updateMasterClasses(){
-      var enabled = ticketType && ticketType.value === 'vip';
+      var enabled = ticketType && (ticketType.value === 'vip' || ticketType.value === 'standard_recording');
       masterInputs.forEach(function(input){
         input.disabled = !enabled;
         if (!enabled) input.checked = false;
