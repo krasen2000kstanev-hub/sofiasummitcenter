@@ -978,17 +978,7 @@
                 <input type="text" name="promoCode" autocomplete="off" placeholder="ако имаш">
               </label>
               <label class="reg-field"><span>Брой участници</span>
-                <select id="attendeeCount" name="attendeesCount">
-                  <option value="1">1 (само аз)</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100 (максимум)</option>
-                </select>
+                <input id="attendeeCount" name="attendeesCount" type="number" min="1" max="100" step="1" value="1" inputmode="numeric" required>
               </label>
             </div>
             <div class="reg-mc-group">
@@ -1867,7 +1857,11 @@
       }
     }
     if (countSelect) {
-      countSelect.addEventListener('change', function(e){ renderExtraAttendees(e.target.value); });
+      countSelect.addEventListener('input', function(e){
+        var value = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+        e.target.value = value;
+        renderExtraAttendees(value);
+      });
     }
   }, 'registration-form');
 
