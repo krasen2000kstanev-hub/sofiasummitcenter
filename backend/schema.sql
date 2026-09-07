@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS orders (
   buyer_name TEXT NOT NULL,
   buyer_email TEXT NOT NULL,
   buyer_phone TEXT NOT NULL,
-  attendee_count INTEGER NOT NULL CHECK (attendee_count BETWEEN 1 AND 5),
+  attendee_count INTEGER NOT NULL CHECK (attendee_count BETWEEN 1 AND 100),
   promo_code TEXT,
   amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL DEFAULT 'EUR',

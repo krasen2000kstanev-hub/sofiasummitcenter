@@ -22,9 +22,9 @@
 
 ## Регистрационна форма
 
-Формата събира име, имейл, телефон, промокод, тип билет, брой участници и допълнителните имена/имейли/телефони. Данните се изпращат към AWS API:
+Формата събира име, имейл, телефон, промокод, тип билет, брой участници и допълнителните имена/имейли/телефони. Backend кодът е Cloudflare Worker + D1. Старият AWS endpoint, записан във front-end-а, в момента връща 404.
 
-`https://xbig7zbeqh.execute-api.eu-central-1.amazonaws.com`
+Преди production тест трябва да се зададе реалният deployed Worker URL в `registrationApiUrl` и реален D1 `database_id` в `backend/wrangler.toml`.
 
 Изборът на master class е активен за `Standard + запис` и `VIP`, но е деактивиран за `Standard`. Броят участници е цяло число от 1 до 100.
 
