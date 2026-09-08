@@ -25,3 +25,13 @@
 - В `index.html` има отделни секции `#podcasts`, `#productions` и `#initiatives`; `#services` сочи към съществуващата секция за услуги. Навигацията е responsive: широкият изглед е на един ред, а под 1180px се показва хамбургер меню.
 - В `#featured-events` е добавена карта за „Кариерно кафе“ с дата 21 ноември 2026, връзка към `events/career-cafe/` и минивизуализацията `assets/event-photos/career-cafe-card.svg`, стилизирана по дизайна на събитието.
 - Последното качване на функционалните промени е commit `56ba54a` (`feat: add Career Cafe event card`). Документацията се актуализира с текущата структура и responsive поведението.
+
+## Homepage collaboration sections — 8 септември 2026 г.
+
+- `#podcasts`, `#productions` и `#initiatives` са отделни responsive секции с меню навигация.
+- Podcast картите са за Misia 100, „Забавни истории от бизнеса“ и EasyCreditTeam и отварят съответните YouTube канали.
+- „Общи продукции“ съдържа „Забавни истории от бизнеса“ и RushForPractice; последната карта използва предоставения локален asset `assets/rush-for-practice.png`.
+- Новите карти са включени в общия pointer-aware tilt ефект, hover/focus подсветката и reduced-motion защитата.
+- „Инициативи, които правим“ съдържа Startup Fairs Bulgaria с логото от публичния сайт на инициативата.
+- Preview: `http://127.0.0.1:8765/?preview-rosa-layout=1#productions`.
+- Текущият пакет включва локалните промени в `index.html`, документацията и `assets/rush-for-practice.png`; следва commit и push към `main`.
