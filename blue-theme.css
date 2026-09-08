@@ -81,3 +81,10 @@ main > .motion-section:not(.is-visible) .motion-item{opacity:0;transform:transla
 /* Keep the reveal animation and the pointer tilt effect from cancelling each other. */
 .motion-section.is-visible .motion-item.tilt-surface{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateZ(0)!important;transform-style:preserve-3d}
 @media(prefers-reduced-motion:reduce){.motion-section.is-visible .motion-item.tilt-surface{transform:none!important}}
+
+/* Keep the ambient background visible through every page section. */
+body{background:transparent!important}
+main>section{background-color:rgba(234,242,255,.78)!important}
+main>section.proof,main>section.partners-section{background-color:rgba(220,233,255,.78)!important}
+main>section.gallery-orbit{background-color:rgba(234,242,255,.68)!important}
+footer{background-color:rgba(18,59,134,.92)!important}
