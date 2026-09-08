@@ -204,6 +204,10 @@
   .sechead{max-width:640px;margin-bottom:48px;}
   .sechead h2{font-size:clamp(1.6rem,3vw,2.15rem);}
   .sechead p{color:var(--ink-soft);font-size:1.04rem;margin:0;}
+  .main-text-reveal{opacity:1;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);transform:none;transition:clip-path 1.1s cubic-bezier(.22,.61,.36,1),-webkit-clip-path 1.1s cubic-bezier(.22,.61,.36,1)}
+  .main-text-reveal.is-visible{clip-path:inset(0);-webkit-clip-path:inset(0)}
+  @supports not (clip-path:inset(0 100% 0 0)){.main-text-reveal{clip-path:none;-webkit-clip-path:none}}
+  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}}
 
   /* spaces */
   .spaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -713,6 +717,27 @@
   var backToTop = document.getElementById('back-to-top');
   window.addEventListener('scroll',function(){backToTop.classList.toggle('visible',window.scrollY>500)},{passive:true});
   backToTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+
+  (function(){
+    var headings = document.querySelectorAll('h1, .sechead h2, .gallery-orbit-copy h3');
+    if (!headings.length) return;
+    var supportsClipPath = window.CSS && CSS.supports && (CSS.supports('clip-path', 'inset(0px 0px 0px 0px)') || CSS.supports('-webkit-clip-path', 'inset(0px 0px 0px 0px)'));
+    if (!supportsClipPath) return;
+    headings.forEach(function(heading){
+      heading.classList.add('main-text-reveal');
+    });
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !('IntersectionObserver' in window)) {
+      headings.forEach(function(heading){ heading.classList.remove('main-text-reveal'); });
+      return;
+    }
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        entry.target.classList.toggle('is-visible', entry.isIntersecting);
+      });
+    }, {threshold:0, rootMargin:'0px 0px -15% 0px'});
+    headings.forEach(function(heading){ observer.observe(heading); });
+  }());
 
   var navtoggle = document.getElementById('navtoggle');
   var navlinks = document.getElementById('navlinks');
