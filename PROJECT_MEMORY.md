@@ -21,3 +21,4 @@
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.
 - Последният GitHub commit е `be49cc4` (`fix registration API payload and endpoint`).
 - Подготвен е лек pointer-aware 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. Hover/focus върху контролите добавя дискретен контур по ръба, а `prefers-reduced-motion` изключва анимацията.
+- Към актуалния `main` са добавени и останалите визуални ефекти от локалния preview: интерактивна 3D сфера в галерията с drag/scroll управление и momentum, движещ се фон от снимки с линии, карта на София със Sofia Summit Center маркер и бутон за връщане в началото.
