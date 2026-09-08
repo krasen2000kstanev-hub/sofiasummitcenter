@@ -763,10 +763,11 @@
   @media(prefers-reduced-motion:reduce){.service.tilt-surface,.service.tilt-surface:hover{transform:none!important;transition:none!important}}
   /* Combine the gallery introduction into one readable block beside the sphere. */
   .gallery-orbit>.wrap>.sechead{display:none!important}
-  .gallery-orbit-copy{left:0;top:50%;width:320px;transform:translateY(-50%);text-align:left}
+  .gallery-orbit-copy{left:-72px;top:50%;width:250px;transform:translateY(-50%);text-align:left}
+  .gallery-orbit-sphere{margin-left:300px}
   .gallery-orbit-copy::before{content:"ГАЛЕРИЯ\A Снимки от предходни събития.\A\A Разгледайте моменти и атмосфера от събитията в Sofia Summit Center.";display:block;white-space:pre-line;color:var(--ink-soft);font-size:1rem;line-height:1.55;margin-bottom:28px}
   .gallery-orbit-copy::before:first-line{color:var(--accent);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
   .gallery-orbit-copy h3{margin-top:0}
-  @media(max-width:900px){.gallery-orbit-copy{left:24px;right:24px;top:auto;bottom:7vh;width:auto;text-align:center;transform:none}.gallery-orbit-copy::before{font-size:.95rem}}
+  @media(max-width:900px){.gallery-orbit-copy{left:24px;right:24px;top:auto;bottom:7vh;width:auto;text-align:center;transform:none}.gallery-orbit-sphere{margin-left:0}.gallery-orbit-copy::before{font-size:.95rem}}
 </style>
 </body></html>
