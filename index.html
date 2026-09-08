@@ -699,7 +699,7 @@
 
   (function(){
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var surfaces = document.querySelectorAll('.space-card, .service, .event-card, .partner-card, .form-wrap, .about-photos img, .gallery-item, .btn, button, .event-tags span');
+    var surfaces = document.querySelectorAll('.hero-photo, .space-card, .service, .event-card, .fact, .partner-card, .form-wrap, .about-photos img, .mapcard, .faq-item, .gallery-item, .btn, button, .event-tags span');
     surfaces.forEach(function(surface){
       surface.classList.add('tilt-surface');
       if (surface.matches('.btn, button, .event-tags span')) surface.classList.add('tilt-control');
