@@ -22,9 +22,11 @@
 
 ## Регистрационна форма
 
-Формата събира име, имейл, телефон, промокод, тип билет, брой участници и допълнителните имена/имейли/телефони. Backend кодът е Cloudflare Worker + D1. Старият AWS endpoint, записан във front-end-а, в момента връща 404.
+Формата събира име, имейл, телефон, промокод, тип билет, брой участници и допълнителните имена/имейли/телефони. Backend кодът е Cloudflare Worker + D1.
 
-Преди production тест трябва да се зададе реалният deployed Worker URL в `registrationApiUrl` и реален D1 `database_id` в `backend/wrangler.toml`.
+Live API: `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. D1 базата е `sofiasummit-events` с binding `DB`; идентификаторът е записан в `backend/wrangler.toml`.
+
+Frontend-ът изпраща регистрациите към `/api/orders`, включително `agreeTerms`, `masterClasses` и данните за всички участници.
 
 Изборът на master class е активен за `Standard + запис` и `VIP`, но е деактивиран за `Standard`. Броят участници е цяло число от 1 до 100.
 
@@ -35,6 +37,12 @@
 Подаръчният пакет на стойност 100 EUR е показан най-отгоре във всеки билет. DSK payment URL адресите още трябва да бъдат добавени в `SITE_CONFIG`, когато бъдат предоставени от Банка ДСК. До тогава бутоните за плащане остават безопасно неактивни.
 
 Промокодовете се добавят в `SITE_CONFIG.promoCodes`. За всяка намалена цена е нужен съответен реален DSK payment URL.
+
+## Backend статус
+
+- Работи: health endpoint, event data, регистрация, капацитет до 100 места, записване на допълнителни участници и промо кодове в D1.
+- Не е завършено: DSK плащане/webhook, автоматични имейли, ticket URL след плащане и admin export.
+- Имейлите изискват Resend API key; DSK изисква payment links и webhook формат от банката.
 
 ## Локален preview
 
