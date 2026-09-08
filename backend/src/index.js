@@ -38,7 +38,7 @@ async function readBody(request) {
   const form = await request.formData();
   const attendeesCount = Number(form.get('attendeesCount') ?? 1);
   const attendees = [{ fullName: form.get('fullName'), email: form.get('email'), phone: form.get('phone') }];
-  for (let i = 2; Number.isInteger(attendeesCount) && attendeesCount <= 10000 && i <= attendeesCount; i++) attendees.push({
+  for (let i = 2; Number.isInteger(attendeesCount) && attendeesCount <= 100 && i <= attendeesCount; i++) attendees.push({
     fullName: form.get(`attendee${i}Name`), email: form.get(`attendee${i}Email`), phone: form.get(`attendee${i}Phone`)
   });
   return {

@@ -1809,18 +1809,19 @@
         submitBtn.disabled = true;
         if (note) { note.hidden = false; note.textContent = 'Изпращане…'; }
         var data = Object.fromEntries(new FormData(form).entries());
-        data.masterClass = Array.from(form.querySelectorAll('input[name="masterClass"]:checked')).map(function(input){ return input.value; });
+        data.masterClasses = Array.from(form.querySelectorAll('input[name="masterClass"]:checked')).map(function(input){ return input.value; });
+        data.agreeTerms = form.querySelector('input[name="agreeTerms"]:checked') !== null;
         data.attendees = [];
       var count = Math.max(1, Math.min(100, parseInt(data.attendeesCount, 10) || 1));
         for (var i = 1; i <= count; i++) {
           data.attendees.push({
-            name: i === 1 ? data.fullName : data['attendee' + i + 'Name'] || '',
+            fullName: i === 1 ? data.fullName : data['attendee' + i + 'Name'] || '',
             email: i === 1 ? data.email : data['attendee' + i + 'Email'] || '',
             phone: i === 1 ? data.phone : data['attendee' + i + 'Phone'] || ''
           });
         }
         try {
-          var response = await fetch(SITE_CONFIG.registrationApiUrl, {
+          var response = await fetch(SITE_CONFIG.registrationApiUrl + '/api/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
