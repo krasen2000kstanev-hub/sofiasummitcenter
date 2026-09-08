@@ -138,23 +138,24 @@
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;max-width:1120px;margin:0 auto;gap:24px;}
-  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);white-space:nowrap;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;max-width:1600px;margin:0 auto;gap:18px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);white-space:nowrap;flex-shrink:0;}
   .brand img{height:42px;width:auto;}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .brand img{filter:invert(1);}}
   :root[data-theme="dark"] .brand img{filter:invert(1);}
   .brand-word{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.98rem;line-height:1.1;}
   .brand-word b{display:block;color:var(--gold);font-weight:800;}
-  .navlinks{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:.92rem;font-weight:500;}
-  .navlinks a{text-decoration:none;color:var(--ink-soft);border-bottom:2px solid transparent;padding-bottom:4px;transition:color .15s, border-color .15s;}
+  .navlinks{display:flex;flex:1;justify-content:center;gap:18px;list-style:none;margin:0;padding:0;font-size:.88rem;font-weight:500;min-width:0;}
+  .navlinks a{text-decoration:none;color:var(--ink-soft);border-bottom:2px solid transparent;padding-bottom:4px;transition:color .15s, border-color .15s;white-space:nowrap;}
   .navlinks a:hover{color:var(--ink);border-color:var(--gold);}
-  .nav-cta{display:flex;align-items:center;gap:14px;}
+  .nav-cta{display:flex;align-items:center;gap:14px;flex-shrink:0;}
   .nav-phone{font-size:.88rem;font-weight:600;color:var(--ink-soft);text-decoration:none;display:none;}
   .navtoggle{display:none;background:none;border:1px solid var(--line);border-radius:var(--radius);width:40px;height:40px;cursor:pointer;color:var(--ink);}
   @media (min-width:860px){.nav-phone{display:inline;}}
-  @media (max-width:900px){
+  @media (max-width:1180px){
     .navlinks{position:fixed;top:65px;left:0;right:0;background:var(--surface);flex-direction:column;padding:18px 24px;gap:14px;border-bottom:1px solid var(--line);display:none;}
     .navlinks.open{display:flex;}
+    .nav-phone{display:none;}
     .navtoggle{display:inline-flex;align-items:center;justify-content:center;}
   }
 
@@ -479,7 +480,7 @@
         <span>Livestream събития</span>
       </div>
     </div>
-  </section><section id="featured-events"><div class="wrap"><div class="sechead"><p class="eyebrow">Предстоящи събития</p><p>Събития, в които не просто предоставяме пространство, а сме активна част от екипа — от първоначалната идея до реализацията.</p></div><div class="events-grid"><article class="event-card"><img src="assets/nail-business-restart-hero.webp" alt="NAIL BUSINESS RE:START — професионално събитие за маникюристи"><div class="event-card-content"><p class="eyebrow">26 октомври 2026 · София</p><h3>NAIL BUSINESS RE:START</h3><p>Професионално събитие за маникюристи с бизнес теми, лекции и практически мастър класове.</p><a class="btn btn-primary" href="events/nail-business-restart/" target="_blank" rel="noopener">Научи повече ↗</a></div></article></div></div></section>
+  </section><section id="featured-events"><div class="wrap"><div class="sechead"><p class="eyebrow">Предстоящи събития</p><p>Събития, в които не просто предоставяме пространство, а сме активна част от екипа — от първоначалната идея до реализацията.</p></div><div class="events-grid"><article class="event-card"><img src="assets/nail-business-restart-hero.webp" alt="NAIL BUSINESS RE:START — професионално събитие за маникюристи"><div class="event-card-content"><p class="eyebrow">26 октомври 2026 · София</p><h3>NAIL BUSINESS RE:START</h3><p>Професионално събитие за маникюристи с бизнес теми, лекции и практически мастър класове.</p><a class="btn btn-primary" href="events/nail-business-restart/" target="_blank" rel="noopener">Научи повече ↗</a></div></article><article class="event-card" id="career-cafe"><img src="assets/event-photos/career-cafe-card.svg" alt="Кариерно кафе в Sofia Summit Center"><div class="event-card-content"><p class="eyebrow">21 ноември 2026 · София</p><h3>Кариерно кафе</h3><p>Неформална среща между хора, които търсят развитие, и HR специалисти, кариерни консултанти и работодатели.</p><a class="btn btn-primary" href="events/career-cafe/" target="_blank" rel="noopener">Научи повече ↗</a></div></article></div></div></section>
 
   <section id="gallery" class="gallery-section gallery-orbit"><div class="wrap"><div class="sechead"><p class="eyebrow">Галерия</p><h2>Снимки от предходни събития.</h2><p>Разгледайте моменти и атмосфера от събитията в Sofia Summit Center.</p></div><div class="gallery-orbit-stage"><div class="gallery-orbit-scene"><div class="gallery-orbit-backdrop" aria-hidden="true"><img src="assets/event-photos/hr-sreshta-01.jpg" alt=""><img src="assets/event-photos/misia100-01.jpg" alt=""><img src="assets/event-photos/hr-rush-practice-01.jpg" alt=""><img src="assets/event-photos/be-you-01.jpg" alt=""><img src="assets/event-photos/biznes-i-mladite-01.jpg" alt=""><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt=""><svg class="gallery-orbit-network" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4,24 C22,4 35,34 53,16 S78,13 97,30" fill="none" stroke="rgba(36,82,184,.18)" stroke-width=".22"></path><path d="M0,74 C20,48 33,91 56,68 S82,56 100,78" fill="none" stroke="rgba(36,82,184,.13)" stroke-width=".22"></path></svg></div><div class="gallery-orbit-copy"><p class="eyebrow">Моменти от Sofia Summit Center</p><h3>Събития, които остават.</h3><p>Превъртете, за да разгледате галерията. Изберете карта, за да отворите пълния албум.</p></div><div class="gallery-orbit-sphere" id="gallery-orbit-sphere"><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrsreshha/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-sreshta-01.jpg" alt="HR Среща"><span>HR Среща ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/snimki/" target="_blank" rel="noopener"><img src="assets/event-photos/misia100-01.jpg" alt="Misia100"><span>Misia100 ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-rush-practice-01.jpg" alt="HR Rush for Practice"><span>HR Rush for Practice ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/beyou/" target="_blank" rel="noopener"><img src="assets/event-photos/be-you-01.jpg" alt="Be You"><span>Be You ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/sreshtamejdubisnesaimladite/" target="_blank" rel="noopener"><img src="assets/event-photos/biznes-i-mladite-01.jpg" alt="Бизнесът и младите"><span>Бизнесът и младите ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt="HR Rush for Practice Sofia"><span>HR Rush for Practice ↗</span></a></div><svg class="gallery-orbit-line" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,56 Q25,34 50,50 T100,42" stroke="rgba(36,82,184,.14)" stroke-width=".25" fill="none"></path><path d="M18,0 L82,100" stroke="rgba(36,82,184,.08)" stroke-width=".25" fill="none"></path></svg></div></div></div></section>
 
