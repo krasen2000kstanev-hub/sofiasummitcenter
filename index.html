@@ -334,6 +334,10 @@
     <ul class="navlinks" id="navlinks">
       <li><a href="#spaces">Пространства</a></li>
       <li><a href="#events">Събития</a></li>
+      <li><a href="#podcasts">Подкасти</a></li>
+      <li><a href="#productions">Продукции</a></li>
+      <li><a href="#initiatives">Инициативи</a></li>
+      <li><a href="#services">Услуги</a></li>
       <li><a href="#about">За нас</a></li>
       <li><a href="#faq">Въпроси</a></li>
       <li><a href="#contact">Контакти</a></li>
@@ -478,6 +482,21 @@
   </section><section id="featured-events"><div class="wrap"><div class="sechead"><p class="eyebrow">Предстоящи събития</p><p>Събития, в които не просто предоставяме пространство, а сме активна част от екипа — от първоначалната идея до реализацията.</p></div><div class="events-grid"><article class="event-card"><img src="assets/nail-business-restart-hero.webp" alt="NAIL BUSINESS RE:START — професионално събитие за маникюристи"><div class="event-card-content"><p class="eyebrow">26 октомври 2026 · София</p><h3>NAIL BUSINESS RE:START</h3><p>Професионално събитие за маникюристи с бизнес теми, лекции и практически мастър класове.</p><a class="btn btn-primary" href="events/nail-business-restart/" target="_blank" rel="noopener">Научи повече ↗</a></div></article></div></div></section>
 
   <section id="gallery" class="gallery-section gallery-orbit"><div class="wrap"><div class="sechead"><p class="eyebrow">Галерия</p><h2>Снимки от предходни събития.</h2><p>Разгледайте моменти и атмосфера от събитията в Sofia Summit Center.</p></div><div class="gallery-orbit-stage"><div class="gallery-orbit-scene"><div class="gallery-orbit-backdrop" aria-hidden="true"><img src="assets/event-photos/hr-sreshta-01.jpg" alt=""><img src="assets/event-photos/misia100-01.jpg" alt=""><img src="assets/event-photos/hr-rush-practice-01.jpg" alt=""><img src="assets/event-photos/be-you-01.jpg" alt=""><img src="assets/event-photos/biznes-i-mladite-01.jpg" alt=""><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt=""><svg class="gallery-orbit-network" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4,24 C22,4 35,34 53,16 S78,13 97,30" fill="none" stroke="rgba(36,82,184,.18)" stroke-width=".22"></path><path d="M0,74 C20,48 33,91 56,68 S82,56 100,78" fill="none" stroke="rgba(36,82,184,.13)" stroke-width=".22"></path></svg></div><div class="gallery-orbit-copy"><p class="eyebrow">Моменти от Sofia Summit Center</p><h3>Събития, които остават.</h3><p>Превъртете, за да разгледате галерията. Изберете карта, за да отворите пълния албум.</p></div><div class="gallery-orbit-sphere" id="gallery-orbit-sphere"><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrsreshha/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-sreshta-01.jpg" alt="HR Среща"><span>HR Среща ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/snimki/" target="_blank" rel="noopener"><img src="assets/event-photos/misia100-01.jpg" alt="Misia100"><span>Misia100 ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-rush-practice-01.jpg" alt="HR Rush for Practice"><span>HR Rush for Practice ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/beyou/" target="_blank" rel="noopener"><img src="assets/event-photos/be-you-01.jpg" alt="Be You"><span>Be You ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/sreshtamejdubisnesaimladite/" target="_blank" rel="noopener"><img src="assets/event-photos/biznes-i-mladite-01.jpg" alt="Бизнесът и младите"><span>Бизнесът и младите ↗</span></a><a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener"><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt="HR Rush for Practice Sofia"><span>HR Rush for Practice ↗</span></a></div><svg class="gallery-orbit-line" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,56 Q25,34 50,50 T100,42" stroke="rgba(36,82,184,.14)" stroke-width=".25" fill="none"></path><path d="M18,0 L82,100" stroke="rgba(36,82,184,.08)" stroke-width=".25" fill="none"></path></svg></div></div></div></section>
+
+  <style>
+    .collab-section{background:rgba(234,242,255,.72)}
+    .collab-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+    .collab-card{padding:26px 22px;min-height:210px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(248,251,255,.86);box-shadow:0 10px 24px rgba(20,72,145,.08);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+    .collab-card:hover{transform:translateY(-5px);border-color:#8fb4eb;box-shadow:0 18px 34px rgba(20,72,145,.14)}
+    .collab-card h3{margin:18px 0 10px;font-size:1.05rem;color:var(--ink)}
+    .collab-card p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.6}
+    .collab-number{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:.82rem}
+    @media(max-width:900px){.collab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:560px){.collab-grid{grid-template-columns:1fr}.collab-card{min-height:0}}
+  </style>
+  <section id="podcasts" class="section collab-section"><div class="wrap"><div class="sechead"><p class="eyebrow">Подкасти</p><h2>Подкасти, които се снимат при нас.</h2><p>Разговори и формати с професионална картина, звук и атмосфера, готови за публикуване.</p></div></div></section>
+  <section id="productions" class="section collab-section"><div class="wrap"><div class="sechead"><p class="eyebrow">Продукции</p><h2>Общи продукции.</h2><p>Партньорства за събития, видео съдържание и комуникационни проекти от идея до реализация.</p></div></div></section>
+  <section id="initiatives" class="section collab-section"><div class="wrap"><div class="sechead"><p class="eyebrow">Инициативи</p><h2>Инициативи, които правим.</h2><p>Срещи, обучения и формати, с които събираме хора, идеи и възможности на едно място.</p></div></div></section>
 
   <section id="about">
     <div class="wrap">
