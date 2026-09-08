@@ -77,3 +77,7 @@ main > .motion-section:not(.is-visible) .motion-item{opacity:0;transform:transla
 @media(hover:hover){.partner-card:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(20,72,145,.14);border-color:#8fb4eb}}
 @media(max-width:900px){.partners-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.partners-grid{grid-template-columns:1fr}.partner-card{min-height:140px}}
+
+/* Keep the reveal animation and the pointer tilt effect from cancelling each other. */
+.motion-section.is-visible .motion-item.tilt-surface{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateZ(0)!important;transform-style:preserve-3d}
+@media(prefers-reduced-motion:reduce){.motion-section.is-visible .motion-item.tilt-surface{transform:none!important}}
