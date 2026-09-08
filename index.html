@@ -721,8 +721,6 @@
   (function(){
     var headings = document.querySelectorAll('h1, .sechead h2, .gallery-orbit-copy h3');
     if (!headings.length) return;
-    var supportsClipPath = window.CSS && CSS.supports && (CSS.supports('clip-path', 'inset(0px 0px 0px 0px)') || CSS.supports('-webkit-clip-path', 'inset(0px 0px 0px 0px)'));
-    if (!supportsClipPath) return;
     headings.forEach(function(heading){
       heading.classList.add('main-text-reveal');
     });
