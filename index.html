@@ -692,7 +692,23 @@
 </footer>
 
 <button class="back-to-top" id="back-to-top" type="button" aria-label="Върни се в началото" title="Върни се в началото">↑</button>
+<style id="rosa-layout-preview-v1">
+  .rosa-layout-preview-v1 .hero{min-height:calc(100svh - 67px);display:flex;align-items:center;padding:72px 0 84px}
+  .rosa-layout-preview-v1 .hero-grid{width:100%;max-width:1320px;margin:0 auto;gap:clamp(32px,5vw,84px)}
+  .rosa-layout-preview-v1 .hero-ctas{justify-content:flex-start}
+  .rosa-layout-preview-v1 #spaces>.wrap,.rosa-layout-preview-v1 #services>.wrap,.rosa-layout-preview-v1 #featured-events>.wrap,.rosa-layout-preview-v1 #partners>.wrap{max-width:1320px}
+  .rosa-layout-preview-v1 #spaces,.rosa-layout-preview-v1 #services,.rosa-layout-preview-v1 #featured-events,.rosa-layout-preview-v1 #partners{padding-top:96px;padding-bottom:96px}
+  .rosa-layout-preview-v1 #spaces>.wrap>.sechead,.rosa-layout-preview-v1 #services>.wrap>.sechead,.rosa-layout-preview-v1 #featured-events>.wrap>.sechead,.rosa-layout-preview-v1 #partners>.wrap>.sechead{max-width:720px}
+  .rosa-layout-preview-v1 .spaces-grid,.rosa-layout-preview-v1 .services-grid,.rosa-layout-preview-v1 .events-grid,.rosa-layout-preview-v1 .partners-grid{min-width:0}
+  .rosa-layout-preview-v1 .space-card,.rosa-layout-preview-v1 .service,.rosa-layout-preview-v1 .event-card,.rosa-layout-preview-v1 .partner-card{min-width:0}
+  @media(max-width:880px){
+    .rosa-layout-preview-v1 .hero{min-height:auto;padding:56px 0 72px}
+    .rosa-layout-preview-v1 .hero-ctas{justify-content:center}
+    .rosa-layout-preview-v1 #spaces,.rosa-layout-preview-v1 #services,.rosa-layout-preview-v1 #featured-events,.rosa-layout-preview-v1 #partners{padding-top:72px;padding-bottom:72px}
+  }
+</style>
 <script>
+  if (new URLSearchParams(window.location.search).get('preview-rosa-layout') === '1') document.documentElement.classList.add('rosa-layout-preview-v1');
   (function(){
     var ambient = document.querySelector('.site-ambient-background');
     if (!ambient || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
