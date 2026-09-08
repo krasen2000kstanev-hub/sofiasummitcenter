@@ -65,3 +65,10 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 Публикуваното repository е локалното `.publish-repo`. След промени копирай актуалните файлове в `.publish-repo/events/nail-business-restart/`, направи commit, изпрати го в `origin main` и провери live страницата.
 
 Не записвай AWS ключове, GitHub токени или други секрети в repository-то.
+
+## Начална страница — подкасти, продукции и инициативи
+
+- `#podcasts`, `#productions` и `#initiatives` са отделни responsive секции с връзки от менюто.
+- Podcast картите водят към съответните YouTube канали и използват channel video thumbnails.
+- „Общи продукции“ включва „Забавни истории от бизнеса“ и RushForPractice. RushForPractice използва `assets/rush-for-practice.png` и води към `https://www.youtube.com/@RushforPractice`.
+- Картите използват общите tilt, hover edge highlight, focus и reduced-motion ефекти.
