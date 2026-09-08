@@ -8,6 +8,8 @@
 - GitHub repository: https://github.com/krasen2000kstanev-hub/sofiasummitcenter
 - Публикуване: GitHub Pages, branch `main`
 
+Началната страница има лек CodePen-inspired 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. При hover върху бутоните и форматите се появява дискретен контур по ръба; ефектът се изключва при `prefers-reduced-motion`.
+
 ## Файлова структура
 
 - `index.html` — локален preview на event страницата.

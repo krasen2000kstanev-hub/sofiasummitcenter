@@ -108,6 +108,13 @@
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
   .btn-line{background:transparent;color:var(--accent-strong);border:1px solid var(--accent);padding:10px 16px;font-size:.88rem;}
   .btn-line:hover{background:var(--accent-tint);}
+  .tilt-surface{--tilt-x:0deg;--tilt-y:0deg;transform:perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);transform-style:preserve-3d;transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s ease;will-change:transform}
+  .tilt-surface:hover{box-shadow:0 24px 48px rgba(18,59,134,.2)}
+  .tilt-control{position:relative;isolation:isolate}
+  .tilt-control::after{content:"";position:absolute;inset:-3px;border:1px solid rgba(36,82,184,.42);border-radius:inherit;opacity:0;pointer-events:none;transition:opacity .25s ease,box-shadow .25s ease}
+  .tilt-control:hover::after,.tilt-control:focus-visible::after{opacity:1;box-shadow:0 0 0 3px rgba(36,82,184,.12),0 0 18px rgba(36,82,184,.2)}
+  .event-tags span:hover{color:var(--accent-strong);background:#fff}
+  @media(prefers-reduced-motion:reduce){.tilt-surface{transition:none;transform:none}}
 
   /* header */
   header{
@@ -211,7 +218,7 @@
   .event-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
   .event-tags span{
     background:var(--surface);border:1px solid var(--line);border-radius:20px;
-    padding:9px 16px;font-size:.9rem;font-weight:600;color:var(--accent-strong);
+    padding:9px 16px;font-size:.9rem;font-weight:600;color:var(--accent-strong);cursor:default;
   }
 
   /* about */
@@ -668,6 +675,27 @@
   navlinks.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){ navlinks.classList.remove('open'); });
   });
+
+  (function(){
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var surfaces = document.querySelectorAll('.space-card, .service, .event-card, .partner-card, .form-wrap, .about-photos img, .gallery-item, .btn, button, .event-tags span');
+    surfaces.forEach(function(surface){
+      surface.classList.add('tilt-surface');
+      if (surface.matches('.btn, button, .event-tags span')) surface.classList.add('tilt-control');
+      surface.addEventListener('pointermove', function(e){
+        if (e.pointerType === 'touch') return;
+        var box = surface.getBoundingClientRect();
+        var x = (e.clientX - box.left) / box.width;
+        var y = (e.clientY - box.top) / box.height;
+        surface.style.setProperty('--tilt-x', ((.5 - y) * 9).toFixed(2) + 'deg');
+        surface.style.setProperty('--tilt-y', ((x - .5) * 11).toFixed(2) + 'deg');
+      });
+      surface.addEventListener('pointerleave', function(){
+        surface.style.setProperty('--tilt-x', '0deg');
+        surface.style.setProperty('--tilt-y', '0deg');
+      });
+    });
+  }());
 
   document.getElementById('inquiry-form').addEventListener('submit', function(e){
     e.preventDefault();
