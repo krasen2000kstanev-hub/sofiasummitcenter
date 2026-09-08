@@ -20,3 +20,4 @@
 - Не се съхраняват никакви секрети в проекта.
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.
 - Последният GitHub commit е `be49cc4` (`fix registration API payload and endpoint`).
+- Подготвен е лек pointer-aware 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. Hover/focus върху контролите добавя дискретен контур по ръба, а `prefers-reduced-motion` изключва анимацията.
