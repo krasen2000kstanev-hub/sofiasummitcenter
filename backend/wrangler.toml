@@ -8,4 +8,4 @@ PUBLIC_SITE_URL = "https://sofiasummit.bg"
 [[d1_databases]]
 binding = "DB"
 database_name = "sofiasummit-events"
-database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+database_id = "59171d68-7a1e-492b-9014-1213ab3ffe5d"
