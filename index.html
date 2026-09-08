@@ -123,6 +123,8 @@
   .tilt-surface::before{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.6);border-radius:inherit;opacity:0;pointer-events:none;z-index:3;transition:opacity .25s ease,box-shadow .25s ease}
   .tilt-surface:hover{box-shadow:0 26px 54px rgba(18,59,134,.24),0 0 0 1px rgba(36,82,184,.18)}
   .tilt-surface:hover::before,.tilt-surface:focus-within::before{opacity:1;box-shadow:inset 0 0 18px rgba(255,255,255,.24)}
+  @media (hover:hover){.tilt-surface:hover{--tilt-x:2deg;--tilt-y:-2deg}}
+  .tilt-surface:active{--tilt-x:1deg;--tilt-y:-1deg}
   .tilt-control{position:relative;isolation:isolate}
   .tilt-control::after{content:"";position:absolute;inset:-3px;border:1px solid rgba(36,82,184,.42);border-radius:inherit;opacity:0;pointer-events:none;transition:opacity .25s ease,box-shadow .25s ease}
   .tilt-control:hover::after,.tilt-control:focus-visible::after{opacity:1;box-shadow:0 0 0 3px rgba(36,82,184,.12),0 0 18px rgba(36,82,184,.2)}
