@@ -431,22 +431,22 @@
         <p>Цялостно аудио и видео оборудване, което покрива целия жизнен цикъл на едно събитие. От подготовката до записа.</p>
       </div>
       <div class="services-grid">
-        <div class="service">
+        <div class="service tilt-surface">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg>
           <h4>Мултимедия и озвучаване</h4>
           <p>Конферентна катедра с четири стационарни микрофона, трибуна или микрофони на стойки, готови за презентация.</p>
         </div>
-        <div class="service">
+        <div class="service tilt-surface">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
           <h4>Сцена и трансформируемо пространство</h4>
           <p>Сцената и залата се пренареждат според формата. Театър, класна стая, коктейл или банкет.</p>
         </div>
-        <div class="service">
+        <div class="service tilt-surface">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
            <h4>Камери и озвучение</h4>
            <p>В голямата зала три управляеми камери, монтирани на тавана, осигуряват цялостно покритие на събитието. Подкаст студиото разполага с отделна система от три камери за интервюта, разговори и подкаст формати. Камерите и озвучението са различни за всяко пространство и са подбрани според конкретния тип събитие.</p>
         </div>
-        <div class="service">
+        <div class="service tilt-surface">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></svg>
            <h4>Офис помещения</h4>
            <p>Функционални офис помещения в допълнение към конферентната зала. Подходящи са за екипна работа, регистрация или спокойна подготовка.</p>
@@ -758,5 +758,8 @@
   footer .footer-links a:hover,footer .footer-links a:focus-visible{color:#fff!important;transform:translateX(4px)}
   footer .foot-bottom,footer .foot-bottom span{color:#e1ebff!important;border-top-color:rgba(184,204,239,.38)!important}
   footer .foot-bottom{font-size:.84rem;letter-spacing:.01em}
+  .service.tilt-surface{transform-style:preserve-3d;will-change:transform}
+  .service.tilt-surface:hover{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateZ(0)!important}
+  @media(prefers-reduced-motion:reduce){.service.tilt-surface,.service.tilt-surface:hover{transform:none!important;transition:none!important}}
 </style>
 </body></html>
