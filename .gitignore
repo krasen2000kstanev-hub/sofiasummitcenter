@@ -1,6 +1,10 @@
 # Keep hosting backups and local configuration out of the GitHub Pages repository.
 *.zip
 *-installer-backup.php
+.upload-temp/
+.ftpquota
+.htaccess_*_bak
+*.tfplan
 dup-installer/
 cgi-bin/
 *.sql
@@ -10,3 +14,10 @@ wp-config.php
 wp-admin/
 wp-includes/
 wp-content/
+
+# Terraform local state and credentials.
+infra/terraform/.terraform/
+infra/terraform/.terraform-data/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/terraform.tfvars
