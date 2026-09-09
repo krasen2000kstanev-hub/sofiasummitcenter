@@ -876,6 +876,25 @@
     .tilt-surface:hover::before{opacity:0}
   }
 </style>
+<style id="approved-ux-order">
+  /* Approved homepage flow: offer, proof, collaborations, conversion. */
+  main#top{display:flex;flex-direction:column}
+  main#top > .hero{order:0}
+  main#top > #spaces{order:1}
+  main#top > #services{order:2}
+  main#top > #creative-services{order:3}
+  main#top > #featured-events{order:4}
+  main#top > #gallery{order:5}
+  main#top > #podcasts{order:6}
+  main#top > #productions{order:7}
+  main#top > #initiatives{order:8}
+  main#top > #about{order:9}
+  main#top > #faq{order:10}
+  main#top > #request{order:11}
+  main#top > #partners{order:12}
+  main#top > #contact{order:13}
+  html,body{overflow-x:hidden}
+</style>
 <style id="mobile-ux-overrides">
   @media (max-width:640px){
     .wrap{padding-left:16px;padding-right:16px;min-width:0}
