@@ -72,3 +72,10 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 - Podcast картите водят към съответните YouTube канали и използват channel video thumbnails.
 - „Общи продукции“ включва „Забавни истории от бизнеса“ и RushForPractice. RushForPractice използва `assets/rush-for-practice.png` и води към `https://www.youtube.com/@RushforPractice`.
 - Картите използват общите tilt, hover edge highlight, focus и reduced-motion ефекти.
+
+## Услуги и FAQ
+
+- Отделната секция `#creative-services` включва видео, фото, монтаж, лендинг страници и организация на събития.
+- Менюто води към новата секция, а оборудването остава отделно на `#services`.
+- FAQ секцията описва услугите, 360-градусовата фотобутка и свързването с наши партньори при организация на събития.
+- Картите използват съществуващите responsive и tilt/hover/focus ефекти.
