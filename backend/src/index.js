@@ -84,7 +84,8 @@ async function quotePromo(env, event, ticket, promoCode, count) {
   }
   const discountPercent = count === 1 ? Number(promo.single_discount_percent ?? 20) : Number(promo.group_discount_percent ?? 25);
   const amountCents = Math.round(baseAmountCents * (100 - discountPercent) / 100);
-  const link = await env.DB.prepare('SELECT payment_url FROM promo_payment_links WHERE promo_code_id=? AND ticket_key=? AND attendee_count=? AND active=1').bind(promo.id, ticket.ticket_key, count).first();
+  // ponytail: one group link covers 2+; the discount rule stays flat at 25%.
+  const link = await env.DB.prepare('SELECT payment_url FROM promo_payment_links WHERE promo_code_id=? AND ticket_key=? AND attendee_count=? AND active=1').bind(promo.id, ticket.ticket_key, count === 1 ? 1 : 2).first();
   if (!link?.payment_url) throw new Error('За този промокод, билет и брой участници няма конфигуриран DSK payment link.');
   return { baseAmountCents, amountCents, discountPercent, paymentUrl: link.payment_url, promo };
 }
