@@ -1750,7 +1750,7 @@
       var code = people > 1 ? '' : raw.toUpperCase(), selected = TICKETS[ticketType.value] || TICKETS.standard;
       if (!raw && people === 1) {
         form.dataset.appliedPromo = '';
-        resetPrice(selected);
+        renderAllPrices(0);
         if (showErrors) setNote('', false);
         return;
       }
