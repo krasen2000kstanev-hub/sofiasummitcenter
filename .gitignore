@@ -8,6 +8,7 @@
 dup-installer/
 cgi-bin/
 *.sql
+!backend/migrations/*.sql
 wp-config.php
 
 # Legacy hosting files kept locally but not published.
