@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sofia Summit — Admin</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#17171a;background:#f3f1ed}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1180px;margin:0 auto;padding:28px 18px}.card{background:#fff;border:1px solid #ddd9d2;border-radius:16px;padding:22px;box-shadow:0 8px 30px #17171a0d}h1{margin:0 0 6px;font-size:28px}h2{margin:0 0 14px;font-size:20px}.muted{color:#6d6870}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat{padding:16px;border-radius:12px;background:#f7f5f1}.stat b{display:block;font-size:25px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}input,select,button{font:inherit;border:1px solid #c9c4bc;border-radius:9px;padding:10px 12px}input{width:100%}button{cursor:pointer;background:#155f73;color:#fff;border-color:#155f73;font-weight:600}button.secondary{background:#fff;color:#155f73}button.danger{background:#a63d26;border-color:#a63d26}.login{max-width:420px;margin:10vh auto}.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #eee9e2;vertical-align:top}th{font-size:12px;color:#6d6870;text-transform:uppercase}.status{display:inline-block;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:700}.paid{color:#126541;background:#e7f5ed}.pending{color:#8a5d00;background:#fff4ce}.cancelled,.refunded{color:#8a2f21;background:#fde9e5}.actions{display:flex;gap:6px;flex-wrap:wrap}.notice{padding:10px 12px;border-radius:9px;background:#fff4ce;margin:12px 0;display:none}.error{background:#fde9e5;color:#8a2f21}.empty{text-align:center;padding:30px;color:#6d6870}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}table{font-size:13px}th:nth-child(1),td:nth-child(1){display:none}.card{padding:15px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section id="login" class="card login">
+      <h1>Админ панел</h1><p class="muted">Sofia Summit Center</p>
+      <div id="loginError" class="notice error"></div>
+      <form id="loginForm">
+        <div class="field"><label for="user">Потребител</label><input id="user" autocomplete="username" required></div>
+        <div class="field"><label for="pass">Парола</label><input id="pass" type="password" autocomplete="current-password" required></div>
+        <button type="submit">Вход</button>
+      </form>
+    </section>
+
+    <section id="panel" hidden>
+      <div class="toolbar"><div><h1>Поръчки</h1><div class="muted">Управление на плащания и билети</div></div><span style="flex:1"></span><button id="refresh" class="secondary">Обнови</button><button id="export" class="secondary">Експорт CSV</button><button id="logout" class="danger">Изход</button></div>
+      <div id="notice" class="notice"></div>
+      <div class="grid"><div class="stat"><span class="muted">Всички</span><b id="allCount">0</b></div><div class="stat"><span class="muted">Чакащи</span><b id="pendingCount">0</b></div><div class="stat"><span class="muted">Платени</span><b id="paidCount">0</b></div><div class="stat"><span class="muted">Приходи</span><b id="revenue">0 €</b></div></div>
+      <div class="card"><div class="toolbar"><select id="filter"><option value="">Всички статуси</option><option value="pending">Чакащи</option><option value="paid">Платени</option><option value="cancelled">Отказани</option><option value="refunded">Възстановени</option></select><button id="checkin" class="secondary">Провери билет</button><input id="token" placeholder="ticket token" style="max-width:260px"><span id="result" class="muted"></span></div><div style="overflow:auto"><table><thead><tr><th>Поръчка</th><th>Дата</th><th>Купувач</th><th>Билет / участници</th><th>Сума</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+    </section>
+  </main>
+  <script>
+    const API='https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev';
+    const $=id=>document.getElementById(id); let orders=[];
+    const auth=()=>sessionStorage.getItem('sofiasummit_admin_auth');
+    const headers=()=>({Authorization:'Basic '+auth(), 'Content-Type':'application/json'});
+    function showNotice(text,error=false){$('notice').textContent=text;$('notice').style.display='block';$('notice').className='notice'+(error?' error':'');}
+    function money(cents,currency='EUR'){return (Number(cents||0)/100).toFixed(2)+' '+(currency==='EUR'?'€':currency)}
+    function render(){
+      const counts=orders.reduce((a,o)=>(a.all++,a[o.status]=(a[o.status]||0)+1,a),{all:0});
+      $('allCount').textContent=counts.all||0;$('pendingCount').textContent=counts.pending||0;$('paidCount').textContent=counts.paid||0;$('revenue').textContent=money(orders.filter(o=>o.status==='paid').reduce((s,o)=>s+Number(o.amount_cents||0),0));
+      const filter=$('filter').value; const visible=filter?orders.filter(o=>o.status===filter):orders;
+      $('rows').innerHTML=visible.length?visible.map(o=>`<tr><td><strong>${esc(o.id)}</strong></td><td>${date(o.created_at)}</td><td>${esc(o.buyer_name)}<br><span class="muted">${esc(o.buyer_email)}</span></td><td>${esc(o.ticket_name)}<br>${o.attendee_count||1} участник(а)</td><td>${money(o.amount_cents,o.currency)}</td><td><span class="status ${esc(o.status)}">${esc(o.status)}</span></td><td class="actions">${o.status==='pending'?`<button data-paid="${esc(o.id)}">Маркирай платена</button>`:''}${o.status==='paid'?`<button class="secondary" data-resend="${esc(o.id)}">Изпрати пак</button>`:''}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Няма поръчки</td></tr>';
+    }
+    const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const date=v=>v?new Date(v).toLocaleString('bg-BG'):'—';
+    async function load(){try{const r=await fetch(API+'/api/admin/orders',{headers:headers()});if(r.status===401)throw Error('Невалиден вход.');if(!r.ok)throw Error('Грешка при зареждане.');orders=await r.json();render()}catch(e){showNotice(e.message,true)}}
+    $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').style.display='none';const value=btoa(unescape(encodeURIComponent($('user').value+':'+$('pass').value)));sessionStorage.setItem('sofiasummit_admin_auth',value);const r=await fetch(API+'/api/admin/orders',{headers:headers()});if(!r.ok){sessionStorage.removeItem('sofiasummit_admin_auth');$('loginError').textContent='Невалиден потребител или парола.';$('loginError').style.display='block';return} $('login').hidden=true;$('panel').hidden=false;orders=await r.json();render()};
+    $('logout').onclick=()=>{sessionStorage.removeItem('sofiasummit_admin_auth');location.reload()};$('refresh').onclick=load;$('filter').onchange=load;
+    $('rows').onclick=async e=>{const paid=e.target.dataset.paid,resend=e.target.dataset.resend;if(!paid&&!resend)return;const id=paid||resend;if(paid&&!confirm('Маркирай поръчката като платена и изпрати билет?'))return;const url=API+'/api/admin/orders/'+encodeURIComponent(id)+(paid?'/status':'/resend-ticket');const body=paid?{status:'paid',paymentReference:'admin-panel-'+Date.now()}:undefined;try{const r=await fetch(url,{method:'POST',headers:headers(),body:body?JSON.stringify(body):undefined});const data=await r.json();if(!r.ok)throw Error(data.error||'Операцията не успя.');showNotice(paid?'Поръчката е платена и билетът се изпраща.':'Билетът е изпратен повторно.');await load()}catch(e){showNotice(e.message,true)}};
+    $('checkin').onclick=async()=>{const token=$('token').value.trim();if(!token)return;$('result').textContent='Проверка…';try{const r=await fetch(API+'/api/admin/tickets/'+encodeURIComponent(token)+'/check-in',{method:'POST',headers:headers()});const d=await r.json();$('result').textContent=d.status==='checked_in'?'Валиден билет — чекиран.':d.status==='already_checked_in'?'Билетът вече е използван.':d.error||'Невалиден билет.'}catch{$('result').textContent='Грешка при проверката.'}};
+    $('export').onclick=async()=>{const r=await fetch(API+'/api/admin/export.csv',{headers:headers()});if(!r.ok){showNotice('Експортът не успя.',true);return}const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download='registrations.csv';a.click();URL.revokeObjectURL(a.href)};
+    if(auth()){$('login').hidden=true;$('panel').hidden=false;load()}
+  </script>
+</body>
+</html>
