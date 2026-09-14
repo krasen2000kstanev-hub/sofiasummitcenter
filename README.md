@@ -80,10 +80,11 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 
 `.github/workflows/deploy-worker.yml` се стартира при push към `main`, когато има промяна в `backend/`. Workflow-ът първо прилага D1 миграциите към `sofiasummit-events`, след което deploy-ва Worker-а от `backend/`.
 
-GitHub repository secrets:
+GitHub repository secret:
 
 - `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
+
+Cloudflare Account ID е публичен идентификатор и е записан директно в workflow-а, за да не зависи deploy-ът от форматирането на втори secret.
 
 Resend, DSK и Cloudflare Access secrets остават конфигурирани само в Cloudflare Worker-а. Реален email delivery тест изисква тестова регистрация и реален Resend/DSK webhook flow; не се изпращат тестови писма автоматично при CI.
 
