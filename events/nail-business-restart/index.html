@@ -380,8 +380,8 @@
     margin-top:auto;text-align:center;padding:13px;border-radius:3px;font-weight:700;
     font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;
   }
-  .tix-card:not(.vip) .tix-cta{border:1px solid var(--line);color:var(--text-ink);}
-  .tix-card:not(.vip) .tix-cta:hover{border-color:var(--pink);color:var(--pink);}
+  .tix-card:not(.vip) .tix-cta{background:var(--pink);color:#fff;border:1px solid var(--pink);}
+  .tix-card:not(.vip) .tix-cta:hover{box-shadow:0 0 26px var(--pink-glow);}
   .tix-card.vip .tix-cta{background:var(--pink);color:#fff;}
   .tix-card.vip .tix-cta:hover{box-shadow:0 0 26px var(--pink-glow);}
   .tix-cta[aria-disabled="true"]{opacity:.55;cursor:not-allowed;pointer-events:none;}
@@ -1376,9 +1376,9 @@
     // ticket variant, each its own DSK payment page/amount). Until a given
     // link is filled in, the matching "Купи ... билет" button stays safely
     // disabled and shows "Продажбите започват скоро".
-    dskStandardPaymentUrl: '',
-    dskStandardRecordingPaymentUrl: '', // Standard + запис от мастър класовете (+25€)
-    dskVipPaymentUrl: '',
+    dskStandardPaymentUrl: 'https://epg.dskbank.bg/sc/ktgERYKucdkhyuRK',
+    dskStandardRecordingPaymentUrl: 'https://epg.dskbank.bg/sc/SjnQoLEBzCJjpSSi', // Standard + запис от мастър класовете (+25€)
+    dskVipPaymentUrl: 'https://epg.dskbank.bg/sc/OWhxRZDYrhsnFIdc',
     // TODO(organizer): промокодове са изключени по подразбиране (празен обект
     // по-долу) — докато няма нито един ред тук, полето за промокод до
     // билетите винаги показва "Невалиден промокод", без да лъже посетителя.
