@@ -14,14 +14,14 @@
 - Master class изборът е разрешен за Standard + запис и VIP.
 - Правните страници са `terms.html`, `privacy.html`, `cookies.html`, `recording.html` и `refund.html`.
 - Всички правни препратки се отварят като отделни страници в нов таб и връщат към секцията `#legal`.
-- Формата вече изпраща към `/api/orders`, подава `agreeTerms: true`, `masterClasses` и `fullName` за допълнителните участници.
+- Формата вече изпраща към `/api/orders`, подава `agreeTerms: true`, `masterClasses` и `fullName` за допълнителните участници; UX изборът е 1–3 участници.
 - Базовите DSK links са в D1 `ticket_types.dsk_url`; промо link-овете са в `promo_payment_links` по `promo_code_id + ticket_key + attendee_count`.
 - Промокодовете са в D1 `promo_codes`, с активност, срокове, лимит, позволени билети и 20%/25% server-side отстъпка. Admin UI/API: Worker `/admin/promos`, `/api/admin/promos` и `/api/admin/promo-links`.
-- Seed-нати са активните кодове `BIBI20`, `EVA20` и `EMI20`; за реална покупка трябва да се добавят техните DSK link-ове по билет и брой участници.
-- Добавени са 20% DSK links за 1 участник и 25% group DSK links за 2+ участници за Standard, Standard + запис и VIP за трите промокода. При 3+ участници няма допълнителна отстъпка; използва се същият group link.
+- Seed-нати са активните кодове `BIBI20`, `EVA20` и `EMI20`; те се използват само за единична регистрация с 20% отстъпка.
+- При 2 или 3 участници промокод не е нужен: backend-ът прилага автоматични 25%, обновява всички билетни карти и избира отделен x2 или x3 DSK link за Standard, Standard + запис и VIP.
 - Admin `/api/admin/promos` показва usage count, а `/api/admin/promo-usage?code=...` показва кой е използвал кода, кога, за кой билет, с колко участници и какъв е статусът на поръчката.
 - Полето „Промо код“ е отделно от регистрационната форма; приложението прави quote към Worker, а submit създава поръчка и пренасочва към DSK.
-- Quote-ът се обновява автоматично при input/change на промокода, типа билет и броя участници; непълен групов запис не чупи интерфейса и се отхвърля от backend-а с ясно съобщение.
+- Quote-ът се обновява автоматично при промяна на типа билет и броя участници; при група полето за промокод се деактивира, а при връщане към 1 участник всички цени се възстановяват.
 - Всички билетни бутони използват един и същ акцентен цвят като VIP бутона.
 - DSK webhook `/api/payments/dsk/webhook` приема само подписан payload с познат `orderId`/merchant reference и финализира поръчката идемпотентно.
 - След плащане се генерира `/api/tickets/:token` и Resend изпраща имейл към купувача и уникалните имейли на участниците; `email_log` предотвратява автоматични дублирания.
@@ -32,7 +32,7 @@
 - GitHub Actions workflow `.github/workflows/deploy-worker.yml` deploy-ва `backend/` към Cloudflare при push към `main`; преди deploy прилага D1 миграциите към `sofiasummit-events`.
 - GitHub Actions използва `CLOUDFLARE_API_TOKEN`; публичният Cloudflare Account ID е зададен директно в workflow-а. Runtime secrets за Resend, DSK и Cloudflare Access не се съхраняват в GitHub repository-то.
 - Реален email delivery тест не се изпълнява в CI, защото би изпратил писма и би създал registration side effect; проверката на имейлите изисква контролирана тестова регистрация и DSK webhook.
-- Последният успешен функционален commit преди CI workflow-а е `c74fb19`; workflow commit-ът `c8adf6b` беше коригиран след откритата несъвместимост на Wrangler 4 с флага `--yes`.
+- Последният функционален commit е `bed95cc` (`fix: use dedicated payment links for three attendees`). Live quote проверките са успешни за x1/x2/x3, трите билета и невалиден промокод.
 - Подготвен е лек pointer-aware 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. Hover/focus върху контролите добавя дискретен контур по ръба, а `prefers-reduced-motion` изключва анимацията.
 - Към актуалния `main` са добавени и останалите визуални ефекти от локалния preview: интерактивна 3D сфера в галерията с drag/scroll управление и momentum, движещ се фон от снимки с линии, карта на София със Sofia Summit Center маркер и бутон за връщане в началото.
 - В `index.html` има отделни секции `#podcasts`, `#productions` и `#initiatives`; `#services` сочи към съществуващата секция за услуги. Навигацията е responsive: широкият изглед е на един ред, а под 1180px се показва хамбургер меню.
