@@ -19,7 +19,7 @@ jobs:
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: c14c0743f4fb0f540c29fa98b8b481ed
           workingDirectory: backend
           wranglerVersion: "4"
           command: d1 migrations apply sofiasummit-events --remote
@@ -28,7 +28,7 @@ jobs:
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: c14c0743f4fb0f540c29fa98b8b481ed
           workingDirectory: backend
           wranglerVersion: "4"
           command: deploy
