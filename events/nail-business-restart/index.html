@@ -424,7 +424,7 @@
   .loc-grid address{font-style:normal;color:var(--muted);margin-top:10px;font-size:1rem;font-weight:500;}
 
   /* ---------- partners ---------- */
-  .partners-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:40px;}
+  .partners-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:672px;margin:40px auto 0;}
   @media (max-width:940px){.partners-grid{grid-template-columns:repeat(3,1fr);}}
   @media (max-width:560px){.partners-grid{grid-template-columns:repeat(2,1fr);}}
   .partner-tile{
