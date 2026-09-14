@@ -18,6 +18,7 @@
 - Базовите DSK links са в D1 `ticket_types.dsk_url`; промо link-овете са в `promo_payment_links` по `promo_code_id + ticket_key + attendee_count`.
 - Промокодовете са в D1 `promo_codes`, с активност, срокове, лимит, позволени билети и 20%/25% server-side отстъпка. Admin UI/API: Worker `/admin/promos`, `/api/admin/promos` и `/api/admin/promo-links`.
 - Seed-нати са активните кодове `BIBI20`, `EVA20` и `EMI20`; за реална покупка трябва да се добавят техните DSK link-ове по билет и брой участници.
+- Добавени са 20% DSK links за 1 участник за Standard, Standard + запис и VIP за трите промокода. 25% group links за 2+ участници остават за добавяне.
 - Полето „Промо код“ е отделно от регистрационната форма; приложението прави quote към Worker, а submit създава поръчка и пренасочва към DSK.
 - Всички билетни бутони използват един и същ акцентен цвят като VIP бутона.
 - DSK webhook `/api/payments/dsk/webhook` приема само подписан payload с познат `orderId`/merchant reference и финализира поръчката идемпотентно.
