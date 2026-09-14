@@ -962,7 +962,7 @@
         <div class="st-col">
           <span class="kicker">Записване</span>
           <h3>Регистрирай данните си</h3>
-          <p class="reg-intro">Попълни формата, за да знаем кой ще присъства, дали имаш промо код и (за VIP) кои master class-ове избираш. Това <strong>не е плащане</strong> — самият билет купуваш отделно, чрез бутоните вдясно, през страницата на Банка ДСК.</p>
+          <p class="reg-intro">Попълни формата, избери билет и при нужда въведи промокод. След изпращане ще създадем поръчката и ще те пренасочим към защитената страница на Банка ДСК.</p>
           <form class="reg-form" id="regForm" action="" method="POST" target="_blank" novalidate>
             <div class="reg-grid">
               <label class="reg-field"><span>Име и фамилия*</span>
@@ -1693,29 +1693,19 @@
     }
   }, 'cookie-banner');
 
-  // ---------- DSK payment buttons (Bank DSK handles the actual checkout) ----------
-  safeRun(function(){
-    wirePaymentButton('buyStandardBtn', SITE_CONFIG.dskStandardPaymentUrl, 'select_standard_ticket', 'standard');
-    wirePaymentButton('buyStandardRecordingBtn', SITE_CONFIG.dskStandardRecordingPaymentUrl, 'select_standard_recording_ticket', 'standard_recording');
-    wirePaymentButton('buyVipBtn', SITE_CONFIG.dskVipPaymentUrl, 'select_vip_ticket', 'vip');
-  }, 'dsk-payment-buttons');
-
-  // ---------- promo codes: live price preview + optional discounted payment link ----------
-  // A code only ever changes what a "Купи ..." button DOES if the organizer
-  // has configured a real https:// Bank DSK link for that exact code+ticket
-  // combination in SITE_CONFIG.promoCodes — otherwise the discounted price is
-  // still shown (so the code isn't silently "wrong"), but the button stays
-  // safely disabled, exactly like an unconfigured base ticket link. This
-  // guarantees the page can never display a price it doesn't actually charge.
+  // ---------- ticket selection + server-side order/payment flow ----------
   safeRun(function(){
     var promoInput = document.getElementById('promoApplyInput');
     var promoBtn = document.getElementById('promoApplyBtn');
     var promoNote = document.getElementById('promoApplyNote');
-    if (!promoInput || !promoBtn || !promoNote) return;
+    var form = document.getElementById('regForm');
+    var countSelect = document.getElementById('attendeeCount');
+    var ticketType = document.getElementById('ticketType');
+    if (!promoInput || !promoBtn || !promoNote || !form) return;
 
     var TICKETS = {
       standard: { priceElId: 'priceStandard', btnId: 'buyStandardBtn', basePrice: SITE_CONFIG.pricing.standard, eventName: 'select_standard_ticket', label: 'Standard' },
-      standardRecording: { priceElId: 'priceStandardRecording', btnId: 'buyStandardRecordingBtn', basePrice: SITE_CONFIG.pricing.standardRecording, eventName: 'select_standard_recording_ticket', label: 'Standard + запис' },
+      standard_recording: { priceElId: 'priceStandardRecording', btnId: 'buyStandardRecordingBtn', basePrice: SITE_CONFIG.pricing.standardRecording, eventName: 'select_standard_recording_ticket', label: 'Standard + запис' },
       vip: { priceElId: 'priceVip', btnId: 'buyVipBtn', basePrice: SITE_CONFIG.pricing.vip, eventName: 'select_vip_ticket', label: 'VIP' }
     };
 
@@ -1725,68 +1715,43 @@
       promoNote.classList.toggle('is-error', !!isError);
     }
 
-    function computeDiscountedPrice(basePrice, promo){
-      var price = basePrice;
-      if (typeof promo.percentOff === 'number') price = basePrice * (1 - promo.percentOff / 100);
-      else if (typeof promo.amountOff === 'number') price = basePrice - promo.amountOff;
-      return Math.max(0, Math.round(price));
-    }
-
-    function applyPromo(){
+    async function applyPromo(){
       var raw = (promoInput.value || '').trim();
       if (!raw) { setNote('Въведи промокод.', true); return; }
-      var code = raw.toUpperCase();
-      var promo = SITE_CONFIG.promoCodes && SITE_CONFIG.promoCodes[code];
-      if (!promo) { setNote('Невалиден промокод.', true); return; }
-
-      var applied = [];
-      var pending = [];
-      var matchedAnyTicket = false;
-
-      Object.keys(TICKETS).forEach(function(key){
-        var t = TICKETS[key];
-        var promoUrl = promo.dskLinks ? promo.dskLinks[key] : undefined;
-        if (!promo.dskLinks || !(key in promo.dskLinks)) return; // code doesn't apply to this ticket at all
-        matchedAnyTicket = true;
-
-        var discounted = computeDiscountedPrice(t.basePrice, promo);
-        var priceEl = document.getElementById(t.priceElId);
-        if (priceEl) {
-          priceEl.innerHTML = '<span class="tix-price-was">' + t.basePrice + '€</span>' + discounted + '<span class="cur">€</span>';
-        }
-
-        if (isSafeHttpsUrl(promoUrl)) {
-          wirePaymentButton(t.btnId, promoUrl, t.eventName, key + '_promo_' + code);
-          applied.push(t.label);
-        } else {
-          // Discount is real and shown, but no discounted-price payment page
-          // exists yet — never fall back to charging the base price silently.
-          wirePaymentButton(t.btnId, '', t.eventName, key);
-          pending.push(t.label);
-        }
-      });
-
-      if (!matchedAnyTicket) { setNote('Този промокод не важи за никой от билетите.', true); return; }
-
-      var msg = '';
-      if (applied.length) msg += 'Промокодът е приложен за: ' + applied.join(', ') + '.';
-      if (pending.length) msg += (msg ? ' ' : '') + 'Новата цена за ' + pending.join(', ') + ' е вярна, но плащането с тази отстъпка все още не е активно.';
-      setNote(msg, applied.length === 0);
-      trackEvent('apply_promo_code', { code: code });
+      var code = raw.toUpperCase(), selected = TICKETS[ticketType.value] || TICKETS.standard;
+      promoBtn.disabled = true;
+      try {
+        var response = await fetch(SITE_CONFIG.registrationApiUrl + '/api/promo/quote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventSlug: 'nail-business-restart', ticketType: ticketType.value, promoCode: code, attendeesCount: Number(countSelect.value || 1) }) });
+        var quote = await response.json();
+        if (!response.ok) throw new Error(quote.error || 'Промокодът не може да се приложи.');
+        var priceEl = document.getElementById(selected.priceElId);
+        if (priceEl) priceEl.innerHTML = '<span class="tix-price-was">' + (quote.baseAmountCents / 100).toFixed(2) + '€</span>' + (quote.amountCents / 100).toFixed(2) + '<span class="cur">€</span>';
+        form.dataset.appliedPromo = code;
+        setNote('Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
+        trackEvent('apply_promo_code', { code: code });
+      } catch (error) { form.dataset.appliedPromo = ''; setNote(error.message, true); }
+      promoBtn.disabled = false;
     }
 
     promoBtn.addEventListener('click', applyPromo);
     promoInput.addEventListener('keydown', function(e){
       if (e.key === 'Enter') { e.preventDefault(); applyPromo(); }
     });
+    Object.keys(TICKETS).forEach(function(key){
+      var button = document.getElementById(TICKETS[key].btnId);
+      if (!button) return;
+      button.href = '#tickets';
+      button.addEventListener('click', function(e){
+        e.preventDefault();
+        if (ticketType) ticketType.value = key;
+        ticketType && ticketType.dispatchEvent(new Event('change'));
+        if (typeof form.requestSubmit === 'function') form.requestSubmit();
+        else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
+    });
   }, 'promo-codes');
 
-  // ---------- registration (attendee info) form ----------
-  // This form is NOT a payment/checkout: it only forwards name/email/phone/
-  // promo code/master class choice/attendee count to an external form
-  // service (Formspree, Google Forms, ...) chosen and owned by the
-  // organizer. This file never receives or stores that data itself — there
-  // is no server here to store it on. See README.md for setup.
+  // ---------- registration: create pending order, then open DSK ----------
   safeRun(function initRegistrationForm(){
     var form = document.getElementById('regForm');
     var submitBtn = document.getElementById('regSubmitBtn');
@@ -1808,6 +1773,7 @@
         var data = Object.fromEntries(new FormData(form).entries());
         data.masterClasses = Array.from(form.querySelectorAll('input[name="masterClass"]:checked')).map(function(input){ return input.value; });
         data.agreeTerms = form.querySelector('input[name="agreeTerms"]:checked') !== null;
+        data.promoCode = form.dataset.appliedPromo || (document.getElementById('promoApplyInput') || {}).value || '';
         data.attendees = [];
       var count = Math.max(1, Math.min(100, parseInt(data.attendeesCount, 10) || 1));
         for (var i = 1; i <= count; i++) {
@@ -1823,13 +1789,14 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
           });
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          if (note) note.textContent = 'Данните са записани успешно.';
-          form.reset();
-          renderExtraAttendees(1);
+          var result = await response.json();
+          if (!response.ok) throw new Error(result.error || ('HTTP ' + response.status));
+          if (!result.paymentUrl) throw new Error('Плащането все още не е конфигурирано.');
+          if (note) note.textContent = 'Поръчката е създадена. Пренасочване към плащане…';
+          window.location.assign(result.paymentUrl);
         } catch (err) {
           submitBtn.disabled = false;
-          if (note) note.textContent = 'Не успяхме да запишем данните. Опитай отново.';
+          if (note) note.textContent = err && err.message ? err.message : 'Не успяхме да създадем поръчката. Опитай отново.';
           if (window.console && console.error) console.error('[nail-restart:registration-submit]', err);
         }
         trackEvent('submit_registration_form', {});

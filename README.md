@@ -36,7 +36,7 @@
 
 Live API: `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. D1 базата е `sofiasummit-events` с binding `DB`; идентификаторът е записан в `backend/wrangler.toml`.
 
-Frontend-ът изпраща регистрациите към `/api/orders`, включително `agreeTerms`, `masterClasses` и данните за всички участници.
+Frontend-ът изпраща регистрациите към `/api/orders`, включително `agreeTerms`, `masterClasses`, промокода и данните за всички участници, след което пренасочва към върнатия DSK payment link.
 
 Изборът на master class е активен за `Standard + запис` и `VIP`, но е деактивиран за `Standard`. Броят участници е цяло число от 1 до 100.
 
@@ -46,13 +46,14 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 
 Подаръчният пакет на стойност 100 EUR е показан най-отгоре във всеки билет. Standard, Standard + запис и VIP вече имат активни DSK payment URL адреси в `SITE_CONFIG`. Бутоните използват един и същ акцентен цвят.
 
-Промокодовете се добавят в `SITE_CONFIG.promoCodes`. За всяка намалена цена е нужен съответен реален DSK payment URL.
+Промокодовете вече се управляват в D1 през защитения Worker admin интерфейс `/admin/promos`. При 1 участник отстъпката е 20%, а при 2+ участници — 25%. За всяка комбинация промокод + билет + брой участници се конфигурира отделен DSK link; frontend-ът не приема цена от клиента.
 
 ## Backend статус
 
-- Работи: health endpoint, event data, регистрация, капацитет до 100 места, записване на допълнителни участници и промо кодове в D1.
-- Не е завършено: DSK плащане/webhook, автоматични имейли, ticket URL след плащане и admin export.
-- Имейлите изискват Resend API key; DSK изисква payment links и webhook формат от банката.
+- Работи: health/event API, D1 поръчки, капацитет до 100 места, участници, server-side промо quote, admin CRUD за промокодове и payment links, DSK webhook, ticket URL и Resend имейли към купувача и уникалните имейли на участниците.
+- DSK webhook трябва да изпраща `orderId`/merchant reference, който съвпада с локалната поръчка; без него плащане не се маркира автоматично.
+- Имейлите изискват `RESEND_API_KEY` и `EMAIL_FROM`; webhook-ът изисква `DSK_WEBHOOK_SECRET`.
+- `/admin/promos` трябва да бъде публикуван зад Cloudflare Access. Basic Auth остава само fallback за локална настройка.
 
 ## Локален preview
 
@@ -64,7 +65,7 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 
 Публикуваното repository е локалното `.publish-repo`. След промени копирай актуалните файлове в `.publish-repo/events/nail-business-restart/`, направи commit, изпрати го в `origin main` и провери live страницата.
 
-Не записвай AWS ключове, GitHub токени или други секрети в repository-то.
+Не записвай AWS ключове, GitHub токени, Resend ключове, DSK secret или Cloudflare Access secrets в repository-то.
 
 ## Начална страница — подкасти, продукции и инициативи
 

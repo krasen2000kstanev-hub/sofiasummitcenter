@@ -15,10 +15,13 @@
 - Правните страници са `terms.html`, `privacy.html`, `cookies.html`, `recording.html` и `refund.html`.
 - Всички правни препратки се отварят като отделни страници в нов таб и връщат към секцията `#legal`.
 - Формата вече изпраща към `/api/orders`, подава `agreeTerms: true`, `masterClasses` и `fullName` за допълнителните участници.
-- DSK payment links са конфигурирани за Standard, Standard + запис и VIP в `SITE_CONFIG`; промокодовете остават изключени.
-- Полето „Промо код“ е премахнато от регистрационната форма; отделният блок за промокодите при билетите е запазен за бъдеща употреба.
+- Базовите DSK links са в D1 `ticket_types.dsk_url`; промо link-овете са в `promo_payment_links` по `promo_code_id + ticket_key + attendee_count`.
+- Промокодовете са в D1 `promo_codes`, с активност, срокове, лимит, позволени билети и 20%/25% server-side отстъпка. Admin UI/API: Worker `/admin/promos`, `/api/admin/promos` и `/api/admin/promo-links`.
+- Полето „Промо код“ е отделно от регистрационната форма; приложението прави quote към Worker, а submit създава поръчка и пренасочва към DSK.
 - Всички билетни бутони използват един и същ акцентен цвят като VIP бутона.
-- DSK webhook, автоматични имейли, ticket URL и admin export изискват пълното backend deployment; текущият live Worker е минималният registration API.
+- DSK webhook `/api/payments/dsk/webhook` приема само подписан payload с познат `orderId`/merchant reference и финализира поръчката идемпотентно.
+- След плащане се генерира `/api/tickets/:token` и Resend изпраща имейл към купувача и уникалните имейли на участниците; `email_log` предотвратява автоматични дублирания.
+- Live migration, Worker secrets, DSK webhook configuration и Cloudflare Access са deployment стъпки извън GitHub push-а и изискват достъп до Cloudflare/DSK/Resend.
 - Не се съхраняват никакви секрети в проекта.
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.
 - Последният GitHub commit е `be49cc4` (`fix registration API payload and endpoint`).
