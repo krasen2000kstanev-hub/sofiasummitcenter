@@ -15,9 +15,16 @@ const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
 const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 const GROUP_PAYMENT_URLS = {
-  standard: 'https://epg.dskbank.bg/sc/TRIUNenQNHWhsPgU',
-  standard_recording: 'https://epg.dskbank.bg/sc/TaLuqbWTDVVZklMU',
-  vip: 'https://epg.dskbank.bg/sc/GNHYplyQjAfCWsle'
+  2: {
+    standard: 'https://epg.dskbank.bg/sc/TRIUNenQNHWhsPgU',
+    standard_recording: 'https://epg.dskbank.bg/sc/TaLuqbWTDVVZklMU',
+    vip: 'https://epg.dskbank.bg/sc/GNHYplyQjAfCWsle'
+  },
+  3: {
+    standard: 'https://epg.dskbank.bg/sc/kLCyAHEmiVjrmwvB',
+    standard_recording: 'https://epg.dskbank.bg/sc/sNmAxRwYIPgHyize',
+    vip: 'https://epg.dskbank.bg/sc/SEnWwgKQhwxoDDsE'
+  }
 };
 
 function adminAuth(request, env) {
@@ -81,7 +88,7 @@ async function quotePromo(env, event, ticket, promoCode, count) {
   if (count > 1) {
     const discountPercent = 25;
     const unitAmountCents = Math.round(baseUnitAmountCents * (100 - discountPercent) / 100);
-    return { baseAmountCents, amountCents: unitAmountCents * count, unitAmountCents, discountPercent, paymentUrl: GROUP_PAYMENT_URLS[ticket.ticket_key] || null, promo: null };
+    return { baseAmountCents, amountCents: unitAmountCents * count, unitAmountCents, discountPercent, paymentUrl: GROUP_PAYMENT_URLS[count]?.[ticket.ticket_key] || null, promo: null };
   }
   if (!promoCode) return { baseAmountCents, amountCents: baseAmountCents, unitAmountCents: baseUnitAmountCents, discountPercent: 0, paymentUrl: ticket.dsk_url || null, promo: null };
   const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id=? AND code=?').bind(event.id, promoCode).first();
