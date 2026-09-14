@@ -1,0 +1,38 @@
+name: Deploy events API
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-events-api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Wrangler
+        run: npm install --global wrangler@4.131.1
+      - name: Resolve D1 database id
+        working-directory: backend
+        shell: bash
+        run: |
+          database_id="$(wrangler d1 list --json | jq -r '.[] | select(.name == "sofiasummit-events") | .uuid')"
+          test -n "$database_id" && test "$database_id" != "null"
+          sed -i "s/REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID/$database_id/" wrangler.toml
+      - name: Apply D1 migrations
+        working-directory: backend
+        run: wrangler d1 migrations apply sofiasummit-events --remote
+      - name: Deploy Worker
+        working-directory: backend
+        run: wrangler deploy

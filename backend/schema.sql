@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS attendees (
   full_name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
+  ticket_token TEXT UNIQUE,
+  checked_in_at TEXT,
   UNIQUE(order_id, attendee_no)
 );
 
@@ -98,6 +100,7 @@ CREATE TABLE IF NOT EXISTS payment_events (
 CREATE TABLE IF NOT EXISTS email_log (
   id TEXT PRIMARY KEY,
   order_id TEXT,
+  attendee_id TEXT,
   recipient TEXT NOT NULL,
   email_type TEXT NOT NULL,
   provider_id TEXT,
@@ -108,7 +111,9 @@ CREATE TABLE IF NOT EXISTS email_log (
 CREATE INDEX IF NOT EXISTS idx_orders_event_status ON orders(event_id, status, expires_at);
 CREATE INDEX IF NOT EXISTS idx_orders_buyer_email ON orders(buyer_email);
 CREATE INDEX IF NOT EXISTS idx_attendees_order ON attendees(order_id);
+CREATE INDEX IF NOT EXISTS idx_attendees_ticket_token ON attendees(ticket_token);
 CREATE INDEX IF NOT EXISTS idx_payment_events_order ON payment_events(order_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_email_log_ticket_once ON email_log(order_id, attendee_id, email_type);
 
 INSERT OR IGNORE INTO events (id, slug, name, starts_at, venue, capacity, status, created_at, updated_at)
 VALUES ('event-nail-business-restart', 'nail-business-restart', 'NAIL BUSINESS RE:START', '2026-10-26T09:00:00+02:00', 'Sofia Summit Center', 100, 'active', datetime('now'), datetime('now'));

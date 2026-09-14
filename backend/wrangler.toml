@@ -4,6 +4,7 @@ compatibility_date = "2026-09-01"
 
 [vars]
 PUBLIC_SITE_URL = "https://sofiasummit.bg"
+QR_CODE_API_URL = "https://api.qrserver.com/v1/create-qr-code/"
 
 [[d1_databases]]
 binding = "DB"

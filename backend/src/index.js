@@ -64,17 +64,126 @@ async function verifySignature(raw, signature, secret) {
   return expected === signature.replace(/^sha256=/, '').toLowerCase();
 }
 
-async function sendTicketEmail(env, order, attendees, event, ticketUrl) {
-  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped' };
-  const html = `<h1>${event.name}</h1><p>Регистрацията и плащането са потвърдени.</p><p><strong>Номер на поръчка:</strong> ${order.id}</p><p><strong>Участници:</strong> ${attendees.map((a) => clean(a.full_name)).join(', ')}</p><p><a href="${ticketUrl}">Отвори билета</a></p>`;
+const EVENT_ADDRESS = 'ул. „8-ми декември“ № 13, София, България';
+
+const transliterate = (value) => String(value ?? '').replace(/[А-Яа-яЁё]/g, (character) => ({
+  А: 'A', Б: 'B', В: 'V', Г: 'G', Д: 'D', Е: 'E', Ж: 'Zh', З: 'Z', И: 'I', Й: 'Y', К: 'K', Л: 'L', М: 'M', Н: 'N', О: 'O', П: 'P', Р: 'R', С: 'S', Т: 'T', У: 'U', Ф: 'F', Х: 'H', Ц: 'Ts', Ч: 'Ch', Ш: 'Sh', Щ: 'Sht', Ъ: 'A', Ь: 'Y', Ю: 'Yu', Я: 'Ya',
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sht', ъ: 'a', ь: 'y', ю: 'yu', я: 'ya', Ё: 'Yo', ё: 'yo'
+}[character] || character)).replace(/[^\x20-\x7E]/g, '?');
+
+const pdfEscape = (value) => transliterate(value).replace(/([\\()])/g, '\\$1');
+const pdfText = (value, x, y, size, color = '0 0 0') => `BT /F1 ${size} Tf ${color} rg 1 0 0 1 ${x} ${y} Tm (${pdfEscape(value)}) Tj ET\n`;
+const pdfRect = (x, y, width, height, color) => `${color} rg ${x} ${y} ${width} ${height} re f\n`;
+const asciiBytes = (value) => new TextEncoder().encode(value);
+
+function concatBytes(...parts) {
+  const length = parts.reduce((total, part) => total + part.length, 0);
+  const output = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) { output.set(part, offset); offset += part.length; }
+  return output;
+}
+
+function buildPdf(content, qrJpeg) {
+  const imageHeader = asciiBytes(`<< /Type /XObject /Subtype /Image /Width 300 /Height 300 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${qrJpeg.length} >>\nstream\n`);
+  const imageObject = concatBytes(imageHeader, qrJpeg, asciiBytes('\nendstream'));
+  const contentObject = asciiBytes(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const objects = [
+    asciiBytes('<< /Type /Catalog /Pages 2 0 R >>'),
+    asciiBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
+    asciiBytes('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> /XObject << /Im1 5 0 R >> >> /Contents 6 0 R >>'),
+    asciiBytes('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'),
+    imageObject,
+    contentObject
+  ];
+  const header = asciiBytes('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  const chunks = [header];
+  const offsets = [0];
+  let offset = header.length;
+  objects.forEach((object, index) => {
+    const chunk = concatBytes(asciiBytes(`${index + 1} 0 obj\n`), object, asciiBytes('\nendobj\n'));
+    offsets.push(offset);
+    chunks.push(chunk);
+    offset += chunk.length;
+  });
+  const xrefOffset = offset;
+  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (let index = 1; index <= objects.length; index++) xref += `${String(offsets[index]).padStart(10, '0')} 00000 n \n`;
+  xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  chunks.push(asciiBytes(xref));
+  return concatBytes(...chunks);
+}
+
+function base64(bytes) {
+  let output = '';
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) output += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  return btoa(output);
+}
+
+async function fetchQrJpeg(env, ticketUrl) {
+  const base = env.QR_CODE_API_URL || 'https://api.qrserver.com/v1/create-qr-code/';
+  const separator = base.includes('?') ? '&' : '?';
+  const response = await fetch(`${base}${separator}size=300x300&format=jpg&data=${encodeURIComponent(ticketUrl)}`);
+  if (!response.ok) throw new Error(`QR renderer returned ${response.status}`);
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+async function generateTicketPdf(env, order, attendee, event, ticketUrl) {
+  const qrJpeg = await fetchQrJpeg(env, ticketUrl);
+  const startsAt = new Date(event.starts_at || '').toLocaleString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long', timeStyle: 'short' });
+  let content = '';
+  content += pdfRect(0, 0, 595, 842, '0.043 0.043 0.051');
+  content += pdfRect(42, 82, 511, 678, '0.98 0.97 0.95');
+  content += pdfRect(42, 700, 511, 60, '0.118 0.549 0.682');
+  content += pdfRect(42, 82, 511, 4, '0.886 0.329 0.165');
+  content += pdfText('NAIL BUSINESS RE:START', 68, 724, 21, '1 1 1');
+  content += pdfText('REGISTRATION CONFIRMED', 68, 678, 12, '0.118 0.549 0.682');
+  content += pdfText('ИМЕ НА УЧАСТНИКА', 68, 636, 9, '0.435 0.416 0.447');
+  content += pdfText(attendee.full_name, 68, 610, 18, '0.043 0.043 0.051');
+  content += pdfText('ВИД БИЛЕТ', 68, 566, 9, '0.435 0.416 0.447');
+  content += pdfText(event.ticket_name || 'Ticket', 68, 542, 14, '0.043 0.043 0.051');
+  content += pdfText('ДАТА И МЯСТО', 68, 500, 9, '0.435 0.416 0.447');
+  content += pdfText(startsAt, 68, 476, 12, '0.043 0.043 0.051');
+  content += pdfText(event.venue, 68, 454, 12, '0.043 0.043 0.051');
+  content += pdfText(EVENT_ADDRESS, 68, 434, 9, '0.435 0.416 0.447');
+  content += pdfText('НОМЕР НА ПОРЪЧКА', 68, 386, 9, '0.435 0.416 0.447');
+  content += pdfText(order.id, 68, 362, 11, '0.043 0.043 0.051');
+  content += pdfText('Покажи този билет на входа.', 68, 128, 12, '0.043 0.043 0.051');
+  content += pdfText('QR кодът е индивидуален за този участник.', 68, 108, 9, '0.435 0.416 0.447');
+  content += 'q 120 0 0 120 398 230 cm /Im1 Do Q\n';
+  return buildPdf(content, qrJpeg);
+}
+
+async function sendAttendeeTicketEmail(env, order, attendee, event) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped', attendeeId: attendee.id };
+  const recipient = clean(attendee.email, 160).toLowerCase() || order.buyer_email;
+  const existing = await env.DB.prepare("SELECT status FROM email_log WHERE order_id=? AND attendee_id=? AND email_type='ticket'").bind(order.id, attendee.id).first();
+  if (existing?.status === 'sent') return { status: 'already_sent', attendeeId: attendee.id };
+  const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${attendee.ticket_token}`;
+  let pdf;
+  try { pdf = await generateTicketPdf(env, order, attendee, event, ticketUrl); }
+  catch (error) {
+    await env.DB.prepare("INSERT OR REPLACE INTO email_log (id, order_id, attendee_id, recipient, email_type, provider_id, status, sent_at) VALUES (?,?,?,?,?,?,?,?)")
+      .bind(id('email'), order.id, attendee.id, recipient, 'ticket', null, 'failed', now()).run();
+    console.error('[ticket-pdf]', error);
+    return { status: 'failed', attendeeId: attendee.id };
+  }
+  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете QR кода от приложения PDF билет на входа.</p>`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: env.EMAIL_FROM, to: [order.buyer_email], subject: `Билет за ${event.name}`, html })
+    body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Билет за ${event.name}`, html: message, attachments: [{ filename: `ticket-${attendee.ticket_token}.pdf`, content: base64(pdf) }] })
   });
   const result = await response.json().catch(() => ({}));
-  await env.DB.prepare('INSERT INTO email_log (id, order_id, recipient, email_type, provider_id, status, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(id('email'), order.id, order.buyer_email, 'ticket', result.id || null, response.ok ? 'sent' : 'failed', now()).run();
-  return { status: response.ok ? 'sent' : 'failed', providerId: result.id || null };
+  await env.DB.prepare("INSERT OR REPLACE INTO email_log (id, order_id, attendee_id, recipient, email_type, provider_id, status, sent_at) VALUES (?,?,?,?,?,?,?,?)")
+    .bind(id('email'), order.id, attendee.id, recipient, 'ticket', result.id || null, response.ok ? 'sent' : 'failed', now()).run();
+  return { status: response.ok ? 'sent' : 'failed', providerId: result.id || null, attendeeId: attendee.id };
+}
+
+async function sendTicketEmails(env, order, attendees, event) {
+  const results = [];
+  for (const attendee of attendees) results.push(await sendAttendeeTicketEmail(env, order, attendee, event));
+  return results;
 }
 
 async function createOrder(request, env) {
@@ -145,18 +254,22 @@ async function dskWebhook(request, env, ctx) {
 
 async function finalizeOrder(orderId, reference, env, ctx) {
   const token = crypto.randomUUID();
-  const updated = await env.DB.prepare("UPDATE orders SET status='paid', payment_reference=?, ticket_token=COALESCE(ticket_token,?), paid_at=COALESCE(paid_at,?), updated_at=? WHERE id=? AND status='pending_payment'")
+  await env.DB.prepare("UPDATE orders SET status='paid', payment_reference=?, ticket_token=COALESCE(ticket_token,?), paid_at=COALESCE(paid_at,?), updated_at=? WHERE id=? AND status='pending_payment'")
     .bind(reference || null, token, now(), now(), orderId).run();
-  const order = await env.DB.prepare('SELECT o.*, e.name event_name, e.starts_at, e.venue FROM orders o JOIN events e ON e.id=o.event_id WHERE o.id=?').bind(orderId).first();
+  const order = await env.DB.prepare('SELECT o.*, e.name event_name, e.starts_at, e.venue, t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
   if (!order) return false;
   const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
-  const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${order.ticket_token}`;
-  if (updated.meta?.changes) ctx.waitUntil(sendTicketEmail(env, order, attendees.results || [], { name: order.event_name }, ticketUrl));
+  for (const attendee of attendees.results || []) {
+    if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+  }
+  const ticketRows = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
+  ctx.waitUntil(sendTicketEmails(env, order, ticketRows.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }));
   return true;
 }
 
-function ticketPage(order, attendees, event) {
-  return new Response(`<!doctype html><meta charset="utf-8"><title>Билет — ${html(event.name)}</title><style>body{font-family:Arial,sans-serif;background:#f4f7fc;color:#102653;padding:32px}.ticket{max-width:640px;margin:auto;background:#fff;border:1px solid #d6e0f2;border-radius:12px;padding:32px;box-shadow:0 12px 30px #10265318}h1{margin-top:0}.meta{line-height:1.8}.code{font:700 20px monospace;background:#eaf0fb;padding:12px;border-radius:8px;display:inline-block}</style><main class="ticket"><h1>${html(event.name)}</h1><p>Потвърден билет</p><div class="meta"><strong>Номер:</strong> ${html(order.id)}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Участници:</strong> ${(attendees.results || []).map((a) => html(clean(a.full_name))).join(', ')}</div><p class="code">${html(order.ticket_token)}</p><p>Покажете този билет при регистрация на събитието.</p></main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
+function ticketPage(order, attendee, event) {
+  const used = Boolean(attendee.checked_in_at);
+  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет — ${html(event.name)}</title><style>:root{--ink:#0b0b0d;--paper:#faf8f5;--cyan:#1e8cae;--orange:#e2542a}body{font-family:Arial,sans-serif;background:var(--ink);color:#17151a;padding:24px}.ticket{max-width:640px;margin:auto;background:var(--paper);border-top:8px solid var(--cyan);border-bottom:4px solid var(--orange);padding:32px;box-shadow:0 12px 30px #0005}h1{margin:0 0 12px;font-size:28px;color:var(--ink)}.status{color:var(--cyan);font-weight:700;letter-spacing:.08em}.meta{line-height:1.9;margin-top:24px}.code{font:700 16px monospace;background:#eaf6fa;padding:12px;border-radius:4px;display:inline-block;word-break:break-all}.used{color:var(--orange);font-weight:700}</style><main class="ticket"><h1>${html(event.name)}</h1><p class="status">${used ? 'БИЛЕТЪТ Е ВЕЧЕ ИЗПОЛЗВАН' : 'РЕГИСТРАЦИЯ ПОТВЪРДЕНА'}</p><div class="meta"><strong>Участник:</strong> ${html(attendee.full_name)}<br><strong>Билет:</strong> ${html(event.ticket_name || 'Билет')}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Адрес:</strong> ${html(EVENT_ADDRESS)}<br><strong>Поръчка:</strong> ${html(order.id)}</div><p class="code">${html(attendee.ticket_token)}</p>${used ? `<p class="used">Чекиран на ${html(attendee.checked_in_at)}</p>` : '<p>Покажете този билет при регистрация на събитието.</p>'}</main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
 export default {
@@ -178,13 +291,20 @@ export default {
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
         const token = clean(url.pathname.split('/').pop(), 100);
-        const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue FROM orders o JOIN events e ON e.id=o.event_id WHERE o.ticket_token=? AND o.status='paid'").bind(token).first();
-        if (!order) return new Response('Ticket not found', { status: 404 });
-        const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(order.id).all();
-        return ticketPage(order, attendees, { name: order.event_name, starts_at: order.starts_at, venue: order.venue });
+        const row = await env.DB.prepare("SELECT o.*,a.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM attendees a JOIN orders o ON o.id=a.order_id JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE a.ticket_token=? AND o.status='paid'").bind(token).first();
+        if (!row) return new Response('Ticket not found', { status: 404 });
+        return ticketPage(row, row, { name: row.event_name, starts_at: row.starts_at, venue: row.venue, ticket_name: row.ticket_name });
       }
       if (url.pathname.startsWith('/api/admin/')) {
         const denied = requireAdmin(request, env); if (denied) return denied;
+        if (request.method === 'POST' && /^\/api\/admin\/tickets\/[^/]+\/check-in$/.test(url.pathname)) {
+          const token = clean(url.pathname.split('/')[4], 100);
+          const updated = await env.DB.prepare("UPDATE attendees SET checked_in_at=? WHERE ticket_token=? AND checked_in_at IS NULL AND order_id IN (SELECT id FROM orders WHERE status='paid')").bind(now(), token).run();
+          if (updated.meta?.changes) return json({ ok: true, status: 'checked_in', token }, 200, headers);
+          const attendee = await env.DB.prepare('SELECT checked_in_at FROM attendees WHERE ticket_token=?').bind(token).first();
+          if (attendee?.checked_in_at) return json({ ok: false, status: 'already_checked_in', checkedInAt: attendee.checked_in_at }, 409, headers);
+          return json({ error: 'Ticket not found or unpaid' }, 404, headers);
+        }
         if (request.method === 'GET' && url.pathname === '/api/admin/orders') {
           const status = clean(url.searchParams.get('status'), 40);
           const query = status ? 'SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.status=? ORDER BY o.created_at DESC' : 'SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id ORDER BY o.created_at DESC';
@@ -208,11 +328,14 @@ export default {
         }
         if (request.method === 'POST' && /^\/api\/admin\/orders\/[^/]+\/resend-ticket$/.test(url.pathname)) {
           const orderId = url.pathname.split('/')[4];
-          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue FROM orders o JOIN events e ON e.id=o.event_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
+          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
           if (!order) return json({ error: 'Paid order not found' }, 404, headers);
           const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
-          const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${order.ticket_token}`;
-          return json(await sendTicketEmail(env, order, attendees.results || [], { name: order.event_name }, ticketUrl), 200, headers);
+          for (const attendee of attendees.results || []) {
+            if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+          }
+          const refreshed = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
+          return json(await sendTicketEmails(env, order, refreshed.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }), 200, headers);
         }
         if (request.method === 'POST' && url.pathname === '/api/admin/events/clone') {
           const body = await request.json();
