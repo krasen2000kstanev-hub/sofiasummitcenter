@@ -1715,27 +1715,43 @@
       promoNote.classList.toggle('is-error', !!isError);
     }
 
-    async function applyPromo(){
+    function resetPrice(selected){
+      var priceEl = document.getElementById(selected.priceElId);
+      if (priceEl) priceEl.innerHTML = selected.basePrice + '<span class="cur">€</span>';
+    }
+
+    async function refreshQuote(showErrors){
       var raw = (promoInput.value || '').trim();
-      if (!raw) { setNote('Въведи промокод.', true); return; }
       var code = raw.toUpperCase(), selected = TICKETS[ticketType.value] || TICKETS.standard;
+      if (!raw) {
+        form.dataset.appliedPromo = '';
+        resetPrice(selected);
+        if (showErrors) setNote('', false);
+        return;
+      }
       promoBtn.disabled = true;
       try {
         var response = await fetch(SITE_CONFIG.registrationApiUrl + '/api/promo/quote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventSlug: 'nail-business-restart', ticketType: ticketType.value, promoCode: code, attendeesCount: Number(countSelect.value || 1) }) });
         var quote = await response.json();
         if (!response.ok) throw new Error(quote.error || 'Промокодът не може да се приложи.');
         var priceEl = document.getElementById(selected.priceElId);
-        if (priceEl) priceEl.innerHTML = '<span class="tix-price-was">' + (quote.baseAmountCents / 100).toFixed(2) + '€</span>' + (quote.amountCents / 100).toFixed(2) + '<span class="cur">€</span>';
+        var people = Math.max(1, Number(countSelect.value || 1));
+        if (priceEl) priceEl.innerHTML = '<span class="tix-price-was">' + selected.basePrice.toFixed(2) + '€</span>' + (quote.amountCents / people / 100).toFixed(2) + '<span class="cur">€</span>';
         form.dataset.appliedPromo = code;
         setNote('Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
         trackEvent('apply_promo_code', { code: code });
-      } catch (error) { form.dataset.appliedPromo = ''; setNote(error.message, true); }
+      } catch (error) { form.dataset.appliedPromo = ''; resetPrice(selected); if (showErrors) setNote(error.message, true); }
       promoBtn.disabled = false;
     }
 
-    promoBtn.addEventListener('click', applyPromo);
+    var quoteTimer;
+    function scheduleQuote(){ clearTimeout(quoteTimer); quoteTimer = setTimeout(function(){ refreshQuote(false); }, 250); }
+    promoBtn.addEventListener('click', function(){ refreshQuote(true); });
+    promoInput.addEventListener('input', scheduleQuote);
+    countSelect.addEventListener('change', scheduleQuote);
+    ticketType.addEventListener('change', scheduleQuote);
     promoInput.addEventListener('keydown', function(e){
-      if (e.key === 'Enter') { e.preventDefault(); applyPromo(); }
+      if (e.key === 'Enter') { e.preventDefault(); refreshQuote(true); }
     });
     Object.keys(TICKETS).forEach(function(key){
       var button = document.getElementById(TICKETS[key].btnId);

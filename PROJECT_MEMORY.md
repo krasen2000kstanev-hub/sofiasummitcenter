@@ -21,9 +21,11 @@
 - Добавени са 20% DSK links за 1 участник и 25% group DSK links за 2 участници за Standard, Standard + запис и VIP за трите промокода. За 3+ участници са нужни отделни links.
 - Admin `/api/admin/promos` показва usage count, а `/api/admin/promo-usage?code=...` показва кой е използвал кода, кога, за кой билет, с колко участници и какъв е статусът на поръчката.
 - Полето „Промо код“ е отделно от регистрационната форма; приложението прави quote към Worker, а submit създава поръчка и пренасочва към DSK.
+- Quote-ът се обновява автоматично при input/change на промокода, типа билет и броя участници; непълен групов запис не чупи интерфейса и се отхвърля от backend-а с ясно съобщение.
 - Всички билетни бутони използват един и същ акцентен цвят като VIP бутона.
 - DSK webhook `/api/payments/dsk/webhook` приема само подписан payload с познат `orderId`/merchant reference и финализира поръчката идемпотентно.
 - След плащане се генерира `/api/tickets/:token` и Resend изпраща имейл към купувача и уникалните имейли на участниците; `email_log` предотвратява автоматични дублирания.
+- След създаване на поръчка Resend изпраща отделен `registration_received` имейл към всеки уникален имейл от D1, независимо от DSK; след плащане се изпраща отделният билетен email.
 - Live migration, Worker secrets, DSK webhook configuration и Cloudflare Access са deployment стъпки извън GitHub push-а и изискват достъп до Cloudflare/DSK/Resend.
 - Не се съхраняват никакви секрети в проекта.
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.

@@ -119,11 +119,27 @@ async function sendTicketEmail(env, order, attendees, event, ticketUrl) {
   return { status: results.includes('failed') ? 'failed' : 'sent', recipients: recipients.length };
 }
 
+async function sendRegistrationEmails(env, order, attendees, event) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped' };
+  const recipients = [...new Set([order.buyer_email, ...attendees.map((a) => clean(a.email).toLowerCase()).filter((value) => value.includes('@'))])];
+  const results = [];
+  for (const recipient of recipients) {
+    const existing = await env.DB.prepare("SELECT id FROM email_log WHERE order_id=? AND recipient=? AND email_type='registration_received' AND status='sent' LIMIT 1").bind(order.id, recipient).first();
+    if (existing) continue;
+    const message = `<h1>${html(event.name)}</h1><p>Регистрацията ти е записана успешно в сайта.</p><p><strong>Номер на регистрация:</strong> ${html(order.id)}</p><p><strong>Билет:</strong> ${html(order.ticket_name || '')}</p><p><strong>Участници:</strong> ${attendees.map((a) => html(clean(a.full_name))).join(', ')}</p><p>Плащането се извършва отделно през защитената страница на Банка ДСК.</p>`;
+    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Регистрация за ${event.name}`, html: message }) });
+    const result = await response.json().catch(() => ({}));
+    await env.DB.prepare('INSERT INTO email_log (id,order_id,recipient,email_type,provider_id,status,sent_at) VALUES (?,?,?,?,?,?,?)').bind(id('email'), order.id, recipient, 'registration_received', result.id || null, response.ok ? 'sent' : 'failed', now()).run();
+    results.push(response.ok ? 'sent' : 'failed');
+  }
+  return { status: results.includes('failed') ? 'failed' : 'sent', recipients: recipients.length };
+}
+
 function promoAdminPage() {
   return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sofia Summit — промокодове</title><style>body{font:16px system-ui;max-width:960px;margin:32px auto;padding:0 16px;color:#102653}input,button{padding:10px;margin:4px;border:1px solid #b8cbea;border-radius:6px}button{background:#2859bd;color:white;cursor:pointer}.card{border:1px solid #d6e0f2;border-radius:10px;padding:16px;margin:16px 0}pre{white-space:pre-wrap;background:#f4f7fc;padding:12px;overflow:auto}</style><h1>Промокодове</h1><p>Достъпът трябва да е защитен с Cloudflare Access.</p><div class="card"><h2>Нов / обновен код</h2><input id="id" placeholder="ID (за обновяване)"><input id="code" placeholder="Код"><input id="eventSlug" value="nail-business-restart"><input id="single" type="number" value="20" placeholder="1 участник %"><input id="group" type="number" value="25" placeholder="2+ участници %"><input id="limit" type="number" placeholder="Лимит"><input id="keys" placeholder="Билети: standard,vip"><button onclick="savePromo()">Запази</button></div><div class="card"><h2>DSK link за точен билет и брой участници</h2><input id="promoId" placeholder="Promo ID"><input id="ticket" value="standard" placeholder="ticket key"><input id="count" type="number" value="1" placeholder="брой"><input id="url" placeholder="https://..."><button onclick="saveLink()">Запази link</button></div><div class="card"><h2>Използвания</h2><input id="usageCode" placeholder="Код или празно за всички"><button onclick="loadUsage()">Покажи използванията</button></div><pre id="out">Зареждане…</pre><script>const out=document.getElementById('out');async function api(path,opt){const r=await fetch(path,opt);const x=await r.json();if(!r.ok)throw Error(x.error||r.status);return x}async function load(){out.textContent=JSON.stringify(await api('/api/admin/promos'),null,2)}async function loadUsage(){try{out.textContent=JSON.stringify(await api('/api/admin/promo-usage?code='+encodeURIComponent(usageCode.value)),null,2)}catch(e){out.textContent=e.message}}async function savePromo(){try{const x=await api('/api/admin/promos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:id.value,code:code.value,eventSlug:eventSlug.value,singleDiscountPercent:+single.value,groupDiscountPercent:+group.value,usageLimit:limit.value,ticketKeys:keys.value.split(',').map(x=>x.trim()).filter(Boolean)})});promoId.value=x.id;await load()}catch(e){out.textContent=e.message}}async function saveLink(){try{await api('/api/admin/promo-links',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({promoId:promoId.value,ticketKey:ticket.value,attendeeCount:+count.value,paymentUrl:url.value})});await load()}catch(e){out.textContent=e.message}}load().catch(e=>out.textContent=e.message)</script>`, { headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
-async function createOrder(request, env) {
+async function createOrder(request, env, ctx) {
   const headers = cors(request);
   const body = await readBody(request);
   const eventSlug = clean(body.eventSlug || 'nail-business-restart', 80);
@@ -165,6 +181,9 @@ async function createOrder(request, env) {
   }
   const results = await env.DB.batch(statements);
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
+  const createdOrder = await env.DB.prepare('SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
+  const registrationEmailTask = sendRegistrationEmails(env, createdOrder, attendees.slice(0, count).map((a) => ({ full_name: clean(a.fullName), email: clean(a.email).toLowerCase() })), { name: createdOrder.event_name });
+  if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(registrationEmailTask);
   return json({ orderId, status: 'pending_payment', baseAmountCents: quote.baseAmountCents, discountPercent: quote.discountPercent, amountCents: amount, currency: ticket.currency, paymentUrl: quote.paymentUrl, message: quote.paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, quote.paymentUrl ? 201 : 202, headers);
 }
 
@@ -221,7 +240,7 @@ export default {
         const used = await env.DB.prepare("SELECT COALESCE(SUM(attendee_count),0) total FROM orders WHERE event_id=? AND (status='paid' OR (status='pending_payment' AND expires_at > ?))").bind(event.id, now()).first();
         return json({ event, tickets: tickets.results || [], seatsRemaining: Math.max(0, event.capacity - Number(used.total || 0)) }, 200, headers);
       }
-      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env);
+      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env, ctx);
       if (request.method === 'POST' && url.pathname === '/api/promo/quote') return promoQuote(request, env);
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
