@@ -28,7 +28,7 @@ function requireAdmin(request, env) {
   if (adminAuth(request, env)) return null;
   return new Response('Authentication required', {
     status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="Sofia Summit admin"' }
+    headers: { 'WWW-Authenticate': 'Basic realm="Sofia Summit admin"', ...cors(request) }
   });
 }
 
