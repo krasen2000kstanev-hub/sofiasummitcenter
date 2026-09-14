@@ -975,7 +975,11 @@
                 <input type="tel" name="phone" autocomplete="tel" required>
               </label>
               <label class="reg-field"><span>Брой участници</span>
-                <input id="attendeeCount" name="attendeesCount" type="number" min="1" max="3" step="1" value="1" inputmode="numeric" required>
+                <select id="attendeeCount" name="attendeesCount" required>
+                  <option value="1">1 участник</option>
+                  <option value="2">2 участници</option>
+                  <option value="3">3 участници</option>
+                </select>
               </label>
               <label class="reg-field"><span>Тип билет*</span>
                 <select id="ticketType" name="ticketType" required>
