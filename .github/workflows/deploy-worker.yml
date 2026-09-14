@@ -22,7 +22,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: backend
           wranglerVersion: "4"
-          command: d1 migrations apply sofiasummit-events --remote --yes
+          command: d1 migrations apply sofiasummit-events --remote
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4

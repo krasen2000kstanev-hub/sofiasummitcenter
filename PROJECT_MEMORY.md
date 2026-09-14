@@ -29,7 +29,10 @@
 - Live migration, Worker secrets, DSK webhook configuration и Cloudflare Access са deployment стъпки извън GitHub push-а и изискват достъп до Cloudflare/DSK/Resend.
 - Не се съхраняват никакви секрети в проекта.
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.
-- Последният GitHub commit е `be49cc4` (`fix registration API payload and endpoint`).
+- GitHub Actions workflow `.github/workflows/deploy-worker.yml` deploy-ва `backend/` към Cloudflare при push към `main`; преди deploy прилага D1 миграциите към `sofiasummit-events`.
+- GitHub repository secrets за workflow-а са `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID`; runtime secrets за Resend, DSK и Cloudflare Access не се съхраняват в GitHub repository-то.
+- Реален email delivery тест не се изпълнява в CI, защото би изпратил писма и би създал registration side effect; проверката на имейлите изисква контролирана тестова регистрация и DSK webhook.
+- Последният успешен функционален commit преди CI workflow-а е `c74fb19`; workflow commit-ът `c8adf6b` беше коригиран след откритата несъвместимост на Wrangler 4 с флага `--yes`.
 - Подготвен е лек pointer-aware 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. Hover/focus върху контролите добавя дискретен контур по ръба, а `prefers-reduced-motion` изключва анимацията.
 - Към актуалния `main` са добавени и останалите визуални ефекти от локалния preview: интерактивна 3D сфера в галерията с drag/scroll управление и momentum, движещ се фон от снимки с линии, карта на София със Sofia Summit Center маркер и бутон за връщане в началото.
 - В `index.html` има отделни секции `#podcasts`, `#productions` и `#initiatives`; `#services` сочи към съществуващата секция за услуги. Навигацията е responsive: широкият изглед е на един ред, а под 1180px се показва хамбургер меню.

@@ -58,7 +58,7 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 
 ## Backend статус
 
-- Работи: health/event API, D1 поръчки, капацитет до 100 места, участници, server-side промо quote, admin CRUD за промокодове и payment links, DSK webhook, ticket URL и Resend имейли към купувача и уникалните имейли на участниците.
+- Реализирани са: health/event API, D1 поръчки, капацитет до 100 места, участници, server-side промо quote, admin CRUD за промокодове и payment links, DSK webhook, ticket URL и Resend имейли към купувача и уникалните имейли на участниците.
 - При записване в D1 Worker-ът изпраща отделен имейл към всеки уникален имейл на купувач/участник с потвърждение, че регистрацията е записана в сайта; DSK се използва само за плащането и последващото payment confirmation.
 - DSK webhook трябва да изпраща `orderId`/merchant reference, който съвпада с локалната поръчка; без него плащане не се маркира автоматично.
 - Имейлите изискват `RESEND_API_KEY` и `EMAIL_FROM`; webhook-ът изисква `DSK_WEBHOOK_SECRET`.
@@ -75,6 +75,17 @@ Frontend-ът изпраща регистрациите към `/api/orders`, в
 Публикуваното repository е локалното `.publish-repo`. След промени копирай актуалните файлове в `.publish-repo/events/nail-business-restart/`, направи commit, изпрати го в `origin main` и провери live страницата.
 
 Не записвай AWS ключове, GitHub токени, Resend ключове, DSK secret или Cloudflare Access secrets в repository-то.
+
+### Автоматичен Worker deploy
+
+`.github/workflows/deploy-worker.yml` се стартира при push към `main`, когато има промяна в `backend/`. Workflow-ът първо прилага D1 миграциите към `sofiasummit-events`, след което deploy-ва Worker-а от `backend/`.
+
+GitHub repository secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+Resend, DSK и Cloudflare Access secrets остават конфигурирани само в Cloudflare Worker-а. Реален email delivery тест изисква тестова регистрация и реален Resend/DSK webhook flow; не се изпращат тестови писма автоматично при CI.
 
 ## Начална страница — подкасти, продукции и инициативи
 
