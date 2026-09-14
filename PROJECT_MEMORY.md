@@ -15,7 +15,9 @@
 - Правните страници са `terms.html`, `privacy.html`, `cookies.html`, `recording.html` и `refund.html`.
 - Всички правни препратки се отварят като отделни страници в нов таб и връщат към секцията `#legal`.
 - Формата вече изпраща към `/api/orders`, подава `agreeTerms: true`, `masterClasses` и `fullName` за допълнителните участници.
-- DSK payment links и реални промокодове все още не са конфигурирани.
+- DSK payment links са конфигурирани за Standard, Standard + запис и VIP в `SITE_CONFIG`; промокодовете остават изключени.
+- Полето „Промо код“ е премахнато от регистрационната форма; отделният блок за промокодите при билетите е запазен за бъдеща употреба.
+- Всички билетни бутони използват един и същ акцентен цвят като VIP бутона.
 - DSK webhook, автоматични имейли, ticket URL и admin export изискват пълното backend deployment; текущият live Worker е минималният registration API.
 - Не се съхраняват никакви секрети в проекта.
 - `backend/wrangler.toml` съдържа реалния D1 `database_id`.
