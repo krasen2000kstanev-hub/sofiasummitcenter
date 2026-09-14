@@ -14,6 +14,11 @@ const now = () => new Date().toISOString();
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
 const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+const GROUP_PAYMENT_URLS = {
+  standard: 'https://epg.dskbank.bg/sc/TRIUNenQNHWhsPgU',
+  standard_recording: 'https://epg.dskbank.bg/sc/TaLuqbWTDVVZklMU',
+  vip: 'https://epg.dskbank.bg/sc/GNHYplyQjAfCWsle'
+};
 
 function adminAuth(request, env) {
   const header = request.headers.get('Authorization') || '';
@@ -71,8 +76,14 @@ function parseTicketKeys(promo) {
 }
 
 async function quotePromo(env, event, ticket, promoCode, count) {
-  const baseAmountCents = ticket.price_cents * count;
-  if (!promoCode) return { baseAmountCents, amountCents: baseAmountCents, discountPercent: 0, paymentUrl: ticket.dsk_url || null, promo: null };
+  const baseUnitAmountCents = ticket.price_cents;
+  const baseAmountCents = baseUnitAmountCents * count;
+  if (count > 1) {
+    const discountPercent = 25;
+    const unitAmountCents = Math.round(baseUnitAmountCents * (100 - discountPercent) / 100);
+    return { baseAmountCents, amountCents: unitAmountCents * count, unitAmountCents, discountPercent, paymentUrl: GROUP_PAYMENT_URLS[ticket.ticket_key] || null, promo: null };
+  }
+  if (!promoCode) return { baseAmountCents, amountCents: baseAmountCents, unitAmountCents: baseUnitAmountCents, discountPercent: 0, paymentUrl: ticket.dsk_url || null, promo: null };
   const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id=? AND code=?').bind(event.id, promoCode).first();
   const current = now();
   if (!promo || !promo.active || (promo.valid_from && promo.valid_from > current) || (promo.valid_until && promo.valid_until < current)) throw new Error('Невалиден или изтекъл промокод.');
@@ -83,11 +94,12 @@ async function quotePromo(env, event, ticket, promoCode, count) {
     if (Number(used?.count || 0) >= Number(promo.usage_limit)) throw new Error('Лимитът на промокода е изчерпан.');
   }
   const discountPercent = count === 1 ? Number(promo.single_discount_percent ?? 20) : Number(promo.group_discount_percent ?? 25);
-  const amountCents = Math.round(baseAmountCents * (100 - discountPercent) / 100);
+  const unitAmountCents = Math.round(baseUnitAmountCents * (100 - discountPercent) / 100);
+  const amountCents = unitAmountCents * count;
   // ponytail: one group link covers 2+; the discount rule stays flat at 25%.
   const link = await env.DB.prepare('SELECT payment_url FROM promo_payment_links WHERE promo_code_id=? AND ticket_key=? AND attendee_count=? AND active=1').bind(promo.id, ticket.ticket_key, count === 1 ? 1 : 2).first();
   if (!link?.payment_url) throw new Error('За този промокод, билет и брой участници няма конфигуриран DSK payment link.');
-  return { baseAmountCents, amountCents, discountPercent, paymentUrl: link.payment_url, promo };
+  return { baseAmountCents, amountCents, unitAmountCents, discountPercent, paymentUrl: link.payment_url, promo };
 }
 
 async function promoQuote(request, env) {
