@@ -45,7 +45,22 @@ CREATE TABLE IF NOT EXISTS promo_codes (
   valid_from TEXT,
   valid_until TEXT,
   active INTEGER NOT NULL DEFAULT 1,
+  single_discount_percent INTEGER NOT NULL DEFAULT 20 CHECK (single_discount_percent BETWEEN 0 AND 100),
+  group_discount_percent INTEGER NOT NULL DEFAULT 25 CHECK (group_discount_percent BETWEEN 0 AND 100),
+  usage_limit INTEGER,
   UNIQUE(event_id, code)
+);
+
+CREATE TABLE IF NOT EXISTS promo_payment_links (
+  id TEXT PRIMARY KEY,
+  promo_code_id TEXT NOT NULL REFERENCES promo_codes(id) ON DELETE CASCADE,
+  ticket_key TEXT NOT NULL,
+  attendee_count INTEGER NOT NULL CHECK (attendee_count BETWEEN 1 AND 100),
+  payment_url TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(promo_code_id, ticket_key, attendee_count)
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -57,6 +72,8 @@ CREATE TABLE IF NOT EXISTS orders (
   buyer_phone TEXT NOT NULL,
   attendee_count INTEGER NOT NULL CHECK (attendee_count BETWEEN 1 AND 100),
   promo_code TEXT,
+  base_amount_cents INTEGER NOT NULL DEFAULT 0,
+  discount_percent INTEGER NOT NULL DEFAULT 0,
   amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL DEFAULT 'EUR',
   status TEXT NOT NULL DEFAULT 'pending_payment' CHECK (status IN ('pending_payment','paid','expired','cancelled','refunded')),
@@ -109,15 +126,16 @@ CREATE INDEX IF NOT EXISTS idx_orders_event_status ON orders(event_id, status, e
 CREATE INDEX IF NOT EXISTS idx_orders_buyer_email ON orders(buyer_email);
 CREATE INDEX IF NOT EXISTS idx_attendees_order ON attendees(order_id);
 CREATE INDEX IF NOT EXISTS idx_payment_events_order ON payment_events(order_id);
+CREATE INDEX IF NOT EXISTS idx_promo_payment_links_lookup ON promo_payment_links(promo_code_id, ticket_key, attendee_count, active);
 
 INSERT OR IGNORE INTO events (id, slug, name, starts_at, venue, capacity, status, created_at, updated_at)
 VALUES ('event-nail-business-restart', 'nail-business-restart', 'NAIL BUSINESS RE:START', '2026-10-26T09:00:00+02:00', 'Sofia Summit Center', 100, 'active', datetime('now'), datetime('now'));
 
-INSERT OR IGNORE INTO ticket_types (id, event_id, ticket_key, name, price_cents, currency)
+INSERT OR IGNORE INTO ticket_types (id, event_id, ticket_key, name, price_cents, currency, dsk_url)
 VALUES
-  ('ticket-nbr-standard', 'event-nail-business-restart', 'standard', 'Standard', 8900, 'EUR'),
-  ('ticket-nbr-standard-recording', 'event-nail-business-restart', 'standard_recording', 'Standard + запис', 11400, 'EUR'),
-  ('ticket-nbr-vip', 'event-nail-business-restart', 'vip', 'VIP', 12900, 'EUR');
+  ('ticket-nbr-standard', 'event-nail-business-restart', 'standard', 'Standard', 8900, 'EUR', 'https://epg.dskbank.bg/sc/ktgERYKucdkhyuRK'),
+  ('ticket-nbr-standard-recording', 'event-nail-business-restart', 'standard_recording', 'Standard + запис', 11400, 'EUR', 'https://epg.dskbank.bg/sc/SjnQoLEBzCJjpSSi'),
+  ('ticket-nbr-vip', 'event-nail-business-restart', 'vip', 'VIP', 12900, 'EUR', 'https://epg.dskbank.bg/sc/OWhxRZDYrhsnFIdc');
 
 INSERT OR IGNORE INTO masterclasses (id, event_id, masterclass_key, name, capacity)
 VALUES
