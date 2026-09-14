@@ -975,7 +975,7 @@
                 <input type="tel" name="phone" autocomplete="tel" required>
               </label>
               <label class="reg-field"><span>Брой участници</span>
-                <input id="attendeeCount" name="attendeesCount" type="number" min="1" max="100" step="1" value="1" inputmode="numeric" required>
+                <input id="attendeeCount" name="attendeesCount" type="number" min="1" max="3" step="1" value="1" inputmode="numeric" required>
               </label>
               <label class="reg-field"><span>Тип билет*</span>
                 <select id="ticketType" name="ticketType" required>
@@ -1788,7 +1788,7 @@
         data.agreeTerms = form.querySelector('input[name="agreeTerms"]:checked') !== null;
         data.promoCode = form.dataset.appliedPromo || (document.getElementById('promoApplyInput') || {}).value || '';
         data.attendees = [];
-      var count = Math.max(1, Math.min(100, parseInt(data.attendeesCount, 10) || 1));
+      var count = Math.max(1, Math.min(3, parseInt(data.attendeesCount, 10) || 1));
         for (var i = 1; i <= count; i++) {
           data.attendees.push({
             fullName: i === 1 ? data.fullName : data['attendee' + i + 'Name'] || '',
@@ -1827,7 +1827,7 @@
     function renderExtraAttendees(count){
       if (!extraWrap) return;
       extraWrap.innerHTML = '';
-      var n = Math.max(1, Math.min(100, parseInt(count, 10) || 1));
+      var n = Math.max(1, Math.min(3, parseInt(count, 10) || 1));
       if (n <= 1) { extraWrap.hidden = true; return; }
       extraWrap.hidden = false;
       for (var i = 2; i <= n; i++) {
@@ -1856,7 +1856,7 @@
     }
     if (countSelect) {
       countSelect.addEventListener('input', function(e){
-        var value = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+        var value = Math.max(1, Math.min(3, parseInt(e.target.value, 10) || 1));
         e.target.value = value;
         renderExtraAttendees(value);
       });
