@@ -1032,7 +1032,7 @@
         <div class="st-col">
           <span class="kicker">Места</span>
           <h3>Билети</h3>
-          <p class="seats-note">Местата са ограничени до 100 — резервирай своя навреме.</p>
+          <p class="seats-note" id="seatsNote">Проверяваме свободните места…</p>
           <div class="promo-box" id="promoBox">
             <label for="promoApplyInput">Имаш промокод?</label>
             <div class="promo-apply-row">
@@ -1806,6 +1806,29 @@
   }, 'promo-codes');
 
   // ---------- registration: create pending order, then open DSK ----------
+  safeRun(function initSeatAvailability(){
+    var note = document.getElementById('seatsNote');
+    if (!note || !isSafeHttpsUrl(SITE_CONFIG.registrationApiUrl)) return;
+    var refresh = async function(){
+      try {
+        var response = await fetch(SITE_CONFIG.registrationApiUrl + '/api/events/nail-business-restart', { cache: 'no-store' });
+        if (!response.ok) throw new Error('availability ' + response.status);
+        var data = await response.json();
+        var remaining = Number(data.seatsRemaining);
+        var capacity = Number(data.event && data.event.capacity);
+        if (!Number.isInteger(remaining) || remaining < 0 || !Number.isInteger(capacity) || capacity < 1) throw new Error('invalid availability');
+        note.textContent = remaining === 0 ? 'Свободните места са изчерпани.' : 'Остават ' + remaining + ' свободни места от ' + capacity + '.';
+        note.classList.toggle('is-sold-out', remaining === 0);
+      } catch (error) {
+        note.textContent = 'Свободните места се проверяват при записване.';
+        note.classList.remove('is-sold-out');
+      }
+    };
+    window.refreshSeatAvailability = refresh;
+    refresh();
+    window.setInterval(refresh, 30000);
+  }, 'seat-availability');
+
   safeRun(function initRegistrationForm(){
     var form = document.getElementById('regForm');
     var submitBtn = document.getElementById('regSubmitBtn');
@@ -1847,6 +1870,7 @@
           if (!response.ok) throw new Error(result.error || ('HTTP ' + response.status));
           if (!result.paymentUrl) throw new Error('Плащането все още не е конфигурирано.');
           if (note) note.textContent = 'Поръчката е създадена. Пренасочване към плащане…';
+          if (window.refreshSeatAvailability) window.refreshSeatAvailability();
           window.location.assign(result.paymentUrl);
         } catch (err) {
           submitBtn.disabled = false;
