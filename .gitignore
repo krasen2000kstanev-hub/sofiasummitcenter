@@ -11,6 +11,10 @@ cgi-bin/
 !backend/migrations/*.sql
 wp-config.php
 
+# Local Worker test state and dependencies.
+backend/.wrangler/
+backend/node_modules/
+
 # Legacy hosting files kept locally but not published.
 wp-admin/
 wp-includes/
