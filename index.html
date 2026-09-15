@@ -274,8 +274,10 @@
   .sechead p{color:var(--ink-soft);font-size:1.04rem;margin:0;}
   .main-text-reveal{opacity:1;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);transform:none;transition:clip-path 1.1s cubic-bezier(.22,.61,.36,1),-webkit-clip-path 1.1s cubic-bezier(.22,.61,.36,1)}
   .main-text-reveal.is-visible{clip-path:inset(0);-webkit-clip-path:inset(0)}
+  .card-reveal{opacity:0;transition:opacity .7s ease}
+  .card-reveal.is-visible{opacity:1}
   @supports not (clip-path:inset(0 100% 0 0)){.main-text-reveal{clip-path:none;-webkit-clip-path:none}}
-  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}}
+  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}.card-reveal,.card-reveal.is-visible{opacity:1;transition:none}}
 
   /* spaces */
   .spaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -1043,13 +1045,19 @@
 
   (function(){
     var headings = document.querySelectorAll('h1, .sechead h2, .gallery-orbit-copy h3');
-    if (!headings.length) return;
+    var cards = document.querySelectorAll('.service, .review-card');
+    if (!headings.length && !cards.length) return;
     headings.forEach(function(heading){
       heading.classList.add('main-text-reveal');
+    });
+    cards.forEach(function(card, index){
+      card.classList.add('card-reveal');
+      card.style.transitionDelay = Math.min(index % 4, 3) * 90 + 'ms';
     });
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced || !('IntersectionObserver' in window)) {
       headings.forEach(function(heading){ heading.classList.remove('main-text-reveal'); });
+      cards.forEach(function(card){ card.classList.remove('card-reveal'); card.style.transitionDelay = ''; });
       return;
     }
     var observer = new IntersectionObserver(function(entries){
@@ -1058,6 +1066,7 @@
       });
     }, {threshold:0, rootMargin:'0px 0px -15% 0px'});
     headings.forEach(function(heading){ observer.observe(heading); });
+    cards.forEach(function(card){ observer.observe(card); });
   }());
 
   var navtoggle = document.getElementById('navtoggle');
