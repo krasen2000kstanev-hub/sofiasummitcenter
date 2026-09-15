@@ -1764,7 +1764,12 @@
         form.dataset.appliedPromo = code;
         setNote(people > 1 ? 'Групова цена: 25% отстъпка. Промокод не е нужен.' : 'Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
         if (code) trackEvent('apply_promo_code', { code: code });
-      } catch (error) { form.dataset.appliedPromo = ''; resetPrice(selected); if (showErrors) setNote(error.message, true); }
+      } catch (error) {
+        form.dataset.appliedPromo = '';
+        if (people > 1) renderAllPrices(25);
+        else resetPrice(selected);
+        if (showErrors) setNote(error.message, true);
+      }
       promoBtn.disabled = false;
     }
 
@@ -1774,7 +1779,7 @@
       promoInput.disabled = isGroup;
       promoBtn.disabled = isGroup;
       if (promoBox) promoBox.classList.toggle('is-group', isGroup);
-      if (isGroup) promoInput.value = '';
+      if (isGroup) { promoInput.value = ''; renderAllPrices(25); }
     }
     function scheduleQuote(){ clearTimeout(quoteTimer); quoteTimer = setTimeout(function(){ refreshQuote(false); }, 250); }
     promoBtn.addEventListener('click', function(){ refreshQuote(true); });
