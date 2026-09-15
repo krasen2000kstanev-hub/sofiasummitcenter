@@ -332,6 +332,10 @@
   .reg-field input::placeholder{color:var(--muted);font-family:'Manrope',sans-serif;}
   .reg-attendee-block{border-top:1px dashed var(--line);padding-top:14px;margin-top:4px;}
   .reg-attendee-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:10px;}
+  @media (min-width:560px){
+    .reg-attendee-block .reg-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:8px;}
+    .reg-attendee-block .reg-field{font-size:.7rem;}
+  }
   .reg-consent{
     display:flex;align-items:flex-start;gap:10px;margin:18px 0 14px;font-size:.86rem;line-height:1.5;
     color:var(--muted);font-weight:500;text-transform:none;letter-spacing:normal;cursor:pointer;
