@@ -1,114 +1,74 @@
-# NAIL BUSINESS RE:START
+# Sofia Summit Center
 
-Статична страница за събитието на Sofia Summit Center.
+Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 8 септември 2026 г. по локалните файлове и Git историята.
 
-## Sofia Summit Center начална страница
+Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
-Началната страница включва отделни секции за подкасти, общи продукции и инициативи, както и връзка към услугите. Менюто остава на един ред при широк екран и се превръща в хамбургер меню при по-тесни екрани, без да застъпва логото.
+## Current structure
 
-В секцията „Предстоящи събития“ има карта за NAIL BUSINESS RE:START и карта за „Кариерно кафе“. Картата на „Кариерно кафе“ използва компактна SVG минивизуализация в цветовете и типографията на самото събитие: `assets/event-photos/career-cafe-card.svg`. Подробната страница е `events/career-cafe/index.html`.
+- `index.html` — public homepage and main site navigation.
+- `styles.css`, `styles-enhancements.css`, `design-overrides.css`, `script.js` — homepage styling and behavior.
+- `assets/` — venue photos, logos and supporting media.
+- `events/` — standalone landing pages for individual events. The first event page is `events/nail-business-restart/index.html` for NAIL BUSINESS RE:START.
+- `backend/` — Cloudflare Worker + D1 scaffold for event registration, ticket orders, payment webhooks and ticket emails.
+- `admin.html` — lightweight admin view for event operations.
 
-## Публикувана версия
+## Public deployment
 
-- Събитие: https://sofiasummit.bg/events/nail-business-restart/
-- GitHub repository: https://github.com/krasen2000kstanev-hub/sofiasummitcenter
-- Публикуване: GitHub Pages, branch `main`
+- Public URL: <https://sofiasummit.bg/>
+- Hosting: GitHub Pages from the `main` branch.
+- Custom domain: `sofiasummit.bg` is defined in `CNAME`.
+- `redesign-preview` is a preview branch; production changes go to `main`.
+- Legacy WordPress/PHP files remain in the repository. On Apache hosting, `.htaccess` sets `index.html` as the preferred homepage before `index.php`.
 
-Началната страница има лек CodePen-inspired 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. При hover върху бутоните и форматите се появява дискретен контур по ръба; ефектът се изключва при `prefers-reduced-motion`.
+## Local preview
 
-Галерията включва интерактивна 3D сфера с drag и scroll управление, плавен scroll momentum, движещи се свързани снимки и стилизирана карта на София на заден план. Има и бутон за връщане в началото на сайта.
+There is no build step or package installation. Serve the repository with a local web server, or run `preview-server.ps1` and open `http://127.0.0.1:8765/`. A local server is recommended so relative asset paths behave like production.
 
-## Файлова структура
+The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the main cards, buttons, event-format pills and selected gallery imagery. Hover states add a subtle edge highlight. The rotating gallery sphere keeps its own interaction model so the two effects do not conflict.
 
-- `index.html` — локален preview на event страницата.
-- `events/nail-business-restart/index.html` — публикуваният event front-end.
-- `events/nail-business-restart/terms.html` — общи условия.
-- `events/nail-business-restart/privacy.html` — политика за поверителност.
-- `events/nail-business-restart/cookies.html` — политика за бисквитки.
-- `events/nail-business-restart/recording.html` — уведомление за заснемане.
-- `events/nail-business-restart/refund.html` — отказ, анулиране и прехвърляне.
+## Event backend status
 
-Юридическите страници използват общ формат: тъмен header, лого, бял content card и връщане към секцията `#legal`.
+The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. Payment is intended to continue on Bank DSK; a DSK webhook marks successful orders as paid and can trigger ticket email delivery.
 
-## Регистрационна форма
+Before production use, configure the Cloudflare D1 database ID, schema, DSK payment links and webhook secret, admin credentials, and Resend email settings as described in [`backend/README.md`](backend/README.md). The event form and API scaffold are not a substitute for a completed payment-provider and email deployment.
 
-Формата събира име, имейл, телефон, тип билет, брой участници и допълнителните имена/имейли/телефони. Промокодът е отделен от регистрационните данни и се използва само при единична регистрация. Backend кодът е Cloudflare Worker + D1.
+## Adding an event
 
-Live API: `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. D1 базата е `sofiasummit-events` с binding `DB`; идентификаторът е записан в `backend/wrangler.toml`.
+Create a self-contained page under `events/<event-slug>/`, then add an event card or link to the homepage. Event links should use the label **„Научи повече“** and open in a new tab with `target="_blank"` and `rel="noopener"`.
 
-Актуален live Worker: публикуван и проверен на 15 септември 2026 г. D1 миграциите са приложени, а `/api/promo/quote` работи.
+## Contact
 
-Frontend-ът изпраща регистрациите към `/api/orders`, включително `agreeTerms`, `masterClasses`, промокода и данните за всички участници, след което пренасочва към върнатия DSK payment link.
+Sofia Summit Center  
+ул. „8-ми декември“ 13, София  
++359 894 202 086  
+tsvetelin@pleggi.com
 
-Цената се преизчислява автоматично при промяна на типа билет и броя участници. При 1 участник промокодът дава 20% отстъпка. При 2 или 3 участници се прилага автоматична групова отстъпка от 25% без промокод, като се обновяват всички билетни карти и общата сума.
+## Homepage collaborations and effects
 
-Изборът на master class е активен за `Standard + запис` и `VIP`, но е деактивиран за `Standard`. В текущия UX броят участници се избира от 1 до 3; backend-ът поддържа капацитет до 100 места.
+- Added responsive sections `#podcasts`, `#productions` and `#initiatives` with navigation links.
+- Podcast cards link to the Misia100, „Забавни истории от бизнеса“ and EasyCreditTeam YouTube channels and use channel video thumbnails.
+- „Общи продукции“ includes „Забавни истории от бизнеса“ and RushForPractice. RushForPractice uses the provided local artwork at `assets/rush-for-practice.png` and links to its YouTube channel.
+- The collaboration cards use the same tilt, hover edge highlight, focus and reduced-motion behavior as the rest of the site.
+- Preview: `http://127.0.0.1:8765/?preview-rosa-layout=1#productions`.
 
-## Билети
+## Homepage services and FAQ
 
-Има три варианта: Standard — 89 EUR, Standard + запис — 114 EUR и VIP — 129 EUR.
+- Added a separate `#creative-services` section for video, photography, editing, landing pages and event organisation.
+- The navigation link „Услуги“ points to the new section; the existing equipment section remains at `#services`.
+- Added FAQ entries covering the services, 360-degree photo booth and connecting clients with Sofia Summit Center partners.
+- The new service cards reuse the existing responsive card and tilt effects.
 
-Подаръчният пакет на стойност 100 EUR е показан най-отгоре във всеки билет. Standard, Standard + запис и VIP вече имат активни DSK payment URL адреси в `SITE_CONFIG`. Бутоните използват един и същ акцентен цвят.
+## Homepage UX order
 
-Промокодовете вече се управляват в D1 през защитения Worker admin интерфейс `/admin/promos`. При 1 участник отстъпката е 20%; при група промокод не е нужен и се прилага фиксирана отстъпка от 25%. Frontend-ът не приема цена от клиента.
+- The approved homepage flow is: hero, spaces, equipment, services, upcoming events, gallery, podcasts, productions, initiatives, about, FAQ, request, partners and contact.
+- The order prioritizes the visitor path: understand the offer, see proof, explore collaborations, then send an inquiry.
+- The preview keeps the existing visual language and mobile safeguards; no content was removed.
 
-В admin интерфейса списъкът показва броя употреби, а „Използвания“ показва всеки ред с промокод, купувач, имейл, билет, участници, суми и статус.
+## Актуално състояние — 15 септември 2026 г.
 
-Начално са добавени кодовете `BIBI20`, `EVA20` и `EMI20`. Те са активни за всички билети и използват конфигурираните 20% DSK payment links за единична регистрация.
-
-Конфигурирани са 20% payment links за 1 участник и отделни групови payment links за x2 и x3 за трите билета. При x3 отстъпката остава 25%, но се използват отделните x3 линкове.
-
-Групови линкове: x2 използва `TRIUNenQNHWhsPgU`, `TaLuqbWTDVVZklMU`, `GNHYplyQjAfCWsle`; x3 използва `kLCyAHEmiVjrmwvB`, `sNmAxRwYIPgHyize`, `SEnWwgKQhwxoDDsE` за Standard, Standard + запис и VIP.
-
-## Backend статус
-
-- Реализирани са: health/event API, D1 поръчки, капацитет до 100 места, участници, server-side промо quote, admin CRUD за промокодове и payment links, DSK webhook, ticket URL и Resend имейли към купувача и уникалните имейли на участниците.
-- При записване в D1 Worker-ът изпраща отделен имейл към всеки уникален имейл на купувач/участник с потвърждение, че регистрацията е записана в сайта; DSK се използва само за плащането и последващото payment confirmation.
-- DSK webhook трябва да изпраща `orderId`/merchant reference, който съвпада с локалната поръчка; без него плащане не се маркира автоматично.
-- Имейлите изискват `RESEND_API_KEY` и `EMAIL_FROM`; webhook-ът изисква `DSK_WEBHOOK_SECRET`.
-- `/admin/promos` трябва да бъде публикуван зад Cloudflare Access. Basic Auth остава само fallback за локална настройка.
-- Проверени са live quote-овете за 1, 2 и 3 участници, трите типа билети, невалиден промокод и всички x2/x3 payment links. На 15 септември 2026 г. е потвърден и реален live тест с `EVA20`: 20% отстъпка, Standard 89 € → 71,20 €. Не е правено реално плащане или email delivery тест.
-
-## Локален preview
-
-Стартирай локален статичен сървър от директорията на проекта и отвори:
-
-`http://127.0.0.1:8766/index.html#tickets`
-
-## Публикуване
-
-Публикуваното repository е локалното `.publish-repo`. След промени копирай актуалните файлове в `.publish-repo/events/nail-business-restart/`, направи commit, изпрати го в `origin main` и провери live страницата.
-
-Не записвай AWS ключове, GitHub токени, Resend ключове, DSK secret или Cloudflare Access secrets в repository-то.
-
-### Автоматичен Worker deploy
-
-`.github/workflows/deploy-worker.yml` се стартира при push към `main`, когато има промяна в `backend/`. Workflow-ът първо прилага D1 миграциите към `sofiasummit-events`, след което deploy-ва Worker-а от `backend/`.
-
-GitHub repository secret:
-
-- `CLOUDFLARE_API_TOKEN`
-
-Cloudflare Account ID е публичен идентификатор и е записан директно в workflow-а, за да не зависи deploy-ът от форматирането на втори secret.
-
-Resend, DSK и Cloudflare Access secrets остават конфигурирани само в Cloudflare Worker-а. Реален email delivery тест изисква тестова регистрация и реален Resend/DSK webhook flow; не се изпращат тестови писма автоматично при CI.
-
-## Начална страница — подкасти, продукции и инициативи
-
-- `#podcasts`, `#productions` и `#initiatives` са отделни responsive секции с връзки от менюто.
-- Podcast картите водят към съответните YouTube канали и използват channel video thumbnails.
-- „Общи продукции“ включва „Забавни истории от бизнеса“ и RushForPractice. RushForPractice използва `assets/rush-for-practice.png` и води към `https://www.youtube.com/@RushforPractice`.
-- Картите използват общите tilt, hover edge highlight, focus и reduced-motion ефекти.
-
-## Услуги и FAQ
-
-- Отделната секция `#creative-services` включва видео, фото, монтаж, лендинг страници и организация на събития.
-- Менюто води към новата секция, а оборудването остава отделно на `#services`.
-- FAQ секцията описва услугите, 360-градусовата фотобутка и свързването с наши партньори при организация на събития.
-- Картите използват съществуващите responsive и tilt/hover/focus ефекти.
-
-## UX подредба на началната страница
-
-- Одобреният поток е: начало, пространства, оборудване, услуги, предстоящи събития, галерия, подкасти, общи продукции, инициативи, за нас, въпроси, запитване, партньори и контакти.
-- Редът следва потребителския път: какво предлагаме, доказателства и примери, след това запитване.
-- Запазени са съдържанието, визуалният стил и responsive поведението.
+- Главното меню вече обхваща всички основни секции на началната страница: пространства, оборудване, събития, предстоящи събития, галерия, подкасти, продукции, инициативи, услуги, за нас, въпроси, запитване, партньори и контакти.
+- Менюто е компактно и се отваря като анимиран страничен панел; бутонът е до логото и се преобразува в бутон за затваряне.
+- NAIL BUSINESS RE:START поддържа свободно въвеждане на броя участници и показва подаръци на стойност над 100 EUR за всеки билет.
+- Правните документи за събитието са на отделни страници в `events/nail-business-restart/`.
+- Плащанията през ДСК, Cloudflare D1 и имейл услугата изискват реална конфигурация преди продукционна употреба.
