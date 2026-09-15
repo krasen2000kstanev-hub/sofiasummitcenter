@@ -1,3 +1,7 @@
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import arialFont from '../assets/arial.ttf';
+
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
   headers: { 'content-type': 'application/json; charset=utf-8', ...extra }
@@ -84,16 +88,13 @@ function concatBytes(...parts) {
   return output;
 }
 
-function buildPdf(content, qrJpeg) {
-  const imageHeader = asciiBytes(`<< /Type /XObject /Subtype /Image /Width 300 /Height 300 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${qrJpeg.length} >>\nstream\n`);
-  const imageObject = concatBytes(imageHeader, qrJpeg, asciiBytes('\nendstream'));
+function buildPdf(content) {
   const contentObject = asciiBytes(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
   const objects = [
     asciiBytes('<< /Type /Catalog /Pages 2 0 R >>'),
     asciiBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
-    asciiBytes('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> /XObject << /Im1 5 0 R >> >> /Contents 6 0 R >>'),
+    asciiBytes('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>'),
     asciiBytes('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'),
-    imageObject,
     contentObject
   ];
   const header = asciiBytes('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
@@ -130,36 +131,43 @@ async function fetchQrJpeg(env, ticketUrl) {
 }
 
 async function generateTicketPdf(env, order, attendee, event, ticketUrl) {
-  const qrJpeg = await fetchQrJpeg(env, ticketUrl);
-  const startsAt = new Date(event.starts_at || '').toLocaleString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long', timeStyle: 'short' });
-  let content = '';
-  content += pdfRect(0, 0, 595, 842, '0.043 0.043 0.051');
-  content += pdfRect(42, 82, 511, 678, '0.98 0.97 0.95');
-  content += pdfRect(42, 700, 511, 60, '0.118 0.549 0.682');
-  content += pdfRect(42, 82, 511, 4, '0.886 0.329 0.165');
-  content += pdfText('NAIL BUSINESS RE:START', 68, 724, 21, '1 1 1');
-  content += pdfText('REGISTRATION CONFIRMED', 68, 678, 12, '0.118 0.549 0.682');
-  content += pdfText('ИМЕ НА УЧАСТНИКА', 68, 636, 9, '0.435 0.416 0.447');
-  content += pdfText(attendee.full_name, 68, 610, 18, '0.043 0.043 0.051');
-  content += pdfText('ВИД БИЛЕТ', 68, 566, 9, '0.435 0.416 0.447');
-  content += pdfText(event.ticket_name || 'Ticket', 68, 542, 14, '0.043 0.043 0.051');
-  content += pdfText('ДАТА И МЯСТО', 68, 500, 9, '0.435 0.416 0.447');
-  content += pdfText(startsAt, 68, 476, 12, '0.043 0.043 0.051');
-  content += pdfText(event.venue, 68, 454, 12, '0.043 0.043 0.051');
-  content += pdfText(EVENT_ADDRESS, 68, 434, 9, '0.435 0.416 0.447');
-  content += pdfText('НОМЕР НА ПОРЪЧКА', 68, 386, 9, '0.435 0.416 0.447');
-  content += pdfText(order.id, 68, 362, 11, '0.043 0.043 0.051');
-  content += pdfText('Покажи този билет на входа.', 68, 128, 12, '0.043 0.043 0.051');
-  content += pdfText('QR кодът е индивидуален за този участник.', 68, 108, 9, '0.435 0.416 0.447');
-  content += 'q 120 0 0 120 398 230 cm /Im1 Do Q\n';
-  return buildPdf(content, qrJpeg);
+  const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  const font = await pdf.embedFont(new Uint8Array(arialFont), { subset: true });
+  const page = pdf.addPage([595, 842]);
+  const cream = rgb(0.98, 0.97, 0.95);
+  const blue = rgb(0.294, 0.494, 0.796);
+  const green = rgb(0.188, 0.302, 0.09);
+  const black = rgb(0.02, 0.02, 0.02);
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: cream });
+  page.drawRectangle({ x: 0, y: 762, width: 595, height: 80, color: blue });
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 62, color: green });
+  const centered = (text, y, size, color = black) => page.drawText(String(text), { x: (595 - font.widthOfTextAtSize(String(text), size)) / 2, y, size, font, color });
+  const paragraph = (values, y, size, leading) => values.forEach((value, index) => centered(value, y - index * leading, size));
+  centered('NAIL BUSINESS RE:START', 810, 17, rgb(1, 1, 1));
+  centered('София, 26 Октомври 2026', 785, 11, rgb(1, 1, 1));
+  centered('ПОКАЖИ ТОЗИ БИЛЕТ НА ВХОДА', 724, 20);
+  centered('РЕГИСТРАЦИЯ ПОТВЪРДЕНА', 685, 17);
+  centered(`ИМЕ НА УЧАСТНИКА: ${attendee.full_name}`, 648, 11);
+  centered(`ВИД БИЛЕТ: ${event.ticket_name || 'Билет'}`, 626, 11);
+  centered(`НОМЕР НА ПОРЪЧКА: ${order.id}`, 604, 11);
+  centered(`ДАТА: ${new Date(event.starts_at || '').toLocaleDateString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long' })}`, 566, 11);
+  centered('ЧАС: 09:00 ч.', 544, 11);
+  centered(`МЯСТО: ${event.venue}`, 522, 11);
+  centered(`АДРЕС: ${EVENT_ADDRESS}`, 500, 10);
+  paragraph(['Не пропускайте най-важното', 'събитие за развитие на вашия', 'бизнес в нокътната индустрия!'], 420, 16, 23);
+  paragraph(['Очакваме ви на NAIL BUSINESS RE:START, за да стартираме заедно', 'новата ера във вашия успех. Срещаме се с водещи експерти,', 'обменяме ценен опит и откриваме иновативни стратегии за растеж.'], 330, 9, 16);
+  centered('#NAILBUSINESSRESTART', 276, 10);
+  centered('© NAIL BUSINESS RE:START 2026. Всички права запазени.', 35, 8, rgb(1, 1, 1));
+  centered('Този имейл е генериран автоматично. Моля, не отговаряйте на него.', 20, 7, rgb(1, 1, 1));
+  return pdf.save();
 }
 
-async function sendAttendeeTicketEmail(env, order, attendee, event) {
+async function sendAttendeeTicketEmail(env, order, attendee, event, force = false) {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped', attendeeId: attendee.id };
   const recipient = clean(attendee.email, 160).toLowerCase() || order.buyer_email;
   const existing = await env.DB.prepare("SELECT status FROM email_log WHERE order_id=? AND attendee_id=? AND email_type='ticket'").bind(order.id, attendee.id).first();
-  if (existing?.status === 'sent') return { status: 'already_sent', attendeeId: attendee.id };
+  if (!force && existing?.status === 'sent') return { status: 'already_sent', attendeeId: attendee.id };
   const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${attendee.ticket_token}`;
   let pdf;
   try { pdf = await generateTicketPdf(env, order, attendee, event, ticketUrl); }
@@ -169,7 +177,7 @@ async function sendAttendeeTicketEmail(env, order, attendee, event) {
     console.error('[ticket-pdf]', error);
     return { status: 'failed', attendeeId: attendee.id };
   }
-  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете QR кода от приложения PDF билет на входа.</p>`;
+  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете приложения PDF билет на входа.</p>`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Билет за ${event.name}`, html: message, attachments: [{ filename: `ticket-${attendee.ticket_token}.pdf`, content: base64(pdf) }] })
@@ -180,9 +188,9 @@ async function sendAttendeeTicketEmail(env, order, attendee, event) {
   return { status: response.ok ? 'sent' : 'failed', providerId: result.id || null, attendeeId: attendee.id };
 }
 
-async function sendTicketEmails(env, order, attendees, event) {
+async function sendTicketEmails(env, order, attendees, event, force = false) {
   const results = [];
-  for (const attendee of attendees) results.push(await sendAttendeeTicketEmail(env, order, attendee, event));
+  for (const attendee of attendees) results.push(await sendAttendeeTicketEmail(env, order, attendee, event, force));
   return results;
 }
 
@@ -335,7 +343,7 @@ export default {
             if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
           }
           const refreshed = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
-          return json(await sendTicketEmails(env, order, refreshed.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }), 200, headers);
+          return json(await sendTicketEmails(env, order, refreshed.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }, true), 200, headers);
         }
         if (request.method === 'POST' && url.pathname === '/api/admin/events/clone') {
           const body = await request.json();

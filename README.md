@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 8 септември 2026 г. по локалните файлове и Git историята.
+Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 15 септември 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -29,9 +29,9 @@ The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the ma
 
 ## Event backend status
 
-The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. Payment is intended to continue on Bank DSK; a DSK webhook marks successful orders as paid and can trigger ticket email delivery.
+The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend remains available and automatic webhook processing is idempotent.
 
-Before production use, configure the Cloudflare D1 database ID, schema, DSK payment links and webhook secret, admin credentials, and Resend email settings as described in [`backend/README.md`](backend/README.md). The event form and API scaffold are not a substitute for a completed payment-provider and email deployment.
+The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 
 ## Adding an event
 
@@ -43,3 +43,24 @@ Sofia Summit Center
 ул. „8-ми декември“ 13, София  
 +359 894 202 086  
 tsvetelin@pleggi.com
+
+## Homepage collaborations and effects
+
+- Added responsive sections `#podcasts`, `#productions` and `#initiatives` with navigation links.
+- Podcast cards link to the Misia100, „Забавни истории от бизнеса“ and EasyCreditTeam YouTube channels and use channel video thumbnails.
+- „Общи продукции“ includes „Забавни истории от бизнеса“ and RushForPractice. RushForPractice uses the provided local artwork at `assets/rush-for-practice.png` and links to its YouTube channel.
+- The collaboration cards use the same tilt, hover edge highlight, focus and reduced-motion behavior as the rest of the site.
+- Preview: `http://127.0.0.1:8765/?preview-rosa-layout=1#productions`.
+
+## Homepage services and FAQ
+
+- Added a separate `#creative-services` section for video, photography, editing, landing pages and event organisation.
+- The navigation link „Услуги“ points to the new section; the existing equipment section remains at `#services`.
+- Added FAQ entries covering the services, 360-degree photo booth and connecting clients with Sofia Summit Center partners.
+- The new service cards reuse the existing responsive card and tilt effects.
+
+## Homepage UX order
+
+- The approved homepage flow is: hero, spaces, equipment, services, upcoming events, gallery, podcasts, productions, initiatives, about, FAQ, request, partners and contact.
+- The order prioritizes the visitor path: understand the offer, see proof, explore collaborations, then send an inquiry.
+- The preview keeps the existing visual language and mobile safeguards; no content was removed.
