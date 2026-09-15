@@ -1,0 +1,17 @@
+name = "sofiasummit-events-api-test"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf"]
+fallthrough = true
+
+[vars]
+PUBLIC_SITE_URL = "http://localhost:8787"
+EMAIL_FROM = "test@example.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sofiasummit-events-test"
+database_id = "00000000-0000-0000-0000-000000000001"
