@@ -1,3 +1,7 @@
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import arialFont from '../assets/arial.ttf';
+
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
   headers: { 'content-type': 'application/json; charset=utf-8', ...extra }
@@ -14,18 +18,6 @@ const now = () => new Date().toISOString();
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
 const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-const GROUP_PAYMENT_URLS = {
-  2: {
-    standard: 'https://epg.dskbank.bg/sc/TRIUNenQNHWhsPgU',
-    standard_recording: 'https://epg.dskbank.bg/sc/TaLuqbWTDVVZklMU',
-    vip: 'https://epg.dskbank.bg/sc/GNHYplyQjAfCWsle'
-  },
-  3: {
-    standard: 'https://epg.dskbank.bg/sc/kLCyAHEmiVjrmwvB',
-    standard_recording: 'https://epg.dskbank.bg/sc/sNmAxRwYIPgHyize',
-    vip: 'https://epg.dskbank.bg/sc/SEnWwgKQhwxoDDsE'
-  }
-};
 
 function adminAuth(request, env) {
   const header = request.headers.get('Authorization') || '';
@@ -37,12 +29,10 @@ function adminAuth(request, env) {
 }
 
 function requireAdmin(request, env) {
-  // Cloudflare Access is the primary production gate. Basic auth remains a
-  // small local/setup fallback until the Access application is configured.
-  if (request.headers.get('Cf-Access-Authenticated-User-Email') || adminAuth(request, env)) return null;
+  if (adminAuth(request, env)) return null;
   return new Response('Authentication required', {
     status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="Sofia Summit admin"' }
+    headers: { 'WWW-Authenticate': 'Basic realm="Sofia Summit admin"', ...cors(request) }
   });
 }
 
@@ -52,7 +42,7 @@ async function readBody(request) {
   const form = await request.formData();
   const attendeesCount = Number(form.get('attendeesCount') ?? 1);
   const attendees = [{ fullName: form.get('fullName'), email: form.get('email'), phone: form.get('phone') }];
-  for (let i = 2; Number.isInteger(attendeesCount) && attendeesCount <= 100 && i <= attendeesCount; i++) attendees.push({
+  for (let i = 2; Number.isInteger(attendeesCount) && attendeesCount <= 10000 && i <= attendeesCount; i++) attendees.push({
     fullName: form.get(`attendee${i}Name`), email: form.get(`attendee${i}Email`), phone: form.get(`attendee${i}Phone`)
   });
   return {
@@ -78,88 +68,133 @@ async function verifySignature(raw, signature, secret) {
   return expected === signature.replace(/^sha256=/, '').toLowerCase();
 }
 
-function parseTicketKeys(promo) {
-  try { return JSON.parse(promo.ticket_keys_json || '[]'); } catch { return []; }
+const EVENT_ADDRESS = 'ул. „8-ми декември“ № 13, София, България';
+
+const transliterate = (value) => String(value ?? '').replace(/[А-Яа-яЁё]/g, (character) => ({
+  А: 'A', Б: 'B', В: 'V', Г: 'G', Д: 'D', Е: 'E', Ж: 'Zh', З: 'Z', И: 'I', Й: 'Y', К: 'K', Л: 'L', М: 'M', Н: 'N', О: 'O', П: 'P', Р: 'R', С: 'S', Т: 'T', У: 'U', Ф: 'F', Х: 'H', Ц: 'Ts', Ч: 'Ch', Ш: 'Sh', Щ: 'Sht', Ъ: 'A', Ь: 'Y', Ю: 'Yu', Я: 'Ya',
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sht', ъ: 'a', ь: 'y', ю: 'yu', я: 'ya', Ё: 'Yo', ё: 'yo'
+}[character] || character)).replace(/[^\x20-\x7E]/g, '?');
+
+const pdfEscape = (value) => transliterate(value).replace(/([\\()])/g, '\\$1');
+const pdfText = (value, x, y, size, color = '0 0 0') => `BT /F1 ${size} Tf ${color} rg 1 0 0 1 ${x} ${y} Tm (${pdfEscape(value)}) Tj ET\n`;
+const pdfRect = (x, y, width, height, color) => `${color} rg ${x} ${y} ${width} ${height} re f\n`;
+const asciiBytes = (value) => new TextEncoder().encode(value);
+
+function concatBytes(...parts) {
+  const length = parts.reduce((total, part) => total + part.length, 0);
+  const output = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) { output.set(part, offset); offset += part.length; }
+  return output;
 }
 
-async function quotePromo(env, event, ticket, promoCode, count) {
-  const baseUnitAmountCents = ticket.price_cents;
-  const baseAmountCents = baseUnitAmountCents * count;
-  if (count > 1) {
-    const discountPercent = 25;
-    const unitAmountCents = Math.round(baseUnitAmountCents * (100 - discountPercent) / 100);
-    return { baseAmountCents, amountCents: unitAmountCents * count, unitAmountCents, discountPercent, paymentUrl: GROUP_PAYMENT_URLS[count]?.[ticket.ticket_key] || null, promo: null };
+function buildPdf(content) {
+  const contentObject = asciiBytes(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const objects = [
+    asciiBytes('<< /Type /Catalog /Pages 2 0 R >>'),
+    asciiBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
+    asciiBytes('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>'),
+    asciiBytes('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'),
+    contentObject
+  ];
+  const header = asciiBytes('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  const chunks = [header];
+  const offsets = [0];
+  let offset = header.length;
+  objects.forEach((object, index) => {
+    const chunk = concatBytes(asciiBytes(`${index + 1} 0 obj\n`), object, asciiBytes('\nendobj\n'));
+    offsets.push(offset);
+    chunks.push(chunk);
+    offset += chunk.length;
+  });
+  const xrefOffset = offset;
+  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (let index = 1; index <= objects.length; index++) xref += `${String(offsets[index]).padStart(10, '0')} 00000 n \n`;
+  xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  chunks.push(asciiBytes(xref));
+  return concatBytes(...chunks);
+}
+
+function base64(bytes) {
+  let output = '';
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) output += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  return btoa(output);
+}
+
+async function fetchQrJpeg(env, ticketUrl) {
+  const base = env.QR_CODE_API_URL || 'https://api.qrserver.com/v1/create-qr-code/';
+  const separator = base.includes('?') ? '&' : '?';
+  const response = await fetch(`${base}${separator}size=300x300&format=jpg&data=${encodeURIComponent(ticketUrl)}`);
+  if (!response.ok) throw new Error(`QR renderer returned ${response.status}`);
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+async function generateTicketPdf(env, order, attendee, event, ticketUrl) {
+  const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  const font = await pdf.embedFont(new Uint8Array(arialFont), { subset: true });
+  const page = pdf.addPage([595, 842]);
+  const cream = rgb(0.98, 0.97, 0.95);
+  const blue = rgb(0.294, 0.494, 0.796);
+  const green = rgb(0.188, 0.302, 0.09);
+  const black = rgb(0.02, 0.02, 0.02);
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: cream });
+  page.drawRectangle({ x: 0, y: 762, width: 595, height: 80, color: blue });
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 62, color: green });
+  const centered = (text, y, size, color = black) => page.drawText(String(text), { x: (595 - font.widthOfTextAtSize(String(text), size)) / 2, y, size, font, color });
+  const paragraph = (values, y, size, leading) => values.forEach((value, index) => centered(value, y - index * leading, size));
+  centered('NAIL BUSINESS RE:START', 810, 17, rgb(1, 1, 1));
+  centered('София, 26 Октомври 2026', 785, 11, rgb(1, 1, 1));
+  centered('ПОКАЖИ ТОЗИ БИЛЕТ НА ВХОДА', 724, 20);
+  centered('РЕГИСТРАЦИЯ ПОТВЪРДЕНА', 685, 17);
+  centered(`ИМЕ НА УЧАСТНИКА: ${attendee.full_name}`, 648, 11);
+  centered(`ВИД БИЛЕТ: ${event.ticket_name || 'Билет'}`, 626, 11);
+  centered(`НОМЕР НА ПОРЪЧКА: ${order.id}`, 604, 11);
+  centered(`ДАТА: ${new Date(event.starts_at || '').toLocaleDateString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long' })}`, 566, 11);
+  centered('ЧАС: 09:00 ч.', 544, 11);
+  centered(`МЯСТО: ${event.venue}`, 522, 11);
+  centered(`АДРЕС: ${EVENT_ADDRESS}`, 500, 10);
+  paragraph(['Не пропускайте най-важното', 'събитие за развитие на вашия', 'бизнес в нокътната индустрия!'], 420, 16, 23);
+  paragraph(['Очакваме ви на NAIL BUSINESS RE:START, за да стартираме заедно', 'новата ера във вашия успех. Срещаме се с водещи експерти,', 'обменяме ценен опит и откриваме иновативни стратегии за растеж.'], 330, 9, 16);
+  centered('#NAILBUSINESSRESTART', 276, 10);
+  centered('© NAIL BUSINESS RE:START 2026. Всички права запазени.', 35, 8, rgb(1, 1, 1));
+  centered('Този имейл е генериран автоматично. Моля, не отговаряйте на него.', 20, 7, rgb(1, 1, 1));
+  return pdf.save();
+}
+
+async function sendAttendeeTicketEmail(env, order, attendee, event, force = false) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped', attendeeId: attendee.id };
+  const recipient = clean(attendee.email, 160).toLowerCase() || order.buyer_email;
+  const existing = await env.DB.prepare("SELECT status FROM email_log WHERE order_id=? AND attendee_id=? AND email_type='ticket'").bind(order.id, attendee.id).first();
+  if (!force && existing?.status === 'sent') return { status: 'already_sent', attendeeId: attendee.id };
+  const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${attendee.ticket_token}`;
+  let pdf;
+  try { pdf = await generateTicketPdf(env, order, attendee, event, ticketUrl); }
+  catch (error) {
+    await env.DB.prepare("INSERT OR REPLACE INTO email_log (id, order_id, attendee_id, recipient, email_type, provider_id, status, sent_at) VALUES (?,?,?,?,?,?,?,?)")
+      .bind(id('email'), order.id, attendee.id, recipient, 'ticket', null, 'failed', now()).run();
+    console.error('[ticket-pdf]', error);
+    return { status: 'failed', attendeeId: attendee.id };
   }
-  if (!promoCode) return { baseAmountCents, amountCents: baseAmountCents, unitAmountCents: baseUnitAmountCents, discountPercent: 0, paymentUrl: ticket.dsk_url || null, promo: null };
-  const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id=? AND code=?').bind(event.id, promoCode).first();
-  const current = now();
-  if (!promo || !promo.active || (promo.valid_from && promo.valid_from > current) || (promo.valid_until && promo.valid_until < current)) throw new Error('Невалиден или изтекъл промокод.');
-  const allowed = parseTicketKeys(promo);
-  if (allowed.length && !allowed.includes(ticket.ticket_key)) throw new Error('Промокодът не важи за избрания билет.');
-  if (promo.usage_limit !== null && promo.usage_limit !== undefined) {
-    const used = await env.DB.prepare("SELECT COUNT(*) count FROM orders WHERE event_id=? AND promo_code=? AND status IN ('pending_payment','paid')").bind(event.id, promo.code).first();
-    if (Number(used?.count || 0) >= Number(promo.usage_limit)) throw new Error('Лимитът на промокода е изчерпан.');
-  }
-  const discountPercent = count === 1 ? Number(promo.single_discount_percent ?? 20) : Number(promo.group_discount_percent ?? 25);
-  const unitAmountCents = Math.round(baseUnitAmountCents * (100 - discountPercent) / 100);
-  const amountCents = unitAmountCents * count;
-  // ponytail: one group link covers 2+; the discount rule stays flat at 25%.
-  const link = await env.DB.prepare('SELECT payment_url FROM promo_payment_links WHERE promo_code_id=? AND ticket_key=? AND attendee_count=? AND active=1').bind(promo.id, ticket.ticket_key, count === 1 ? 1 : 2).first();
-  if (!link?.payment_url) throw new Error('За този промокод, билет и брой участници няма конфигуриран DSK payment link.');
-  return { baseAmountCents, amountCents, unitAmountCents, discountPercent, paymentUrl: link.payment_url, promo };
+  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете приложения PDF билет на входа.</p>`;
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Билет за ${event.name}`, html: message, attachments: [{ filename: `ticket-${attendee.ticket_token}.pdf`, content: base64(pdf) }] })
+  });
+  const result = await response.json().catch(() => ({}));
+  await env.DB.prepare("INSERT OR REPLACE INTO email_log (id, order_id, attendee_id, recipient, email_type, provider_id, status, sent_at) VALUES (?,?,?,?,?,?,?,?)")
+    .bind(id('email'), order.id, attendee.id, recipient, 'ticket', result.id || null, response.ok ? 'sent' : 'failed', now()).run();
+  return { status: response.ok ? 'sent' : 'failed', providerId: result.id || null, attendeeId: attendee.id };
 }
 
-async function promoQuote(request, env) {
-  const headers = cors(request);
-  const body = await request.json();
-  const event = await env.DB.prepare('SELECT * FROM events WHERE slug=? AND status=?').bind(clean(body.eventSlug || 'nail-business-restart', 80), 'active').first();
-  const ticket = await env.DB.prepare('SELECT * FROM ticket_types WHERE event_id=? AND ticket_key=? AND active=1').bind(event?.id, clean(body.ticketType || 'standard', 50)).first();
-  const count = Number(body.attendeesCount || 1);
-  if (!event || !ticket || !Number.isInteger(count) || count < 1 || count > 100) return json({ error: 'Невалидно събитие, билет или брой участници.' }, 400, headers);
-  try {
-    const quote = await quotePromo(env, event, ticket, clean(body.promoCode, 50).toUpperCase(), count);
-    return json({ ...quote, currency: ticket.currency }, 200, headers);
-  } catch (error) { return json({ error: error.message }, 400, headers); }
-}
-
-async function sendTicketEmail(env, order, attendees, event, ticketUrl) {
-  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped' };
-  const recipients = [...new Set([order.buyer_email, ...attendees.map((a) => clean(a.email).toLowerCase()).filter((value) => value.includes('@'))])];
+async function sendTicketEmails(env, order, attendees, event, force = false) {
   const results = [];
-  for (const recipient of recipients) {
-    const emailType = recipient === order.buyer_email ? 'buyer_ticket' : 'attendee_ticket';
-    const existing = await env.DB.prepare("SELECT id FROM email_log WHERE order_id=? AND recipient=? AND email_type=? AND status='sent' LIMIT 1").bind(order.id, recipient, emailType).first();
-    if (existing) continue;
-    const message = `<h1>${html(event.name)}</h1><p>Регистрацията и плащането са потвърдени.</p><p><strong>Номер на поръчка:</strong> ${html(order.id)}</p><p><strong>Билет:</strong> ${html(order.ticket_name || '')}</p><p><strong>Платена сума:</strong> ${(Number(order.amount_cents) / 100).toFixed(2)} ${html(order.currency)}</p><p><strong>Участници:</strong> ${attendees.map((a) => html(clean(a.full_name))).join(', ')}</p><p><a href="${html(ticketUrl)}">Отвори билета</a></p>`;
-    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Билет за ${event.name}`, html: message }) });
-    const result = await response.json().catch(() => ({}));
-    await env.DB.prepare('INSERT INTO email_log (id, order_id, recipient, email_type, provider_id, status, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(id('email'), order.id, recipient, emailType, result.id || null, response.ok ? 'sent' : 'failed', now()).run();
-    results.push(response.ok ? 'sent' : 'failed');
-  }
-  return { status: results.includes('failed') ? 'failed' : 'sent', recipients: recipients.length };
+  for (const attendee of attendees) results.push(await sendAttendeeTicketEmail(env, order, attendee, event, force));
+  return results;
 }
 
-async function sendRegistrationEmails(env, order, attendees, event) {
-  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped' };
-  const recipients = [...new Set([order.buyer_email, ...attendees.map((a) => clean(a.email).toLowerCase()).filter((value) => value.includes('@'))])];
-  const results = [];
-  for (const recipient of recipients) {
-    const existing = await env.DB.prepare("SELECT id FROM email_log WHERE order_id=? AND recipient=? AND email_type='registration_received' AND status='sent' LIMIT 1").bind(order.id, recipient).first();
-    if (existing) continue;
-    const message = `<h1>${html(event.name)}</h1><p>Регистрацията ти е записана успешно в сайта.</p><p><strong>Номер на регистрация:</strong> ${html(order.id)}</p><p><strong>Билет:</strong> ${html(order.ticket_name || '')}</p><p><strong>Участници:</strong> ${attendees.map((a) => html(clean(a.full_name))).join(', ')}</p><p>Плащането се извършва отделно през защитената страница на Банка ДСК.</p>`;
-    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Регистрация за ${event.name}`, html: message }) });
-    const result = await response.json().catch(() => ({}));
-    await env.DB.prepare('INSERT INTO email_log (id,order_id,recipient,email_type,provider_id,status,sent_at) VALUES (?,?,?,?,?,?,?)').bind(id('email'), order.id, recipient, 'registration_received', result.id || null, response.ok ? 'sent' : 'failed', now()).run();
-    results.push(response.ok ? 'sent' : 'failed');
-  }
-  return { status: results.includes('failed') ? 'failed' : 'sent', recipients: recipients.length };
-}
-
-function promoAdminPage() {
-  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sofia Summit — промокодове</title><style>body{font:16px system-ui;max-width:960px;margin:32px auto;padding:0 16px;color:#102653}input,button{padding:10px;margin:4px;border:1px solid #b8cbea;border-radius:6px}button{background:#2859bd;color:white;cursor:pointer}.card{border:1px solid #d6e0f2;border-radius:10px;padding:16px;margin:16px 0}pre{white-space:pre-wrap;background:#f4f7fc;padding:12px;overflow:auto}</style><h1>Промокодове</h1><p>Достъпът трябва да е защитен с Cloudflare Access.</p><div class="card"><h2>Нов / обновен код</h2><input id="id" placeholder="ID (за обновяване)"><input id="code" placeholder="Код"><input id="eventSlug" value="nail-business-restart"><input id="single" type="number" value="20" placeholder="1 участник %"><input id="group" type="number" value="25" placeholder="2+ участници %"><input id="limit" type="number" placeholder="Лимит"><input id="keys" placeholder="Билети: standard,vip"><button onclick="savePromo()">Запази</button></div><div class="card"><h2>DSK link за точен билет и брой участници</h2><input id="promoId" placeholder="Promo ID"><input id="ticket" value="standard" placeholder="ticket key"><input id="count" type="number" value="1" placeholder="брой"><input id="url" placeholder="https://..."><button onclick="saveLink()">Запази link</button></div><div class="card"><h2>Използвания</h2><input id="usageCode" placeholder="Код или празно за всички"><button onclick="loadUsage()">Покажи използванията</button></div><pre id="out">Зареждане…</pre><script>const out=document.getElementById('out');async function api(path,opt){const r=await fetch(path,opt);const x=await r.json();if(!r.ok)throw Error(x.error||r.status);return x}async function load(){out.textContent=JSON.stringify(await api('/api/admin/promos'),null,2)}async function loadUsage(){try{out.textContent=JSON.stringify(await api('/api/admin/promo-usage?code='+encodeURIComponent(usageCode.value)),null,2)}catch(e){out.textContent=e.message}}async function savePromo(){try{const x=await api('/api/admin/promos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:id.value,code:code.value,eventSlug:eventSlug.value,singleDiscountPercent:+single.value,groupDiscountPercent:+group.value,usageLimit:limit.value,ticketKeys:keys.value.split(',').map(x=>x.trim()).filter(Boolean)})});promoId.value=x.id;await load()}catch(e){out.textContent=e.message}}async function saveLink(){try{await api('/api/admin/promo-links',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({promoId:promoId.value,ticketKey:ticket.value,attendeeCount:+count.value,paymentUrl:url.value})});await load()}catch(e){out.textContent=e.message}}load().catch(e=>out.textContent=e.message)</script>`, { headers: { 'content-type': 'text/html; charset=utf-8' } });
-}
-
-async function createOrder(request, env, ctx) {
+async function createOrder(request, env) {
   const headers = cors(request);
   const body = await readBody(request);
   const eventSlug = clean(body.eventSlug || 'nail-business-restart', 80);
@@ -168,7 +203,7 @@ async function createOrder(request, env, ctx) {
   const email = clean(body.email, 160).toLowerCase();
   const phone = clean(body.phone, 40);
   const count = Number(body.attendeesCount ?? ((body.attendees || []).length || 1));
-  if (!Number.isInteger(count) || count < 1 || count > 100) return json({ error: 'Въведете валиден цял брой участници.' }, 400, headers);
+  if (!Number.isInteger(count) || count < 1 || count > 10000) return json({ error: 'Въведете валиден цял брой участници.' }, 400, headers);
   if (!name || !email.includes('@') || !phone || body.agreeTerms !== true) return json({ error: 'Моля, попълнете задължителните полета и приемете условията.' }, 400, headers);
 
   const event = await env.DB.prepare('SELECT * FROM events WHERE slug = ? AND status = ?').bind(eventSlug, 'active').first();
@@ -178,19 +213,23 @@ async function createOrder(request, env, ctx) {
   if (count > event.capacity) return json({ error: 'Броят участници надвишава капацитета на събитието.' }, 409, headers);
 
   const promoCode = clean(body.promoCode, 50).toUpperCase() || null;
-  let quote;
-  try { quote = await quotePromo(env, event, ticket, promoCode, count); }
-  catch (error) { return json({ error: error.message }, 400, headers); }
-  const amount = quote.amountCents;
+  let amount = ticket.price_cents * count;
+  if (promoCode) {
+    const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id = ? AND code = ? AND active = 1').bind(event.id, promoCode).first();
+    if (!promo) return json({ error: 'Невалиден промокод.' }, 400, headers);
+    const allowed = JSON.parse(promo.ticket_keys_json || '[]');
+    if (allowed.length && !allowed.includes(ticketKey)) return json({ error: 'Промокодът не важи за избрания билет.' }, 400, headers);
+    amount = promo.discount_type === 'percent' ? Math.round(amount * (100 - promo.discount_value) / 100) : Math.max(0, amount - promo.discount_value * count);
+  }
 
   const orderId = id('order');
   const created = now();
   const expires = new Date(Date.now() + 30 * 60 * 1000).toISOString();
   const attendees = Array.isArray(body.attendees) && body.attendees.length ? body.attendees : [{ fullName: name, email, phone }];
   if (attendees.length < count || attendees.slice(0, count).some((attendee) => !clean(attendee.fullName, 120) || !clean(attendee.email, 160).includes('@') || !clean(attendee.phone, 40))) return json({ error: 'Моля, попълнете име, имейл и телефон за всеки участник.' }, 400, headers);
-  const statements = [env.DB.prepare(`INSERT INTO orders (id,event_id,ticket_type_id,buyer_name,buyer_email,buyer_phone,attendee_count,promo_code,base_amount_cents,discount_percent,amount_cents,currency,status,payment_url,expires_at,created_at,updated_at)
-    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,'pending_payment',?,?,?,? WHERE (SELECT COALESCE(SUM(attendee_count),0) FROM orders WHERE event_id = ? AND (status = 'paid' OR (status = 'pending_payment' AND expires_at > ?))) + ? <= ?`)
-    .bind(orderId, event.id, ticket.id, name, email, phone, count, promoCode, quote.baseAmountCents, quote.discountPercent, amount, ticket.currency, quote.paymentUrl, expires, created, created, event.id, created, count, event.capacity)];
+  const statements = [env.DB.prepare(`INSERT INTO orders (id,event_id,ticket_type_id,buyer_name,buyer_email,buyer_phone,attendee_count,promo_code,amount_cents,currency,status,payment_url,expires_at,created_at,updated_at)
+    SELECT ?,?,?,?,?,?,?,?,?,?,'pending_payment',NULL,?,?,? WHERE (SELECT COALESCE(SUM(attendee_count),0) FROM orders WHERE event_id = ? AND (status = 'paid' OR (status = 'pending_payment' AND expires_at > ?))) + ? <= ?`)
+    .bind(orderId, event.id, ticket.id, name, email, phone, count, promoCode, amount, ticket.currency, expires, created, created, event.id, created, count, event.capacity)];
   for (let i = 0; i < count; i++) {
     const attendee = attendees[i] || {};
     statements.push(env.DB.prepare('INSERT INTO attendees (id, order_id, attendee_no, full_name, email, phone) VALUES (?, ?, ?, ?, ?, ?)')
@@ -201,10 +240,9 @@ async function createOrder(request, env, ctx) {
   }
   const results = await env.DB.batch(statements);
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
-  const createdOrder = await env.DB.prepare('SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
-  const registrationEmailTask = sendRegistrationEmails(env, createdOrder, attendees.slice(0, count).map((a) => ({ full_name: clean(a.fullName), email: clean(a.email).toLowerCase() })), { name: createdOrder.event_name });
-  if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(registrationEmailTask);
-  return json({ orderId, status: 'pending_payment', baseAmountCents: quote.baseAmountCents, discountPercent: quote.discountPercent, amountCents: amount, currency: ticket.currency, paymentUrl: quote.paymentUrl, message: quote.paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, quote.paymentUrl ? 201 : 202, headers);
+  const paymentUrl = ticket.dsk_url || null;
+  await env.DB.prepare('UPDATE orders SET payment_url = ? WHERE id = ?').bind(paymentUrl, orderId).run();
+  return json({ orderId, status: 'pending_payment', amountCents: amount, currency: ticket.currency, paymentUrl, message: paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, paymentUrl ? 201 : 202, headers);
 }
 
 async function dskWebhook(request, env, ctx) {
@@ -214,9 +252,6 @@ async function dskWebhook(request, env, ctx) {
   const orderId = clean(payload.orderId || payload.order_id, 100);
   const status = clean(payload.status || payload.paymentStatus, 50).toLowerCase();
   const reference = clean(payload.transactionId || payload.transaction_id || payload.reference, 120);
-  if (!orderId) return json({ error: 'Missing merchant order reference' }, 400, cors(request));
-  const knownOrder = await env.DB.prepare('SELECT id FROM orders WHERE id=?').bind(orderId).first();
-  if (!knownOrder) return json({ error: 'Unknown order reference' }, 404, cors(request));
   const eventId = id('payment');
   await env.DB.prepare('INSERT INTO payment_events (id,order_id,provider,provider_status,provider_reference,payload_hash,received_at) VALUES (?,?,?,?,?,?,?)')
     .bind(eventId, orderId, 'dsk', status, reference || null, await sha256(raw), now()).run();
@@ -227,18 +262,22 @@ async function dskWebhook(request, env, ctx) {
 
 async function finalizeOrder(orderId, reference, env, ctx) {
   const token = crypto.randomUUID();
-  const updated = await env.DB.prepare("UPDATE orders SET status='paid', payment_reference=?, ticket_token=COALESCE(ticket_token,?), paid_at=COALESCE(paid_at,?), updated_at=? WHERE id=? AND status='pending_payment'")
+  await env.DB.prepare("UPDATE orders SET status='paid', payment_reference=?, ticket_token=COALESCE(ticket_token,?), paid_at=COALESCE(paid_at,?), updated_at=? WHERE id=? AND status='pending_payment'")
     .bind(reference || null, token, now(), now(), orderId).run();
   const order = await env.DB.prepare('SELECT o.*, e.name event_name, e.starts_at, e.venue, t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
   if (!order) return false;
   const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
-  const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${order.ticket_token}`;
-  if (updated.meta?.changes) ctx.waitUntil(sendTicketEmail(env, order, attendees.results || [], { name: order.event_name }, ticketUrl));
+  for (const attendee of attendees.results || []) {
+    if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+  }
+  const ticketRows = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
+  ctx.waitUntil(sendTicketEmails(env, order, ticketRows.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }));
   return true;
 }
 
-function ticketPage(order, attendees, event) {
-  return new Response(`<!doctype html><meta charset="utf-8"><title>Билет — ${html(event.name)}</title><style>body{font-family:Arial,sans-serif;background:#f4f7fc;color:#102653;padding:32px}.ticket{max-width:640px;margin:auto;background:#fff;border:1px solid #d6e0f2;border-radius:12px;padding:32px;box-shadow:0 12px 30px #10265318}h1{margin-top:0}.meta{line-height:1.8}.code{font:700 20px monospace;background:#eaf0fb;padding:12px;border-radius:8px;display:inline-block}</style><main class="ticket"><h1>${html(event.name)}</h1><p>Потвърден билет</p><div class="meta"><strong>Номер:</strong> ${html(order.id)}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Участници:</strong> ${(attendees.results || []).map((a) => html(clean(a.full_name))).join(', ')}</div><p class="code">${html(order.ticket_token)}</p><p>Покажете този билет при регистрация на събитието.</p></main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
+function ticketPage(order, attendee, event) {
+  const used = Boolean(attendee.checked_in_at);
+  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет — ${html(event.name)}</title><style>:root{--ink:#0b0b0d;--paper:#faf8f5;--cyan:#1e8cae;--orange:#e2542a}body{font-family:Arial,sans-serif;background:var(--ink);color:#17151a;padding:24px}.ticket{max-width:640px;margin:auto;background:var(--paper);border-top:8px solid var(--cyan);border-bottom:4px solid var(--orange);padding:32px;box-shadow:0 12px 30px #0005}h1{margin:0 0 12px;font-size:28px;color:var(--ink)}.status{color:var(--cyan);font-weight:700;letter-spacing:.08em}.meta{line-height:1.9;margin-top:24px}.code{font:700 16px monospace;background:#eaf6fa;padding:12px;border-radius:4px;display:inline-block;word-break:break-all}.used{color:var(--orange);font-weight:700}</style><main class="ticket"><h1>${html(event.name)}</h1><p class="status">${used ? 'БИЛЕТЪТ Е ВЕЧЕ ИЗПОЛЗВАН' : 'РЕГИСТРАЦИЯ ПОТВЪРДЕНА'}</p><div class="meta"><strong>Участник:</strong> ${html(attendee.full_name)}<br><strong>Билет:</strong> ${html(event.ticket_name || 'Билет')}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Адрес:</strong> ${html(EVENT_ADDRESS)}<br><strong>Поръчка:</strong> ${html(order.id)}</div><p class="code">${html(attendee.ticket_token)}</p>${used ? `<p class="used">Чекиран на ${html(attendee.checked_in_at)}</p>` : '<p>Покажете този билет при регистрация на събитието.</p>'}</main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
 export default {
@@ -247,10 +286,6 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { headers });
     const url = new URL(request.url);
     try {
-      if (request.method === 'GET' && url.pathname === '/admin/promos') {
-        const denied = requireAdmin(request, env); if (denied) return denied;
-        return promoAdminPage();
-      }
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
       if (request.method === 'GET' && url.pathname.startsWith('/api/events/')) {
         const slug = decodeURIComponent(url.pathname.split('/').pop());
@@ -260,72 +295,29 @@ export default {
         const used = await env.DB.prepare("SELECT COALESCE(SUM(attendee_count),0) total FROM orders WHERE event_id=? AND (status='paid' OR (status='pending_payment' AND expires_at > ?))").bind(event.id, now()).first();
         return json({ event, tickets: tickets.results || [], seatsRemaining: Math.max(0, event.capacity - Number(used.total || 0)) }, 200, headers);
       }
-      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env, ctx);
-      if (request.method === 'POST' && url.pathname === '/api/promo/quote') return promoQuote(request, env);
+      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env);
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
         const token = clean(url.pathname.split('/').pop(), 100);
-        const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue FROM orders o JOIN events e ON e.id=o.event_id WHERE o.ticket_token=? AND o.status='paid'").bind(token).first();
-        if (!order) return new Response('Ticket not found', { status: 404 });
-        const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(order.id).all();
-        return ticketPage(order, attendees, { name: order.event_name, starts_at: order.starts_at, venue: order.venue });
+        const row = await env.DB.prepare("SELECT o.*,a.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM attendees a JOIN orders o ON o.id=a.order_id JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE a.ticket_token=? AND o.status='paid'").bind(token).first();
+        if (!row) return new Response('Ticket not found', { status: 404 });
+        return ticketPage(row, row, { name: row.event_name, starts_at: row.starts_at, venue: row.venue, ticket_name: row.ticket_name });
       }
       if (url.pathname.startsWith('/api/admin/')) {
         const denied = requireAdmin(request, env); if (denied) return denied;
+        if (request.method === 'POST' && /^\/api\/admin\/tickets\/[^/]+\/check-in$/.test(url.pathname)) {
+          const token = clean(url.pathname.split('/')[4], 100);
+          const updated = await env.DB.prepare("UPDATE attendees SET checked_in_at=? WHERE ticket_token=? AND checked_in_at IS NULL AND order_id IN (SELECT id FROM orders WHERE status='paid')").bind(now(), token).run();
+          if (updated.meta?.changes) return json({ ok: true, status: 'checked_in', token }, 200, headers);
+          const attendee = await env.DB.prepare('SELECT checked_in_at FROM attendees WHERE ticket_token=?').bind(token).first();
+          if (attendee?.checked_in_at) return json({ ok: false, status: 'already_checked_in', checkedInAt: attendee.checked_in_at }, 409, headers);
+          return json({ error: 'Ticket not found or unpaid' }, 404, headers);
+        }
         if (request.method === 'GET' && url.pathname === '/api/admin/orders') {
           const status = clean(url.searchParams.get('status'), 40);
           const query = status ? 'SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.status=? ORDER BY o.created_at DESC' : 'SELECT o.*,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id ORDER BY o.created_at DESC';
           const rows = status ? await env.DB.prepare(query).bind(status).all() : await env.DB.prepare(query).all();
           return json(rows.results || [], 200, headers);
-        }
-        if (request.method === 'GET' && url.pathname === '/api/admin/promos') {
-          const rows = await env.DB.prepare(`SELECT p.*,e.slug event_slug,
-            (SELECT COUNT(*) FROM orders o WHERE o.event_id=p.event_id AND o.promo_code=p.code AND o.status IN ('pending_payment','paid')) usage_count
-            FROM promo_codes p JOIN events e ON e.id=p.event_id ORDER BY p.code`).all();
-          return json(rows.results || [], 200, headers);
-        }
-        if (request.method === 'GET' && url.pathname === '/api/admin/promo-usage') {
-          const promoCode = clean(url.searchParams.get('code'), 50).toUpperCase();
-          const rows = await env.DB.prepare(`SELECT o.id order_id,o.created_at,o.status,o.promo_code,o.buyer_name,o.buyer_email,
-            o.attendee_count,o.base_amount_cents,o.discount_percent,o.amount_cents,o.currency,
-            t.name ticket_name,e.name event_name
-            FROM orders o JOIN ticket_types t ON t.id=o.ticket_type_id JOIN events e ON e.id=o.event_id
-            WHERE o.promo_code IS NOT NULL AND (?='' OR o.promo_code=?)
-            ORDER BY o.created_at DESC`).bind(promoCode, promoCode).all();
-          const usage = [];
-          for (const row of rows.results || []) {
-            const attendees = await env.DB.prepare('SELECT full_name,email,phone FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(row.order_id).all();
-            usage.push({ ...row, attendees: attendees.results || [] });
-          }
-          return json(usage, 200, headers);
-        }
-        if (request.method === 'GET' && url.pathname === '/api/admin/promo-links') {
-          const promoId = clean(url.searchParams.get('promoId'), 100);
-          const rows = await env.DB.prepare('SELECT * FROM promo_payment_links WHERE promo_code_id=? ORDER BY ticket_key, attendee_count').bind(promoId).all();
-          return json(rows.results || [], 200, headers);
-        }
-        if (request.method === 'POST' && url.pathname === '/api/admin/promos') {
-          const body = await request.json();
-          const event = await env.DB.prepare('SELECT id FROM events WHERE slug=?').bind(clean(body.eventSlug || 'nail-business-restart', 80)).first();
-          const code = clean(body.code, 50).toUpperCase();
-          if (!event || !code) return json({ error: 'Събитието и кодът са задължителни.' }, 400, headers);
-          const promoId = clean(body.id, 100) || id('promo');
-          const keys = Array.isArray(body.ticketKeys) ? body.ticketKeys.map((key) => clean(key, 50)).filter(Boolean) : [];
-          const existing = await env.DB.prepare('SELECT id FROM promo_codes WHERE id=?').bind(promoId).first();
-          const values = [promoId, event.id, code, clean(body.validFrom, 50) || null, clean(body.validUntil, 50) || null, body.active === false ? 0 : 1, Math.max(0, Math.min(100, Number(body.singleDiscountPercent ?? 20))), Math.max(0, Math.min(100, Number(body.groupDiscountPercent ?? 25))), body.usageLimit === '' || body.usageLimit == null ? null : Math.max(1, Number(body.usageLimit)), JSON.stringify(keys)];
-          if (existing) await env.DB.prepare('UPDATE promo_codes SET event_id=?,code=?,valid_from=?,valid_until=?,active=?,single_discount_percent=?,group_discount_percent=?,usage_limit=?,ticket_keys_json=? WHERE id=?').bind(values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], promoId).run();
-          else await env.DB.prepare("INSERT INTO promo_codes (id,event_id,code,discount_type,discount_value,ticket_keys_json,valid_from,valid_until,active,single_discount_percent,group_discount_percent,usage_limit) VALUES (?,?,?,'percent',0,?,?,?,?,?,?,?)").bind(values[0], values[1], values[2], values[9], values[3], values[4], values[5], values[6], values[7], values[8]).run();
-          return json({ ok: true, id: promoId }, existing ? 200 : 201, headers);
-        }
-        if (request.method === 'POST' && url.pathname === '/api/admin/promo-links') {
-          const body = await request.json();
-          const promoId = clean(body.promoId, 100), ticketKey = clean(body.ticketKey, 50), paymentUrl = clean(body.paymentUrl, 500);
-          const attendeeCount = Number(body.attendeeCount);
-          if (!promoId || !ticketKey || !/^https:\/\//i.test(paymentUrl) || !Number.isInteger(attendeeCount) || attendeeCount < 1 || attendeeCount > 100) return json({ error: 'Невалиден payment link.' }, 400, headers);
-          const timestamp = now();
-          await env.DB.prepare(`INSERT INTO promo_payment_links (id,promo_code_id,ticket_key,attendee_count,payment_url,active,created_at,updated_at) VALUES (?,?,?,?,?,1,?,?)
-            ON CONFLICT(promo_code_id,ticket_key,attendee_count) DO UPDATE SET payment_url=excluded.payment_url,active=1,updated_at=excluded.updated_at`).bind(id('plink'), promoId, ticketKey, attendeeCount, paymentUrl, timestamp, timestamp).run();
-          return json({ ok: true }, 201, headers);
         }
         if (request.method === 'GET' && url.pathname === '/api/admin/export.csv') {
           const rows = await env.DB.prepare('SELECT o.id,o.created_at,o.status,o.buyer_name,o.buyer_email,o.buyer_phone,o.attendee_count,o.promo_code,o.amount_cents,o.currency,e.name event_name,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id ORDER BY o.created_at DESC').all();
@@ -344,11 +336,14 @@ export default {
         }
         if (request.method === 'POST' && /^\/api\/admin\/orders\/[^/]+\/resend-ticket$/.test(url.pathname)) {
           const orderId = url.pathname.split('/')[4];
-          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue FROM orders o JOIN events e ON e.id=o.event_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
+          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
           if (!order) return json({ error: 'Paid order not found' }, 404, headers);
           const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
-          const ticketUrl = `${env.PUBLIC_SITE_URL || ''}/api/tickets/${order.ticket_token}`;
-          return json(await sendTicketEmail(env, order, attendees.results || [], { name: order.event_name }, ticketUrl), 200, headers);
+          for (const attendee of attendees.results || []) {
+            if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+          }
+          const refreshed = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
+          return json(await sendTicketEmails(env, order, refreshed.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }, true), 200, headers);
         }
         if (request.method === 'POST' && url.pathname === '/api/admin/events/clone') {
           const body = await request.json();

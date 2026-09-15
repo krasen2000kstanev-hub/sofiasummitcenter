@@ -2,10 +2,14 @@ name = "sofiasummit-events-api"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf"]
+fallthrough = true
+
 [vars]
 PUBLIC_SITE_URL = "https://sofiasummit.bg"
-EMAIL_FROM = "onboarding@resend.dev"
-QR_CODE_API_URL = "https://api.qrserver.com/v1/create-qr-code/"
+EMAIL_FROM = "tickets@sofiasummit.bg"
 
 [[d1_databases]]
 binding = "DB"
