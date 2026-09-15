@@ -1785,6 +1785,7 @@
       if (e.key === 'Enter') { e.preventDefault(); refreshQuote(true); }
     });
     updatePromoUi();
+    refreshQuote(false);
     Object.keys(TICKETS).forEach(function(key){
       var button = document.getElementById(TICKETS[key].btnId);
       if (!button) return;
