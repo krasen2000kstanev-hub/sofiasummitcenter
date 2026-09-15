@@ -276,6 +276,9 @@
   .main-text-reveal.is-visible{clip-path:inset(0);-webkit-clip-path:inset(0)}
   .card-reveal{opacity:0;clip-path:inset(0 0 100% 0);-webkit-clip-path:inset(0 0 100% 0);transition:opacity .65s ease,clip-path .8s cubic-bezier(.22,.61,.36,1),-webkit-clip-path .8s cubic-bezier(.22,.61,.36,1)}
   .card-reveal.is-visible{opacity:1;clip-path:inset(0);-webkit-clip-path:inset(0)}
+  @media (hover:hover) and (pointer:fine){
+    .space-card:hover,.service:hover,.event-card:hover,.review-card:hover,.fact:hover,.partner-card:hover,.podcast-card:hover,.form-wrap:hover,.mapcard:hover,.faq-item:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-4px);box-shadow:0 24px 48px rgba(18,59,134,.22);transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s ease}
+  }
   @supports not (clip-path:inset(0 100% 0 0)){.main-text-reveal{clip-path:none;-webkit-clip-path:none}}
   @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}.card-reveal,.card-reveal.is-visible{opacity:1;clip-path:none;-webkit-clip-path:none;transition:none}}
 
