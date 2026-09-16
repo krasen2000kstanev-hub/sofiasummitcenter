@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 8 септември 2026 г. по локалните файлове и Git историята.
+Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 15 септември 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -29,9 +29,9 @@ The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the ma
 
 ## Event backend status
 
-The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. Payment is intended to continue on Bank DSK; a DSK webhook marks successful orders as paid and can trigger ticket email delivery.
+The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend remains available and automatic webhook processing is idempotent.
 
-Before production use, configure the Cloudflare D1 database ID, schema, DSK payment links and webhook secret, admin credentials, and Resend email settings as described in [`backend/README.md`](backend/README.md). The event form and API scaffold are not a substitute for a completed payment-provider and email deployment.
+The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 
 ## Adding an event
 
@@ -65,10 +65,9 @@ tsvetelin@pleggi.com
 - The order prioritizes the visitor path: understand the offer, see proof, explore collaborations, then send an inquiry.
 - The preview keeps the existing visual language and mobile safeguards; no content was removed.
 
-## Актуално състояние — 15 септември 2026 г.
+## Studio photo updates — 16 септември 2026 г.
 
-- Главното меню вече обхваща всички основни секции на началната страница: пространства, оборудване, събития, предстоящи събития, галерия, подкасти, продукции, инициативи, услуги, за нас, въпроси, запитване, партньори и контакти.
-- Менюто е компактно и се отваря като анимиран страничен панел; бутонът е до логото и се преобразува в бутон за затваряне.
-- NAIL BUSINESS RE:START поддържа свободно въвеждане на броя участници и показва подаръци на стойност над 100 EUR за всеки билет.
-- Правните документи за събитието са на отделни страници в `events/nail-business-restart/`.
-- Плащанията през ДСК, Cloudflare D1 и имейл услугата изискват реална конфигурация преди продукционна употреба.
+- Added optimized, non-repeating WebP photos from the approved studio folder under ssets/studio/.
+- Studio photos are used only for the Podcast Studio and About/space imagery; original event-hall and meeting-room photos remain unchanged.
+- Local preview: http://127.0.0.1:8766/index.html#spaces.
+

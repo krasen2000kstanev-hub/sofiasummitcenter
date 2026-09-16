@@ -184,3 +184,11 @@ Sofia Summit Center · ул. „8-ми декември“ 13, София · +35
 - В началната страница е добавена секция `#reviews` с три кратки откъса от публичните Google ревюта на Sofia Summit Center.
 - Добавен е навигационен линк „Ревюта“ и бутон „Виж всички ревюта в Google“, който отваря намерения Google Maps профил (47 ревюта, оценка 5.0).
 - Промените са само локални и очакват отделно одобрение преди качване в GitHub.
+
+## Studio photos — 16 септември 2026 г.
+
+- Added optimized WebP assets in ssets/studio/ from the approved studio photo folder.
+- The Podcast Studio card uses the original studio photo showing the shelving unit.
+- The About gallery keeps its original images and includes distinct studio photos without repetition.
+- Verified in a fresh local preview at http://127.0.0.1:8766/index.html#spaces.
+
