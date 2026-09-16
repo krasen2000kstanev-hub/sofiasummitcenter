@@ -74,6 +74,7 @@ main > .motion-section:not(.is-visible) .motion-item{opacity:0;transform:transla
 .partner-card img[src*="kaufland"]{transform:scale(1.15)}
 .partner-card img[src*="olympic"]{transform:scale(1.25)}
 .partner-card img[src*="pleggi-logo"]{transform:scale(1.3)}
+.partner-card img[src*="mirellia"]{transform:scale(3.6)}
 @media(hover:hover){.partner-card:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(20,72,145,.14);border-color:#8fb4eb}}
 @media(max-width:900px){.partners-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.partners-grid{grid-template-columns:1fr}.partner-card{min-height:140px}}
