@@ -390,6 +390,7 @@
     background:var(--accent-tint);border:1px solid var(--accent);color:var(--accent-strong);font-weight:600;font-size:.94rem;
   }
   #confirm.show{display:block;}
+  #confirm.error{background:#fff1f1;border-color:#c62828;color:#9b1c1c;}
 
   /* contact */
   .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
@@ -412,6 +413,10 @@
   .footer-links a:hover{color:#fff;}
   .footer-note{font-size:.78rem;color:#8b90bb;}
   .foot-bottom{border-top:1px solid #333a6e;margin-top:40px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.8rem;color:#8b90bb;}
+  footer{background:#123b86!important;color:#fff!important;}
+  footer h5,footer p,footer .footer-brand span,footer .footer-links a,footer .foot-bottom,footer .foot-bottom span{color:#fff!important;opacity:1!important;visibility:visible!important;}
+  footer p{font-size:.95rem;line-height:1.6;}
+  footer .foot-bottom{font-size:.85rem;}
 .events-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.event-card{display:flex;flex-direction:column;background:#071a3d;color:#fff;border:1px solid #2452b8;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}.event-card img{width:100%;height:170px;object-fit:cover}.event-card-content{padding:22px}.event-card-content h3{margin:.5em 0;color:#fff;font-size:1.05rem}.event-card-content p{color:rgba(255,255,255,.78);max-width:60ch;font-size:.92rem}.event-card-content .btn{margin-top:12px}@media(max-width:900px){.events-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.events-grid{grid-template-columns:1fr}.event-card img{height:210px}}:root{--ink:#061638;--ink-soft:#21406e;--paper:#eaf2ff;--surface:#f8fbff;--surface-2:#dce9ff;--line:#b8ccef;--accent:#2452b8;--accent-strong:#123b86;--gold:#2452b8;--gold-tint:#dce9ff;--accent-tint:#dce9ff} .contact-list a,.footer-links a,.navlinks a,.brand,.brand-word,.nav-phone{color:#061638!important} footer{background:#123b86;color:#fff;border-top:1px solid #2452b8} footer h5,footer p,footer a,footer span,.foot-bottom{color:#fff!important}</style>
 
 <!-- SEO: structured data -->
@@ -789,11 +794,12 @@
             </div>
             <div class="field">
               <label for="f-date">Желана дата</label>
-              <input id="f-date" name="date" type="date">
+              <input id="f-date" name="date" type="date" required>
+              <div id="availability-note" class="form-note" aria-live="polite"></div>
             </div>
             <div class="field">
               <label for="f-guests">Брой гости</label>
-              <input id="f-guests" name="guests" type="number" min="1" placeholder="напр. 20">
+              <input id="f-guests" name="guests" type="number" min="1" max="100" placeholder="напр. 20" required>
             </div>
             <div class="field full">
               <label for="f-msg">Съобщение</label>
@@ -803,7 +809,7 @@
           <div class="form-foot">
             <button type="submit" class="btn btn-primary">Изпрати запитване</button>
           </div>
-          <div id="confirm">✓ Благодарим! Това е демонстрация на формата — свържете реален бекенд, за да получавате запитванията по имейл.</div>
+          <div id="confirm" aria-live="polite"></div>
         </form>
       </div>
     </div>
@@ -1100,11 +1106,13 @@
     a.addEventListener('click', function(){ navlinks.classList.remove('open'); });
   });
 
-  document.getElementById('inquiry-form').addEventListener('submit', function(e){
-    e.preventDefault();
-    document.getElementById('confirm').classList.add('show');
-    this.reset();
-  });
+  (function(){
+    var form=document.getElementById('inquiry-form'), space=document.getElementById('f-space'), date=document.getElementById('f-date'), note=document.getElementById('availability-note'), confirm=document.getElementById('confirm'), occupied=[];
+    var api=window.SOFIA_API_BASE||'';
+    function load(){ occupied=[]; if(!api||space.value==='Все още не съм сигурен/а'){note.textContent='Ще потвърдим наличността след запитването.';return;} note.textContent='Проверяваме наличността…'; fetch(api+'/availability?space='+encodeURIComponent(space.value)).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){occupied=d.occupied_dates||[];note.textContent=occupied.length?'Заети дати: '+occupied.join(', '):'Няма потвърдени заети дати.';}).catch(function(){note.textContent='Наличността ще бъде потвърдена при отговор.';}); }
+    space.addEventListener('change',load); load();
+    form.addEventListener('submit',function(e){e.preventDefault();confirm.className='';if(occupied.indexOf(date.value)>=0){confirm.textContent='Избраната дата вече е заета за това пространство.';confirm.classList.add('show','error');return;} var b=form.querySelector('button[type=submit]'), data=Object.fromEntries(new FormData(form)); data.guests=Number(data.guests); b.disabled=true;b.textContent='Изпращане…'; fetch(api+'/inquiries',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.ok?r.json():r.json().then(function(x){return Promise.reject(x);});}).then(function(){confirm.textContent='✓ Благодарим! Получихме запитването и ще се свържем с вас.';confirm.classList.add('show');form.reset();load();}).catch(function(err){confirm.textContent=err&&err.error?err.error:'Възникна проблем. Опитайте отново или ни се обадете.';confirm.classList.add('show','error');}).finally(function(){b.disabled=false;b.textContent='Изпрати запитване';});});
+  }());
 
   var backToTop = document.getElementById('back-to-top');
   window.addEventListener('scroll', function(){
