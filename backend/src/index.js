@@ -194,6 +194,35 @@ async function sendTicketEmails(env, order, attendees, event, force = false) {
   return results;
 }
 
+async function getPromoQuote(env, event, ticket, promoCode, count) {
+  const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id=? AND code=? AND active=1').bind(event.id, promoCode).first();
+  if (!promo) return { error: 'Невалиден промокод.' };
+  const allowed = JSON.parse(promo.ticket_keys_json || '[]');
+  if (allowed.length && !allowed.includes(ticket.ticket_key)) return { error: 'Промокодът не важи за избрания билет.' };
+  const discountPercent = count > 1 ? Number(promo.group_discount_percent ?? promo.discount_value) : Number(promo.single_discount_percent ?? promo.discount_value);
+  const unitAmountCents = promo.discount_type === 'percent'
+    ? Math.round(ticket.price_cents * (100 - discountPercent) / 100)
+    : Math.max(0, ticket.price_cents - Number(promo.discount_value));
+  const paymentLink = await env.DB.prepare('SELECT payment_url FROM promo_payment_links WHERE promo_code_id=? AND ticket_key=? AND attendee_count=? AND active=1').bind(promo.id, ticket.ticket_key, count).first();
+  return { promo, discountPercent, unitAmountCents, amountCents: unitAmountCents * count, paymentUrl: paymentLink?.payment_url || null };
+}
+
+async function promoQuote(request, env) {
+  const headers = cors(request);
+  const body = await request.json();
+  const eventSlug = clean(body.eventSlug || 'nail-business-restart', 80);
+  const ticketKey = clean(body.ticketType || 'standard', 50);
+  const promoCode = clean(body.promoCode, 50).toUpperCase();
+  const count = Number(body.attendeesCount ?? 1);
+  if (!promoCode || !Number.isInteger(count) || count < 1 || count > 100) return json({ error: 'Невалиден промокод или брой участници.' }, 400, headers);
+  const event = await env.DB.prepare('SELECT * FROM events WHERE slug=? AND status=?').bind(eventSlug, 'active').first();
+  const ticket = await env.DB.prepare('SELECT * FROM ticket_types WHERE event_id=? AND ticket_key=? AND active=1').bind(event?.id, ticketKey).first();
+  if (!event || !ticket) return json({ error: 'Събитието или билетът не е наличен.' }, 404, headers);
+  const quote = await getPromoQuote(env, event, ticket, promoCode, count);
+  if (quote.error) return json({ error: quote.error }, 400, headers);
+  return json({ discountPercent: quote.discountPercent, unitAmountCents: quote.unitAmountCents, amountCents: quote.amountCents }, 200, headers);
+}
+
 async function createOrder(request, env) {
   const headers = cors(request);
   const body = await readBody(request);
@@ -214,12 +243,13 @@ async function createOrder(request, env) {
 
   const promoCode = clean(body.promoCode, 50).toUpperCase() || null;
   let amount = ticket.price_cents * count;
+  let promoPaymentUrl = null;
   if (promoCode) {
-    const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id = ? AND code = ? AND active = 1').bind(event.id, promoCode).first();
-    if (!promo) return json({ error: 'Невалиден промокод.' }, 400, headers);
-    const allowed = JSON.parse(promo.ticket_keys_json || '[]');
-    if (allowed.length && !allowed.includes(ticketKey)) return json({ error: 'Промокодът не важи за избрания билет.' }, 400, headers);
-    amount = promo.discount_type === 'percent' ? Math.round(amount * (100 - promo.discount_value) / 100) : Math.max(0, amount - promo.discount_value * count);
+    const quote = await getPromoQuote(env, event, ticket, promoCode, count);
+    if (quote.error) return json({ error: quote.error }, 400, headers);
+    amount = quote.amountCents;
+    promoPaymentUrl = quote.paymentUrl;
+    if (!promoPaymentUrl) return json({ error: 'Плащането с този промокод и този брой участници още не е конфигурирано.' }, 409, headers);
   }
 
   const orderId = id('order');
@@ -240,7 +270,7 @@ async function createOrder(request, env) {
   }
   const results = await env.DB.batch(statements);
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
-  const paymentUrl = ticket.dsk_url || null;
+  const paymentUrl = promoPaymentUrl || ticket.dsk_url || null;
   await env.DB.prepare('UPDATE orders SET payment_url = ? WHERE id = ?').bind(paymentUrl, orderId).run();
   return json({ orderId, status: 'pending_payment', amountCents: amount, currency: ticket.currency, paymentUrl, message: paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, paymentUrl ? 201 : 202, headers);
 }
@@ -295,6 +325,7 @@ export default {
         const used = await env.DB.prepare("SELECT COALESCE(SUM(attendee_count),0) total FROM orders WHERE event_id=? AND (status='paid' OR (status='pending_payment' AND expires_at > ?))").bind(event.id, now()).first();
         return json({ event, tickets: tickets.results || [], seatsRemaining: Math.max(0, event.capacity - Number(used.total || 0)) }, 200, headers);
       }
+      if (request.method === 'POST' && url.pathname === '/api/promo/quote') return promoQuote(request, env);
       if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env);
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
