@@ -274,8 +274,14 @@
   .sechead p{color:var(--ink-soft);font-size:1.04rem;margin:0;}
   .main-text-reveal{opacity:1;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);transform:none;transition:clip-path 1.1s cubic-bezier(.22,.61,.36,1),-webkit-clip-path 1.1s cubic-bezier(.22,.61,.36,1)}
   .main-text-reveal.is-visible{clip-path:inset(0);-webkit-clip-path:inset(0)}
+  .card-reveal{opacity:0;clip-path:inset(0 0 100% 0);-webkit-clip-path:inset(0 0 100% 0);transition:opacity .65s ease,clip-path .8s cubic-bezier(.22,.61,.36,1),-webkit-clip-path .8s cubic-bezier(.22,.61,.36,1)}
+  @keyframes card-3d-in{from{opacity:0}to{opacity:1}}
+  .card-reveal.is-visible{opacity:1;clip-path:inset(0);-webkit-clip-path:inset(0);animation:card-3d-in 1.35s cubic-bezier(.22,.61,.36,1) both}
+  @media (hover:hover) and (pointer:fine){
+    .space-card:hover,.service:hover,.event-card:hover,.review-card:hover,.fact:hover,.partner-card:hover,.podcast-card:hover,.form-wrap:hover,.mapcard:hover,.faq-item:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-4px);box-shadow:0 24px 48px rgba(18,59,134,.22);transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s ease}
+  }
   @supports not (clip-path:inset(0 100% 0 0)){.main-text-reveal{clip-path:none;-webkit-clip-path:none}}
-  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}}
+  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}.card-reveal,.card-reveal.is-visible{opacity:1;clip-path:none;-webkit-clip-path:none;animation:none;transition:none}}
 
   /* spaces */
   .spaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -299,8 +305,12 @@
   .tilt-surface::before{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.6);border-radius:inherit;opacity:0;pointer-events:none;z-index:3;transition:opacity .25s ease,box-shadow .25s ease}
    @media (hover:hover) and (pointer:fine){.tilt-surface:hover{box-shadow:0 26px 54px rgba(18,59,134,.24),0 0 0 1px rgba(36,82,184,.18)}}
   .tilt-surface:hover::before,.tilt-surface:focus-within::before{opacity:1;box-shadow:inset 0 0 18px rgba(255,255,255,.24)}
-  @media (hover:hover){.tilt-surface:hover{--tilt-x:2deg;--tilt-y:-2deg}}
+  @media (hover:hover){.tilt-surface:hover{--tilt-x:5deg;--tilt-y:-6deg;box-shadow:0 18px 36px rgba(18,59,134,.2)}}
   .tilt-surface:active{--tilt-x:1deg;--tilt-y:-1deg}
+  .tilt-surface>*{transform:translateZ(18px);transform-style:preserve-3d}
+  .space-card,.service,.event-card,.review-card,.fact,.partner-card,.podcast-card,.form-wrap,.mapcard,.faq-item{transform-style:preserve-3d;backface-visibility:hidden}
+  .spaces-grid>*,.services-grid>*,.events-grid>*,.reviews-grid>*,.partners-grid>*,.contact-grid>*,.form-grid>*{transform-style:preserve-3d;backface-visibility:hidden;transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s ease}
+  @media (hover:hover){.spaces-grid>*:hover,.services-grid>*:hover,.events-grid>*:hover,.reviews-grid>*:hover,.partners-grid>*:hover,.contact-grid>*:hover,.form-grid>*:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-4px);box-shadow:0 24px 48px rgba(18,59,134,.22)}}
   .tilt-control{position:relative;isolation:isolate}
   .tilt-control::after{content:"";position:absolute;inset:-3px;border:1px solid rgba(36,82,184,.42);border-radius:inherit;opacity:0;pointer-events:none;transition:opacity .25s ease,box-shadow .25s ease}
   .tilt-control:hover::after,.tilt-control:focus-visible::after{opacity:1;box-shadow:0 0 0 3px rgba(36,82,184,.12),0 0 18px rgba(36,82,184,.2)}
@@ -426,6 +436,7 @@
       <li><a href="#services">Оборудване</a></li>
       <li><a href="#events">Събития</a></li>
       <li><a href="#featured-events">Предстоящи</a></li>
+      <li><a href="#reviews">Ревюта</a></li>
       <li><a href="#gallery">Галерия</a></li>
       <li><a href="#podcasts">Подкасти</a></li>
       <li><a href="#productions">Продукции</a></li>
@@ -575,6 +586,8 @@
     </div>
   </section><section id="featured-events"><div class="wrap"><div class="sechead"><p class="eyebrow">Предстоящи събития</p><p>Събития, в които не просто предоставяме пространство, а сме активна част от екипа — от първоначалната идея до реализацията.</p></div><div class="events-grid"><article class="event-card"><img src="assets/nail-business-restart-hero.webp" alt="NAIL BUSINESS RE:START — професионално събитие за маникюристи"><div class="event-card-content"><p class="eyebrow">26 октомври 2026 · София</p><h3>NAIL BUSINESS RE:START</h3><p>Професионално събитие за маникюристи с бизнес теми, лекции и практически мастър класове.</p><a class="btn btn-primary" href="events/nail-business-restart/" target="_blank" rel="noopener">Научи повече ↗</a></div></article><article class="event-card" id="career-cafe"><img src="assets/event-photos/career-cafe-card.svg" alt="Кариерно кафе в Sofia Summit Center"><div class="event-card-content"><p class="eyebrow">21 ноември 2026 · София</p><h3>Кариерно кафе</h3><p>Неформална среща между хора, които търсят развитие, и HR специалисти, кариерни консултанти и работодатели.</p><a class="btn btn-primary" href="events/career-cafe/" target="_blank" rel="noopener">Научи повече ↗</a></div></article></div></div></section>
 
+  <section id="reviews" class="reviews-section"><div class="wrap"><div class="sechead"><p class="eyebrow">Отзиви от Google</p><h2>Какво споделят гостите ни.</h2><p>Подбрани откъси от публичните ревюта на Sofia Summit Center в Google.</p></div><div class="reviews-grid"><article class="review-card"><div class="review-stars" aria-label="5 от 5 звезди">★★★★★</div><p>„Excellent conference venue with everything needed for hosting conferences, forums, business meetings, and similar events.“</p><cite>Михаил Дадов · Google Reviews</cite></article><article class="review-card"><div class="review-stars" aria-label="5 от 5 звезди">★★★★★</div><p>„The venue did a perfect job in facilitating the event.“</p><cite>Nikola Bushnyakov · Google Reviews</cite></article><article class="review-card"><div class="review-stars" aria-label="5 от 5 звезди">★★★★★</div><p>„Пространството е адаптирано към различни формати и екипът е гъвкав.“</p><cite>Надя Петрова · Google Reviews</cite></article></div><a class="btn btn-primary reviews-link" href="https://www.google.com/maps/place/Sofia+Summit+Center/@42.651405,23.3518015,17z/data=!3m1!4b1!4m6!3m5!1s0x40aa85eaf1461803:0x4d01c42b4221086a!8m2!3d42.651405!4d23.3518015!16s%2Fg%2F11vr5qpmfy" target="_blank" rel="noopener">Виж всички ревюта в Google ↗</a></div></section>
+
   <section id="gallery" class="gallery-section gallery-orbit">
     <div class="wrap">
       <div class="sechead">
@@ -615,6 +628,14 @@
   </section>
 
   <style>
+    .reviews-section{background:var(--paper)}
+    .reviews-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:30px}
+    .review-card{padding:24px 22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .review-card p{margin:12px 0 18px;color:var(--ink-soft);line-height:1.6;font-size:.95rem}
+    .review-card cite{font-style:normal;color:var(--ink);font-size:.8rem;font-weight:700}
+    .review-stars{color:#2452b8;letter-spacing:2px;font-size:1rem}
+    .reviews-link{margin-top:24px}
+    @media(max-width:760px){.reviews-grid{grid-template-columns:1fr}}
     .collab-section{background:rgba(234,242,255,.72)}
     .collab-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
     .collab-card{padding:26px 22px;min-height:210px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(248,251,255,.86);box-shadow:0 10px 24px rgba(20,72,145,.08);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
@@ -1009,36 +1030,43 @@
 
   (function(){
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (reduced || !finePointer || !('PointerEvent' in window)) return;
-    var surfaces = document.querySelectorAll('.hero-photo, .space-card, .service, .event-card, .fact, .partner-card, .form-wrap, .about-photos img, .mapcard, .faq-item, .gallery-item img, .podcast-card, .btn, button, .event-tags span');
+    if (reduced) return;
+    var surfaces = document.querySelectorAll('.hero-photo, .space-card, .service, .event-card, .review-card, .fact, .partner-card, .form-wrap, .about-photos img, .mapcard, .faq-item, .gallery-item img, .gallery-orbit-card, .gallery-orbit-copy, .podcast-card, .spaces-grid > *, .services-grid > *, .events-grid > *, .reviews-grid > *, .partners-grid > *, .contact-grid > *, .form-grid > *, .btn, button, .event-tags span');
     surfaces.forEach(function(surface){
       surface.classList.add('tilt-surface');
       if (surface.matches('.btn, button, .event-tags span')) surface.classList.add('tilt-control');
-      surface.addEventListener('pointermove', function(e){
-        if (e.pointerType === 'touch') return;
-        var box = surface.getBoundingClientRect();
-        var x = (e.clientX - box.left) / box.width;
-        var y = (e.clientY - box.top) / box.height;
-        surface.style.setProperty('--tilt-x', ((.5 - y) * 9).toFixed(2) + 'deg');
-        surface.style.setProperty('--tilt-y', ((x - .5) * 11).toFixed(2) + 'deg');
-      }, {passive:true});
-      surface.addEventListener('pointerleave', function(){
-        surface.style.setProperty('--tilt-x', '0deg');
-        surface.style.setProperty('--tilt-y', '0deg');
-      }, {passive:true});
     });
+    var active;
+    document.addEventListener('mousemove', function(e){
+      var surface = e.target.closest && e.target.closest('.tilt-surface');
+      if (!surface) { if (active) { active.style.setProperty('--tilt-x','0deg'); active.style.setProperty('--tilt-y','0deg'); active = null; } return; }
+      if (active && active !== surface) { active.style.setProperty('--tilt-x','0deg'); active.style.setProperty('--tilt-y','0deg'); }
+      active = surface;
+      var box = surface.getBoundingClientRect(), x = (e.clientX - box.left) / box.width, y = (e.clientY - box.top) / box.height;
+      surface.style.setProperty('--tilt-x', ((.5-y)*18).toFixed(2)+'deg');
+      surface.style.setProperty('--tilt-y', ((x-.5)*22).toFixed(2)+'deg');
+    }, {passive:true});
+    function resetTilt(){ if (active) { active.style.setProperty('--tilt-x','0deg'); active.style.setProperty('--tilt-y','0deg'); active = null; } }
+    document.addEventListener('mouseleave', resetTilt, {passive:true});
+    window.addEventListener('blur', resetTilt, {passive:true});
   }());
 
   (function(){
     var headings = document.querySelectorAll('h1, .sechead h2, .gallery-orbit-copy h3');
-    if (!headings.length) return;
+    var cards = document.querySelectorAll('.space-card, .service, .event-card, .review-card, .fact, .partner-card, .podcast-card, .form-wrap, .mapcard, .faq-item');
+    if (!headings.length && !cards.length) return;
     headings.forEach(function(heading){
       heading.classList.add('main-text-reveal');
+    });
+    cards.forEach(function(card, index){
+      card.classList.add('card-reveal');
+      card.style.transitionDelay = Math.min(index % 4, 3) * 90 + 'ms';
+      card.style.animationDelay = Math.min(index % 4, 3) * 90 + 'ms';
     });
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced || !('IntersectionObserver' in window)) {
       headings.forEach(function(heading){ heading.classList.remove('main-text-reveal'); });
+      cards.forEach(function(card){ card.classList.remove('card-reveal'); card.style.transitionDelay = ''; card.style.animationDelay = ''; });
       return;
     }
     var observer = new IntersectionObserver(function(entries){
@@ -1047,6 +1075,7 @@
       });
     }, {threshold:0, rootMargin:'0px 0px -15% 0px'});
     headings.forEach(function(heading){ observer.observe(heading); });
+    cards.forEach(function(card){ observer.observe(card); });
   }());
 
   var navtoggle = document.getElementById('navtoggle');
