@@ -275,12 +275,13 @@
   .main-text-reveal{opacity:1;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);transform:none;transition:clip-path 1.1s cubic-bezier(.22,.61,.36,1),-webkit-clip-path 1.1s cubic-bezier(.22,.61,.36,1)}
   .main-text-reveal.is-visible{clip-path:inset(0);-webkit-clip-path:inset(0)}
   .card-reveal{opacity:0;clip-path:inset(0 0 100% 0);-webkit-clip-path:inset(0 0 100% 0);transition:opacity .65s ease,clip-path .8s cubic-bezier(.22,.61,.36,1),-webkit-clip-path .8s cubic-bezier(.22,.61,.36,1)}
-  .card-reveal.is-visible{opacity:1;clip-path:inset(0);-webkit-clip-path:inset(0)}
+  @keyframes card-3d-in{from{opacity:0;transform:perspective(900px) rotateX(18deg) rotateY(-14deg) translateY(36px) scale(.92)}to{opacity:1;transform:perspective(900px) rotateX(0) rotateY(0) translateY(0) scale(1)}}
+  .card-reveal.is-visible{opacity:1;clip-path:inset(0);-webkit-clip-path:inset(0);animation:card-3d-in 1.35s cubic-bezier(.22,.61,.36,1) both}
   @media (hover:hover) and (pointer:fine){
     .space-card:hover,.service:hover,.event-card:hover,.review-card:hover,.fact:hover,.partner-card:hover,.podcast-card:hover,.form-wrap:hover,.mapcard:hover,.faq-item:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-4px);box-shadow:0 24px 48px rgba(18,59,134,.22);transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s ease}
   }
   @supports not (clip-path:inset(0 100% 0 0)){.main-text-reveal{clip-path:none;-webkit-clip-path:none}}
-  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}.card-reveal,.card-reveal.is-visible{opacity:1;clip-path:none;-webkit-clip-path:none;transition:none}}
+  @media(prefers-reduced-motion:reduce){.main-text-reveal,.main-text-reveal.is-visible{clip-path:none;-webkit-clip-path:none;transition:none}.card-reveal,.card-reveal.is-visible{opacity:1;clip-path:none;-webkit-clip-path:none;animation:none;transition:none}}
 
   /* spaces */
   .spaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -1056,11 +1057,12 @@
     cards.forEach(function(card, index){
       card.classList.add('card-reveal');
       card.style.transitionDelay = Math.min(index % 4, 3) * 90 + 'ms';
+      card.style.animationDelay = Math.min(index % 4, 3) * 90 + 'ms';
     });
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced || !('IntersectionObserver' in window)) {
       headings.forEach(function(heading){ heading.classList.remove('main-text-reveal'); });
-      cards.forEach(function(card){ card.classList.remove('card-reveal'); card.style.transitionDelay = ''; });
+      cards.forEach(function(card){ card.classList.remove('card-reveal'); card.style.transitionDelay = ''; card.style.animationDelay = ''; });
       return;
     }
     var observer = new IntersectionObserver(function(entries){
