@@ -35,6 +35,10 @@ Current active promo codes: `BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `IL
 
 The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 
+## Career Cafe copy update
+
+The public page at `events/career-cafe/` now uses the approved Bulgarian copy for the value proposition, program and ticket tiers Espresso, Doppio and Lungo+. Visible dash punctuation was removed from the visitor facing copy and replaced with commas or short sentences. The helper section remains unchanged until its participants are confirmed. The preview is available through the local preview server at `http://127.0.0.1:8765/events/career-cafe/`.
+
 ## Adding an event
 
 Create a self-contained page under `events/<event-slug>/`, then add an event card or link to the homepage. Event links should use the label **„Научи повече“** and open in a new tab with `target="_blank"` and `rel="noopener"`.

@@ -1,5 +1,9 @@
 # Project memory
 
+## Career Cafe copy update
+
+На 17 септември 2026 г. `events/career-cafe/index.html` е обновена с одобрения текст за стойностното предложение, програмата и билетите Espresso, Doppio и Lungo+. Видимите тирета в публичния текст са заменени с пунктуация или кратки изречения. Секцията „Кой ще ти помогне“ остава без допълнителни роли до потвърждение на участниците.
+
 ## Sofia Summit / Nail Business Re:Start
 
 - Сайтът е на GitHub Pages: `https://sofiasummit.bg/`.
