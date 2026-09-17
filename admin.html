@@ -8,6 +8,7 @@
 </head>
 <body>
   <h1>Регистрации</h1>
+  <section><h2>Запитвания за пространства</h2><button id="load-inquiries">Зареди запитвания</button><table><thead><tr><th>Име</th><th>Имейл</th><th>Пространство</th><th>Дата</th><th>Гости</th><th>Статус</th><th>Действие</th></tr></thead><tbody id="inquiry-rows"></tbody></table></section>
   <p>Административен преглед за NAIL BUSINESS RE:START.</p>
   <label>API адрес <input id="api" value="https://api.sofiasummit.bg" size="32"></label>
   <label>Потребител <input id="user" autocomplete="username"></label>
@@ -20,6 +21,7 @@
   <script>
     const $ = (id) => document.getElementById(id);
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    $('load-inquiries').onclick = async () => { const api=$('api').value.replace(/\/$/,''); const auth='Basic '+btoa($('user').value+':'+$('pass').value); const r=await fetch(api+'/admin/inquiries',{headers:{Authorization:auth}}); if(!r.ok){$('error').textContent='Невалидни администраторски данни.';return;} const items=await r.json(); $('inquiry-rows').innerHTML=items.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.email)}</td><td>${esc(x.space)}</td><td>${esc(x.requested_date)}</td><td>${esc(x.guests)}</td><td>${esc(x.status)}</td><td><button data-inquiry="${esc(x.id)}" data-status="confirmed">Потвърди</button><button data-inquiry="${esc(x.id)}" data-status="rejected">Откажи</button></td></tr>`).join(''); document.querySelectorAll('[data-inquiry]').forEach(b=>b.onclick=async()=>{await fetch(api+'/admin/inquiries/'+encodeURIComponent(b.dataset.inquiry.replace(/^inquiry#/,''))+'/status',{method:'POST',headers:{Authorization:auth,'content-type':'application/json'},body:JSON.stringify({status:b.dataset.status})}); $('load-inquiries').click();}); };
     $('load').onclick = async () => {
       const api = $('api').value.replace(/\/$/, '');
       const auth = 'Basic ' + btoa($('user').value + ':' + $('pass').value);

@@ -33,3 +33,15 @@ variable "inquiry_notify_email" {
   description = "Inbox that receives new website inquiries."
   default     = ""
 }
+
+variable "admin_user" {
+  type = string
+  description = "Admin username for inquiry review."
+  default = ""
+}
+variable "admin_password" {
+  type = string
+  sensitive = true
+  description = "Admin password for inquiry review."
+  default = ""
+}
