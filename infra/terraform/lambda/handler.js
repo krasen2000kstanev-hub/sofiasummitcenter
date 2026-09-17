@@ -7,7 +7,7 @@ const ses = new SESv2Client({});
 const tableName = process.env.TABLE_NAME;
 const eventId = 'nail-business-restart';
 const capacity = 100;
-const response = (statusCode, body) => ({ statusCode, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+const response = (statusCode, body) => ({ statusCode, headers: { 'content-type': 'application/json', 'access-control-allow-origin': 'https://sofiasummit.bg', 'access-control-allow-headers': 'content-type,authorization', 'access-control-allow-methods': 'GET,POST,OPTIONS' }, body: JSON.stringify(body) });
 const text = (value, max = 500) => typeof value === 'string' ? value.trim().slice(0, max) : '';
 
 exports.handler = async (event) => {
