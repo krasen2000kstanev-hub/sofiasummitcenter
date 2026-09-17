@@ -376,6 +376,21 @@
 
   /* form */
   .form-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:36px;box-shadow:var(--shadow);}
+    #request .form-wrap,
+    #request .form-wrap *{
+      animation:none!important;
+      transition:none!important;
+    }
+    #request .form-wrap,
+    #request .form-wrap:hover,
+    #request .form-wrap:focus-within,
+    #request .form-wrap *{
+      transform:none!important;
+    }
+    #request .form-wrap.card-reveal{
+      opacity:1!important;
+      clip-path:none!important;
+    }
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   @media (max-width:640px){.form-grid{grid-template-columns:1fr;}}
   .field{display:flex;flex-direction:column;gap:6px;}
