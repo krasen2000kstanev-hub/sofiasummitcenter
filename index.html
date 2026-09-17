@@ -809,6 +809,7 @@
               <select id="f-space" name="space">
                 <option>Зала за събития</option>
                 <option>Зала за срещи</option>
+                <option>Подкаст студио</option>
                 <option>Все още не съм сигурен/а</option>
               </select>
             </div>
@@ -934,6 +935,7 @@
   }
 </style>
 <script>
+  window.SOFIA_API_BASE = 'https://xbig7zbeqh.execute-api.eu-central-1.amazonaws.com';
   if (new URLSearchParams(window.location.search).get('preview-rosa-layout') === '1') document.documentElement.classList.add('rosa-layout-preview-v1');
   (function(){
     var ambient = document.querySelector('.site-ambient-background');

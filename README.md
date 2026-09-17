@@ -64,3 +64,13 @@ tsvetelin@pleggi.com
 - The approved homepage flow is: hero, spaces, equipment, services, upcoming events, gallery, podcasts, productions, initiatives, about, FAQ, request, partners and contact.
 - The order prioritizes the visitor path: understand the offer, see proof, explore collaborations, then send an inquiry.
 - The preview keeps the existing visual language and mobile safeguards; no content was removed.
+
+## Studio photo updates — 16 септември 2026 г.
+
+- Added optimized, non-repeating WebP photos from the approved studio folder under ssets/studio/.
+- Studio photos are used only for the Podcast Studio and About/space imagery; original event-hall and meeting-room photos remain unchanged.
+- Local preview: http://127.0.0.1:8766/index.html#spaces.
+
+
+## Inquiry API
+The request form posts name, email, phone, space, date, guests and message to POST /inquiries. Confirmed dates are read from GET /availability?space=.... Terraform provisions DynamoDB storage and SES notifications; set inquiry_notify_email in your tfvars before deployment. The form uses window.SOFIA_API_BASE (defaults to the same origin).
