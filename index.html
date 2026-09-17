@@ -319,14 +319,18 @@
   @media(prefers-reduced-motion:reduce){.tilt-surface{transition:none;transform:none}}
 
   /* services */
-  .services-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px;}
-  @media (max-width:1100px){.services-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-  @media (max-width:920px){.services-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-  @media (max-width:560px){.services-grid{grid-template-columns:1fr;}}
+  .services-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;}
+  @media (max-width:900px){.services-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  @media (max-width:620px){.services-grid{grid-template-columns:1fr;}}
   .service{padding:22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);}
   .service .ic{width:38px;height:38px;color:var(--accent);margin-bottom:14px;}
   .service h4{font-size:1rem;line-height:1.25;margin-bottom:6px;overflow-wrap:anywhere;word-break:normal;}
   .service p{font-size:.89rem;color:var(--ink-soft);margin:0;}
+  @media (hover:none),(pointer:coarse){
+    .site-ambient-background img{display:none!important;animation:none!important;}
+    .site-ambient-network{display:none!important;}
+    .tilt-surface{transform:none!important;transition:none!important;will-change:auto!important;}
+  }
 
   /* event types */
   .proof{background:var(--surface-2);}
@@ -1055,9 +1059,9 @@
   }());
 
   (function(){
-    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduced = window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(hover: none), (pointer: coarse)').matches);
     if (reduced) return;
-    var surfaces = document.querySelectorAll('.hero-photo.space-card.service.event-card.review-card.fact.partner-card.form-wrap.about-photos img.mapcard.faq-item.gallery-item img.podcast-card.spaces-grid > *.services-grid > *.events-grid > *.reviews-grid > *.partners-grid > *.contact-grid > *.form-grid > *.btn, button.event-tags span');
+    var surfaces = document.querySelectorAll('.hero-photo, .space-card, .service, .event-card, .review-card, .fact, .partner-card, .form-wrap, .about-photos img, .mapcard, .faq-item, .gallery-item img, .podcast-card, .spaces-grid > *, .services-grid > *, .events-grid > *, .reviews-grid > *, .partners-grid > *, .contact-grid > *, .form-grid > *, .btn, button, .event-tags span');
     surfaces.forEach(function(surface){
       surface.classList.add('tilt-surface');
       if (surface.matches('.btn, button.event-tags span')) surface.classList.add('tilt-control');
@@ -1078,8 +1082,8 @@
   }());
 
   (function(){
-    var headings = document.querySelectorAll('h1.sechead h2.gallery-orbit-copy h3');
-    var cards = document.querySelectorAll('.space-card.service.event-card.review-card.fact.partner-card.podcast-card.form-wrap.mapcard.faq-item');
+    var headings = document.querySelectorAll('h1, .sechead h2, .gallery-orbit-copy h3');
+    var cards = document.querySelectorAll('.space-card, .service, .event-card, .review-card, .fact, .partner-card, .podcast-card, .form-wrap, .mapcard, .faq-item');
     if (!headings.length && !cards.length) return;
     headings.forEach(function(heading){
       heading.classList.add('main-text-reveal');
