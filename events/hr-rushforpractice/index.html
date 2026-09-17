@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HR:RUSH FOR PRACTICE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#181c30;
+    --navy-900:#20243d;
+    --navy-800:#282d4a;
+    --navy-700:#343a5c;
+    --navy-600:#454b72;
+    --navy-500:#5a6089;
+    --navy-400:#7076a0;
+    --navy-300:#9297ba;
+    --navy-200:#b7bad4;
+    --mist-100:#e7e9f1;
+    --mist-50:#eef0f5;
+    --white:#ffffff;
+    --cyan:#12c9db;
+    --cyan-soft:#5fe0ec;
+    --cyan-deep:#0a94a3;
+    --coral:#ff5b72;
+    --coral-soft:#ff8b9b;
+    --coral-deep:#e23a52;
+    --amber:#ffab2e;
+    --amber-deep:#e8871a;
+    --steel:#5c7cae;
+    --steel-deep:#3d5a8a;
+    --font-display:'Unbounded', system-ui, sans-serif;
+    --font-body:'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    background:#ffffff;
+    color:var(--navy-800);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img,svg{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+  ::selection{background:rgba(18,201,219,.32);color:#fff;}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:2px;}
+
+  .container{max-width:1280px;margin:0 auto;padding:0 24px;}
+  @media(max-width:640px){.container{padding:0 18px;}}
+
+  h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;line-height:1.04;margin:0;text-wrap:balance;}
+  .display{text-transform:uppercase;}
+  p{margin:0;line-height:1.65;}
+  .num{font-family:var(--font-display);font-variant-numeric:tabular-nums;}
+
+  .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .eyebrow .rule{width:28px;height:2px;background:var(--coral);}
+  .eyebrow span{font-family:var(--font-body);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--coral);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;padding:15px 30px;font-size:14px;border:1px solid transparent;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease, background .15s ease;white-space:nowrap;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--cyan);color:var(--navy-950);}
+  .btn-primary:hover{background:var(--cyan-soft);box-shadow:0 20px 50px -20px rgba(18,201,219,.55);}
+  .btn-secondary{background:transparent;color:#fff;border-color:rgba(255,255,255,.28);}
+  .btn-secondary:hover{background:rgba(255,255,255,.08);}
+  .btn-dark{background:var(--navy-950);color:#fff;}
+  .btn-dark:hover{background:var(--navy-900);}
+  .btn-outline{background:transparent;color:var(--navy-900);border-color:rgba(24,28,48,.22);}
+  .btn-outline:hover{background:var(--navy-950);color:#fff;}
+  .btn-sm{padding:11px 22px;font-size:13px;}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;color:#fff;transition:background .25s ease, border-color .25s ease, color .25s ease;border-bottom:1px solid transparent;}
+  header.scrolled{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-color:var(--mist-100);color:var(--navy-950);box-shadow:0 1px 0 rgba(24,28,48,.04);}
+  header.scrolled nav.main-nav a{color:rgba(24,28,48,.68);}
+  header.scrolled nav.main-nav a:hover{background:rgba(24,28,48,.06);color:var(--navy-950);}
+  header.scrolled .logo small{color:var(--navy-500);}
+  header.scrolled .hamburger{border-color:rgba(24,28,48,.25);color:var(--navy-950);}
+  .nav-row{display:flex;align-items:center;justify-content:space-between;height:80px;}
+  .logo{font-family:var(--font-display);font-weight:700;font-size:19px;line-height:1;white-space:nowrap;}
+  .logo .colon{color:var(--cyan);}
+  .logo small{display:block;font-family:var(--font-body);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--navy-300);margin-top:3px;}
+  nav.main-nav{display:flex;gap:2px;}
+  nav.main-nav a{padding:9px 13px;border-radius:999px;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);}
+  nav.main-nav a:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .header-cta{display:flex;align-items:center;gap:12px;}
+  .hamburger{display:none;width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;align-items:center;justify-content:center;cursor:pointer;}
+  @media(max-width:980px){
+    nav.main-nav,.header-cta .btn{display:none;}
+    .hamburger{display:inline-flex;}
+  }
+  .mobile-panel{position:fixed;inset:0;z-index:60;background:rgba(24,28,48,.98);backdrop-filter:blur(8px);display:none;flex-direction:column;}
+  .mobile-panel.open{display:flex;}
+  .mobile-panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+  .mobile-panel nav{display:flex;flex-direction:column;gap:4px;padding:20px;overflow-y:auto;flex:1;}
+  .mobile-panel nav a{padding:14px 12px;border-radius:14px;font-size:17px;font-weight:700;color:#fff;}
+  .mobile-panel nav a:hover{background:rgba(255,255,255,.06);}
+  .mobile-panel-foot{padding:20px;border-top:1px solid rgba(255,255,255,.1);}
+  .mobile-panel-foot .btn{width:100%;}
+
+  /* ---------- Hero (with an embedded, scroll-driven rotating cube in place of the old static photo) ---------- */
+  .hero{position:relative;background:var(--navy-900);}
+  .hero-scroll-track{position:relative;height:560vh;}
+  @media(max-width:899px){.hero-scroll-track{height:auto;}}
+  @media (prefers-reduced-motion: reduce){.hero-scroll-track{height:auto;}}
+  .hero-stage{position:sticky;top:0;height:100vh;overflow:hidden;}
+  @media(max-width:899px){.hero-stage{position:static;height:auto;overflow:visible;}}
+  @media (prefers-reduced-motion: reduce){.hero-stage{position:static;height:auto;overflow:visible;}}
+
+  .hero-cube-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(155deg,#3a4066,#20233b 70%);}
+  .bg-slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;}
+  .bg-slide.active{opacity:1;}
+  .bg-slide.slide-0{background:radial-gradient(circle at 75% 30%,rgba(93,110,166,.55),transparent 60%),linear-gradient(155deg,#3a4066,#20233b 70%);}
+  .bg-slide.slide-1{background:radial-gradient(circle at 70% 35%,rgba(18,201,219,.4),transparent 60%),linear-gradient(160deg,#1c3a45,#151f38 70%);}
+  .bg-slide.slide-2{background:radial-gradient(circle at 65% 40%,rgba(255,111,97,.35),transparent 60%),linear-gradient(160deg,#3a2438,#1a1830 70%);}
+  .bg-slide.slide-3{background:radial-gradient(circle at 70% 30%,rgba(245,166,66,.32),transparent 60%),linear-gradient(160deg,#3a2f1e,#1c1a2e 70%);}
+  .bg-slide.slide-4{background:radial-gradient(circle at 65% 35%,rgba(9,140,158,.4),transparent 60%),linear-gradient(160deg,#132f3a,#141a30 70%);}
+  .bg-slide.slide-5{background:radial-gradient(circle at 70% 40%,rgba(214,74,58,.35),transparent 60%),linear-gradient(160deg,#331d24,#191828 70%);}
+  @media(max-width:899px){.bg-slide{transition:none;opacity:0 !important;}.bg-slide.slide-0{opacity:.9 !important;}}
+
+  .hero-cube-viewport{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:flex-end;padding-right:7%;perspective:1400px;will-change:transform;}
+  @media(max-width:1180px){.hero-cube-viewport{justify-content:center;padding-right:0;opacity:.85;}}
+  @media(max-width:899px){.hero-cube-viewport{display:none;}}
+  @media (prefers-reduced-motion: reduce){.hero-cube-viewport{display:none;}}
+  .hero-cube-wrap{position:relative;--cube-size:clamp(230px, 30vw, 400px);width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;will-change:transform;}
+  @media(max-width:1180px){.hero-cube-wrap{--cube-size:clamp(190px, 32vw, 320px);}}
+
+  .cube-face{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,3.4vw,36px);border-radius:20px;background:radial-gradient(130% 150% at 12% -10%,rgba(255,255,255,.14),transparent 55%),linear-gradient(160deg,var(--navy-800),var(--navy-950));border:1px solid rgba(255,255,255,.2);backface-visibility:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 36px 90px -35px rgba(0,0,0,.7),0 0 70px -14px var(--face-glow,rgba(18,201,219,.5));}
+  .cube-face.front{transform:translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(18,201,219,.55);}
+  .cube-face.back{transform:rotateY(180deg) translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(255,171,46,.5);}
+  .cube-face.right{transform:rotateY(90deg) translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(255,91,114,.5);}
+  .cube-face.left{transform:rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(10,148,163,.55);}
+  .cube-face.top{transform:rotateX(90deg) translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(92,124,174,.5);}
+  .cube-face.bottom{transform:rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(226,58,82,.5);}
+  .cube-face .cf-eyebrow{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--navy-200);}
+  .cube-face .cf-num{font-family:var(--font-display);font-weight:700;font-size:clamp(1.9rem,6vw,3.4rem);line-height:1;margin-top:12px;filter:drop-shadow(0 0 26px var(--face-glow,transparent));}
+  .cube-face .cf-label{font-family:var(--font-body);font-weight:800;font-size:.9rem;margin-top:12px;color:#fff;}
+  .cube-face .cf-desc{margin-top:8px;font-size:12px;color:var(--mist-100);opacity:.8;max-width:240px;font-weight:500;}
+
+  .hero-bg{position:absolute;inset:0;z-index:2;background:
+      linear-gradient(100deg, rgba(24,28,48,.94) 0%, rgba(24,28,48,.78) 42%, rgba(24,28,48,.4) 70%, rgba(24,28,48,.18) 100%),
+      radial-gradient(circle at 85% 15%, rgba(18,201,219,.12), transparent 45%);
+  }
+  .side-label{position:absolute;left:0;top:50%;transform:translateY(-50%) rotate(-90deg) translateX(-50%);transform-origin:left top;font-size:11px;font-weight:800;letter-spacing:.25em;color:var(--navy-300);display:none;z-index:3;}
+  @media(min-width:1180px){.side-label{display:block;left:24px;}}
+  .hero-inner{position:relative;z-index:4;padding:64px 0 96px;}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:0;max-width:640px;}
+  .hero-badge span{font-size:12px;font-weight:800;letter-spacing:.18em;color:var(--cyan-soft);text-transform:uppercase;}
+  .hero-badge{display:flex;align-items:center;gap:10px;margin-bottom:26px;}
+  .hero-badge .rule{width:26px;height:2px;background:var(--cyan);}
+  .hero h1{font-size:clamp(2.5rem,6.4vw,4.6rem);color:#fff;}
+  .hero h1 .cy{color:var(--cyan);}
+  .hero h1 .strike{position:relative;color:var(--navy-300);}
+  .hero h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:52%;height:.07em;background:var(--coral);transform:rotate(-3deg);}
+  .hero p.lede{margin-top:26px;max-width:460px;font-size:17px;color:var(--navy-200);font-weight:500;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px;}
+
+  .cube-hud{position:absolute;top:28px;right:28px;text-align:right;z-index:5;}
+  .cube-hud .pct{font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+  .cube-hud .bar{margin-top:10px;width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden;margin-left:auto;}
+  .cube-hud .bar-fill{height:100%;width:0%;background:var(--cyan);border-radius:999px;}
+  .cube-hud .scene{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-300);max-width:150px;}
+  @media(max-width:1180px){.cube-hud{display:none;}}
+
+  .cube-dots{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;z-index:5;}
+  @media(max-width:1180px){.cube-dots{display:none;}}
+  .cube-dots button{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.25);border:none;padding:0;cursor:pointer;transition:transform .2s ease, background .2s ease;}
+  .cube-dots button.active{background:var(--cyan);transform:scale(1.8);}
+
+  .cube-caption{position:absolute;right:7%;bottom:56px;text-align:right;z-index:5;}
+  @media(max-width:1180px){.cube-caption{left:50%;right:auto;transform:translateX(-50%);text-align:center;bottom:36px;}}
+  @media(max-width:899px){.cube-caption{display:none;}}
+  .cube-caption .n{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--navy-400);}
+  .cube-caption .name{margin-top:4px;font-family:var(--font-body);font-weight:800;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:.05em;}
+
+  .season-pill{position:absolute;right:24px;bottom:-34px;z-index:6;display:flex;align-items:center;gap:14px;border-radius:14px;background:var(--navy-800);border:1px solid rgba(255,255,255,.12);padding:16px 22px;box-shadow:0 30px 60px -25px rgba(0,0,0,.6);}
+  @media(max-width:640px){.season-pill{position:static;margin-top:32px;display:inline-flex;}}
+  .season-pill .tag{background:var(--amber);color:var(--navy-950);border-radius:999px;padding:5px 13px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;}
+  .season-pill .date{font-size:14px;font-weight:700;color:#fff;}
+  .season-pill .date em{font-style:normal;color:var(--navy-300);font-weight:600;}
+
+  /* ---------- Stats strip ---------- */
+  .stats-strip{background:var(--mist-50);padding-top:56px;}
+  .stats-row{display:grid;grid-template-columns:1.1fr repeat(4,1fr);gap:20px;padding-bottom:44px;border-bottom:1px solid var(--mist-100);}
+  @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.stats-row{grid-template-columns:1fr 1fr;}}
+  .stats-row .lead-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-500);align-self:end;line-height:1.5;}
+  .stat .num{font-size:2.4rem;font-weight:700;color:var(--navy-950);}
+  .stat .lbl{margin-top:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--navy-500);}
+  .partner-strip{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center;justify-content:center;padding:26px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--navy-400);}
+  .partner-strip b{color:var(--navy-800);}
+  .partner-strip .dot{width:4px;height:4px;border-radius:999px;background:var(--cyan);}
+
+  /* ---------- Generic section ---------- */
+  section{padding:96px 0;}
+  @media(max-width:640px){section{padding:68px 0;}}
+  .bg-light{background:#fff;color:var(--navy-900);}
+  .bg-tint{background:var(--mist-50);color:var(--navy-900);}
+  .bg-dark{background:var(--navy-900);color:#fff;}
+  .section-head h2{font-size:clamp(2rem,4.4vw,3.2rem);}
+  .bg-light .section-head h2, .bg-tint .section-head h2{color:var(--navy-950);}
+  .bg-dark .section-head h2{color:#fff;}
+  .section-lede{margin-top:18px;max-width:600px;color:var(--navy-300);font-weight:500;}
+  .bg-light .section-lede,.bg-tint .section-lede{color:var(--navy-500);}
+
+  /* ---------- About ---------- */
+  .about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:end;}
+  @media(max-width:860px){.about-grid{grid-template-columns:1fr;}}
+
+  .highlight-grid{margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--mist-100);border-left:1px solid var(--mist-100);}
+  @media(max-width:900px){.highlight-grid{grid-template-columns:repeat(2,1fr);}}
+  .highlight-cell{border-right:1px solid var(--mist-100);border-bottom:1px solid var(--mist-100);padding:28px 26px;min-height:190px;display:flex;flex-direction:column;}
+  .highlight-cell .top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .highlight-cell .idx{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--navy-400);}
+  .arrow-circle{width:32px;height:32px;border-radius:999px;border:1px solid var(--mist-100);display:flex;align-items:center;justify-content:center;color:var(--navy-500);font-size:14px;}
+  .highlight-cell h4{font-family:var(--font-body);font-weight:800;font-size:16px;color:var(--navy-950);margin-top:20px;}
+  .highlight-cell p{margin-top:10px;font-size:13px;color:var(--navy-500);}
+
+  /* ---------- Split ---------- */
+  .split{display:grid;grid-template-columns:1fr 1fr;margin-top:64px;}
+  @media(max-width:860px){.split{grid-template-columns:1fr;}}
+  .split-panel{padding:60px 44px;}
+  @media(max-width:640px){.split-panel{padding:44px 24px;}}
+  .split-panel.dark{background:var(--navy-950);}
+  .split-panel.cyan{background:var(--cyan);color:var(--navy-950);}
+  .split-inner{max-width:420px;margin:0 auto;}
+  .split-panel .kicker{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--coral);}
+  .split-panel.cyan .kicker{color:rgba(15,20,38,.6);}
+  .split-panel h3{font-family:var(--font-body);font-weight:800;font-size:1.7rem;margin-top:12px;letter-spacing:-.01em;line-height:1.15;}
+  .split-panel p{margin-top:16px;color:var(--navy-300);font-weight:500;}
+  .split-panel.cyan p{color:rgba(15,20,38,.75);}
+  .check-list{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;}
+  .check-list li{display:flex;gap:8px;font-size:13px;font-weight:700;align-items:flex-start;}
+  .check-list li::before{content:"✓";color:var(--cyan);font-weight:800;flex-shrink:0;}
+  .split-panel.dark .check-list li{color:var(--mist-100);}
+  .split-panel.cyan .check-list li::before{color:var(--navy-950);}
+  .split-panel.cyan .check-list li{color:var(--navy-950);}
+
+  /* ---------- Process list ---------- */
+  .process-list{margin-top:52px;border-top:1px solid var(--mist-100);}
+  .process-item{display:grid;grid-template-columns:64px 1fr auto;gap:20px;padding:28px 0;border-bottom:1px solid var(--mist-100);align-items:center;}
+  @media(max-width:700px){.process-item{grid-template-columns:36px 1fr;}.process-item .arrow-circle{display:none;}}
+  .process-item .idx{font-family:var(--font-display);font-weight:700;color:var(--amber-deep);font-size:13px;}
+  .process-item .body{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .process-item h4{font-family:var(--font-body);font-size:18px;font-weight:800;color:var(--navy-950);}
+  .process-item p{font-size:13px;color:var(--navy-500);max-width:340px;font-weight:500;}
+  .process-item .arrow-circle{border-color:var(--mist-100);color:var(--navy-500);}
+
+  /* ---------- Impact stats (light) ---------- */
+  .impact-wrap{margin-top:56px;}
+  .impact-grid{display:grid;grid-template-columns:repeat(2,1fr);}
+  @media(min-width:800px){.impact-grid{grid-template-columns:repeat(4,1fr);}}
+  .impact-cell{padding:30px 28px 30px 0;border-top:1px solid var(--mist-100);}
+  .impact-cell:nth-child(odd){border-right:1px solid var(--mist-100);}
+  @media(min-width:800px){.impact-cell{border-right:1px solid var(--mist-100) !important;padding:0 28px;}
+    .impact-cell:first-child{padding-left:0;}
+    .impact-cell:last-child{border-right:none !important;}}
+  .impact-cell .num{font-size:2.6rem;font-weight:700;}
+  .impact-cell .lbl{margin-top:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-500);}
+  .impact-cell.c1 .num{color:var(--cyan-deep);}
+  .impact-cell.c2 .num{color:var(--coral-deep);}
+  .impact-cell.c3 .num{color:var(--amber-deep);}
+  .impact-cell.c4 .num{color:var(--steel);}
+
+  /* ---------- Season timeline ---------- */
+  .season-head{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:end;}
+  @media(max-width:760px){.season-head{grid-template-columns:1fr;}}
+  .season-num-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--navy-500);}
+  .season-num{font-family:var(--font-display);font-size:5rem;color:var(--cyan-deep);line-height:1;margin-top:6px;}
+  .season-head h2{font-size:clamp(1.8rem,3.6vw,2.6rem);}
+  .timeline-grid{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-radius:22px;overflow:hidden;}
+  @media(max-width:760px){.timeline-grid{grid-template-columns:1fr;}}
+  .timeline-card{padding:36px 30px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;}
+  .timeline-card.t1{background:var(--navy-900);color:#fff;}
+  .timeline-card.t2{background:var(--coral);color:#fff;}
+  .timeline-card.t3{background:var(--amber);color:var(--navy-950);}
+  .timeline-card .range{font-family:var(--font-display);font-size:2.1rem;font-weight:700;}
+  .timeline-card .cap{margin-top:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.75;}
+  .timeline-card h4{font-family:var(--font-body);font-weight:800;font-size:17px;margin-top:22px;}
+  .timeline-card p{margin-top:6px;font-size:13px;opacity:.85;font-weight:500;}
+
+  /* ---------- Employer split ---------- */
+  .employer-grid{display:grid;grid-template-columns:0.95fr 1.05fr;gap:0;margin-top:56px;border-radius:24px;overflow:hidden;}
+  @media(max-width:860px){.employer-grid{grid-template-columns:1fr;}}
+  .employer-left{background:var(--navy-950);padding:52px 44px;position:relative;overflow:hidden;}
+  .employer-left::before{content:"";position:absolute;left:-60px;bottom:-60px;width:260px;height:260px;border-radius:999px;background:radial-gradient(circle,rgba(255,91,114,.25),transparent 70%);}
+  .employer-left h3{position:relative;font-size:clamp(1.6rem,3vw,2.1rem);color:#fff;}
+  .employer-left h3 .cy{color:var(--cyan);}
+  .employer-left p{position:relative;margin-top:18px;max-width:340px;color:var(--navy-300);font-weight:500;font-size:14px;}
+  .employer-right{background:var(--navy-800);display:grid;grid-template-columns:1fr 1fr;}
+  .employer-cell{padding:34px 30px;border-left:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);}
+  .employer-cell .idx{font-family:var(--font-display);color:var(--amber);font-size:12px;font-weight:700;}
+  .employer-cell h4{font-family:var(--font-body);font-weight:800;color:#fff;font-size:15px;margin-top:16px;}
+  .employer-cell p{margin-top:8px;font-size:13px;color:var(--navy-300);font-weight:500;}
+
+  /* ---------- Apply form ---------- */
+  .apply-form-wrap{margin-top:56px;background:#fff;border:1px solid var(--mist-100);border-radius:22px;padding:44px;box-shadow:0 30px 60px -40px rgba(24,28,48,.18);}
+  @media(max-width:640px){.apply-form-wrap{padding:28px 22px;}}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:700px){.form-grid{grid-template-columns:1fr;}}
+  .form-field{display:flex;flex-direction:column;gap:8px;}
+  .form-field label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--navy-500);}
+  .form-field input{border:1px solid var(--mist-100);background:var(--mist-50);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--navy-950);transition:border-color .15s ease, background .15s ease;}
+  .form-field input:focus{outline:none;border-color:var(--cyan);background:#fff;}
+  .form-field input::placeholder{color:var(--navy-300);font-weight:500;}
+  .form-actions{margin-top:28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .form-note{font-size:12px;color:var(--navy-400);max-width:280px;}
+  .form-success{display:none;text-align:center;padding:30px 20px;}
+  .form-success.show{display:block;}
+  .form-success .check{width:56px;height:56px;border-radius:999px;background:rgba(18,201,219,.12);color:var(--cyan-deep);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 18px;font-weight:800;}
+  .form-success h3{font-family:var(--font-body);font-size:19px;font-weight:800;color:var(--navy-950);}
+  .form-success p{margin-top:10px;color:var(--navy-500);font-size:14px;max-width:420px;margin-left:auto;margin-right:auto;}
+  .form-error{display:none;margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(255,91,114,.08);border:1px solid rgba(255,91,114,.3);}
+  .form-error.show{display:block;}
+  .form-error p{color:var(--coral-deep);font-size:13px;font-weight:600;}
+  .form-error a{color:inherit;text-decoration:underline;}
+  .form-actions .btn[disabled]{opacity:.6;cursor:wait;}
+
+  /* ---------- Cards grids ---------- */
+  .cards-grid{margin-top:52px;display:grid;grid-template-columns:1fr;gap:22px;}
+  @media(min-width:640px){.cards-grid.cols-4,.cards-grid.cols-2{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1024px){.cards-grid.cols-4{grid-template-columns:repeat(4,1fr);}.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}}
+
+  .whom-card{border:1px solid var(--mist-100);border-radius:18px;padding:28px;background:#fff;transition:transform .25s ease, box-shadow .25s ease;}
+  .whom-card:hover{transform:translateY(-4px);box-shadow:0 22px 44px -26px rgba(24,28,48,.35);}
+  .whom-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid;font-family:var(--font-display);font-size:14px;font-weight:700;}
+  .whom-card h3{font-family:var(--font-body);margin-top:22px;font-size:1.05rem;color:var(--navy-950);}
+  .whom-card p{margin-top:8px;font-size:13px;color:var(--navy-500);font-weight:500;}
+
+  .mentor-card{border:1px solid var(--mist-100);border-radius:18px;overflow:hidden;background:#fff;}
+  .mentor-photo{aspect-ratio:1/1;background:linear-gradient(160deg,var(--mist-100),var(--mist-50));display:flex;align-items:center;justify-content:center;color:var(--navy-400);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
+  .mentor-body{padding:20px;}
+  .mentor-body h4{font-family:var(--font-body);color:var(--navy-950);font-size:15px;font-weight:800;}
+  .mentor-body .role{margin-top:3px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--cyan-deep);}
+  .mentor-body p{margin-top:12px;font-size:13px;color:var(--navy-500);font-weight:500;}
+  .mentor-body .li{margin-top:14px;display:inline-flex;gap:6px;font-size:12px;font-weight:800;color:var(--navy-600);}
+
+  .logo-grid{margin-top:44px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  @media(min-width:640px){.logo-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:1024px){.logo-grid.uni{grid-template-columns:repeat(5,1fr);}.logo-grid.comp{grid-template-columns:repeat(8,1fr);}}
+  .logo-box{height:84px;border:1px solid var(--mist-100);border-radius:12px;background:var(--mist-50);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;text-align:center;color:var(--navy-400);text-transform:uppercase;letter-spacing:.04em;padding:8px;}
+  .logo-box.comp{height:68px;background:#fff;}
+
+  .company-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;}
+
+  .story-card{position:relative;background:var(--mist-50);border:1px solid var(--mist-100);border-radius:18px;padding:26px;}
+  .story-card .placeholder-tag{position:absolute;top:16px;right:16px;background:#fdecc8;color:#8a5a10;font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em;}
+  .story-card blockquote{margin:16px 0 0;font-style:italic;font-size:14px;color:var(--navy-700);line-height:1.75;font-weight:500;}
+  .story-person{margin-top:24px;display:flex;align-items:center;gap:12px;}
+  .story-avatar{width:42px;height:42px;border-radius:999px;background:var(--mist-100);border:1px solid var(--navy-200);}
+  .story-person strong{display:block;font-size:13px;color:var(--navy-950);}
+  .story-person span{font-size:11px;color:var(--navy-500);font-weight:600;}
+
+  /* ---------- FAQ ---------- */
+  .faq-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;}
+  @media(max-width:860px){.faq-layout{grid-template-columns:1fr;gap:36px;}}
+  .faq-item{border-bottom:1px solid var(--mist-100);padding:22px 0;}
+  .faq-q{display:flex;width:100%;justify-content:space-between;align-items:center;gap:16px;background:none;border:none;cursor:pointer;text-align:left;padding:0;}
+  .faq-q .txt{display:flex;gap:12px;align-items:baseline;}
+  .faq-q .n{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--coral);}
+  .faq-q .q{font-family:var(--font-body);font-size:16px;font-weight:800;color:var(--navy-950);}
+  .faq-toggle{width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--navy-700);transition:transform .2s ease, color .2s ease;font-size:18px;font-weight:300;}
+  .faq-item.open .faq-toggle{transform:rotate(45deg);color:var(--coral);}
+  .faq-a{display:grid;grid-template-rows:0fr;opacity:0;transition:all .3s ease;}
+  .faq-item.open .faq-a{grid-template-rows:1fr;opacity:1;margin-top:12px;}
+  .faq-a-inner{overflow:hidden;}
+  .faq-a p{font-size:14px;color:var(--navy-500);max-width:560px;font-weight:500;}
+
+  /* ---------- Contact ---------- */
+  .contact-card{background:#fff;border:1px solid var(--mist-100);border-radius:18px;padding:28px;display:flex;flex-direction:column;box-shadow:0 24px 48px -36px rgba(24,28,48,.2);}
+  .contact-icon{width:44px;height:44px;border-radius:12px;background:var(--mist-50);color:var(--cyan-deep);display:flex;align-items:center;justify-content:center;font-size:19px;}
+  .contact-card h3{font-family:var(--font-body);margin-top:22px;font-size:16px;color:var(--navy-950);font-weight:800;}
+  .contact-card p{margin-top:8px;font-size:13px;color:var(--navy-500);flex:1;font-weight:500;}
+  .contact-card .btn{margin-top:22px;}
+
+  /* ---------- Final CTA ---------- */
+  .final-cta{text-align:center;background:var(--navy-950);position:relative;overflow:hidden;}
+  .final-cta::before{content:"";position:absolute;left:8%;top:20%;width:340px;height:340px;border-radius:999px;border:1px solid rgba(255,255,255,.08);}
+  .final-cta-inner{position:relative;max-width:640px;margin:0 auto;}
+  .final-cta h2{font-size:clamp(2rem,4.6vw,3.2rem);margin-top:16px;}
+  .final-cta .grad{background:linear-gradient(90deg,var(--cyan),var(--coral-soft),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .final-cta p{margin-top:20px;color:var(--navy-300);font-weight:500;}
+  .final-cta .ctas{margin-top:32px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .final-cta .fine{margin-top:26px;font-size:12px;color:var(--navy-500);}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--mist-50);border-top:1px solid var(--mist-100);padding:52px 0 32px;color:var(--navy-900);}
+  footer .logo small{color:var(--navy-500);}
+  .footer-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;}
+  .footer-top p{max-width:360px;font-size:13px;color:var(--navy-500);font-weight:500;}
+  .footer-links{display:flex;flex-wrap:wrap;gap:22px;}
+  .footer-links a{font-size:13px;font-weight:700;color:var(--navy-700);}
+  .footer-links a:hover{color:var(--cyan-deep);}
+  .footer-bottom{margin-top:36px;padding-top:22px;border-top:1px solid var(--mist-100);display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;}
+  .footer-bottom .legal{display:flex;gap:18px;font-size:12px;color:var(--navy-500);}
+  .footer-bottom .legal a:hover{color:var(--cyan-deep);}
+  .footer-bottom .meta{font-size:12px;color:var(--navy-500);display:flex;gap:16px;align-items:center;}
+  .social-row{display:flex;gap:8px;}
+  .social-row a{width:32px;height:32px;border-radius:999px;border:1px solid var(--mist-100);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--navy-500);}
+  .social-row a:hover{color:var(--cyan-deep);border-color:var(--cyan);}
+
+
+  /* ---------- Back to top ---------- */
+  .back-to-top{position:fixed;right:20px;bottom:20px;z-index:65;width:48px;height:48px;border-radius:999px;background:var(--cyan);color:var(--navy-950);border:none;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;line-height:1;cursor:pointer;box-shadow:0 16px 34px -14px rgba(18,201,219,.6);opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .25s ease, transform .25s ease, background .15s ease;}
+  .back-to-top.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .back-to-top:hover{background:var(--cyan-soft);}
+  body.nav-open .back-to-top{display:none;}
+  @media(max-width:640px){.back-to-top{right:14px;bottom:14px;width:44px;height:44px;font-size:17px;}}
+
+  /* ---------- Phone-specific refinements ---------- */
+  @media(max-width:640px){
+    .nav-row{height:64px;}
+    .logo{font-size:16px;}
+    .logo small{font-size:8px;}
+    .hero-bg{background:
+        linear-gradient(180deg, rgba(24,28,48,.55) 0%, rgba(24,28,48,.9) 55%, rgba(24,28,48,.97) 100%),
+        radial-gradient(circle at 85% 10%, rgba(18,201,219,.16), transparent 45%);
+    }
+    .season-pill{flex-wrap:wrap;gap:8px;padding:14px 16px;}
+    .season-pill .date{font-size:13px;}
+    .check-list{grid-template-columns:1fr;}
+    .employer-right{grid-template-columns:1fr;}
+    .highlight-cell{padding:22px 18px;min-height:auto;}
+    .mobile-panel nav{-webkit-overflow-scrolling:touch;}
+  }
+  @media(max-width:480px){
+    section{padding:52px 0;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+
+<header id="site-header">
+  <div class="container nav-row">
+    <a class="logo" href="#top">HR<span class="colon">:</span>Rush<small>for practice</small></a>
+    <nav class="main-nav">
+      <a href="#top">Начало</a>
+      <a href="#about">За инициативата</a>
+      <a href="#how">Как работи</a>
+      <a href="#whom">За студенти</a>
+      <a href="#mentors">Ментори</a>
+      <a href="#companies">Компании</a>
+      <a href="#universities">Университети</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Контакти</a>
+    </nav>
+    <div class="header-cta">
+      <a class="btn btn-primary btn-sm" href="#apply">Включи се →</a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Отвори менюто">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <div class="mobile-panel-head">
+    <span class="logo">HR<span class="colon">:</span>Rush<small>for practice</small></span>
+    <button class="hamburger" id="closeMobileBtn" aria-label="Затвори менюто">✕</button>
+  </div>
+  <nav>
+    <a href="#top">Начало</a>
+    <a href="#about">За инициативата</a>
+    <a href="#how">Как работи</a>
+    <a href="#whom">За студенти</a>
+    <a href="#mentors">Ментори</a>
+    <a href="#companies">Компании</a>
+    <a href="#universities">Университети</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Контакти</a>
+  </nav>
+  <div class="mobile-panel-foot">
+    <a class="btn btn-primary" href="#apply">Кандидатствай →</a>
+  </div>
+</div>
+
+<section class="hero" id="top">
+  <div class="hero-scroll-track" id="cubeTrack">
+    <div class="hero-stage">
+      <div class="hero-cube-bg" id="cubeBg">
+        <!-- Placeholder gradient "photos" — one per cube face. Swap each
+             .bg-slide's background for a real initiative photo later; the
+             slide-N classes and JS active-toggling can stay as-is. -->
+        <div class="bg-slide slide-0 active"></div>
+        <div class="bg-slide slide-1"></div>
+        <div class="bg-slide slide-2"></div>
+        <div class="bg-slide slide-3"></div>
+        <div class="bg-slide slide-4"></div>
+        <div class="bg-slide slide-5"></div>
+      </div>
+
+      <!-- Replaces the old static hero photo: the same rotating "Highlights" cube
+           now lives here. On desktop, once you start scrolling the cube moves to
+           center stage, the intro text fades out, and it rotates through all 6
+           facts (with the background swapping each time) before the page moves
+           on to the stats bar. -->
+      <div class="hero-cube-viewport">
+        <div class="hero-cube-wrap" id="cubeWrap">
+          <div class="cube-face top"><span class="cf-eyebrow">01 / 06</span><div class="cf-num" style="color:var(--steel)">8</div><div class="cf-label">сезона зад нас</div><p class="cf-desc">Осем последователни сезона на практическо HR състезание.</p></div>
+          <div class="cube-face front"><span class="cf-eyebrow">02 / 06</span><div class="cf-num" style="color:var(--cyan)">1,130+</div><div class="cf-label">студенти участвали</div><p class="cf-desc">Реални участници, преминали през практическите мисии на инициативата.</p></div>
+          <div class="cube-face right"><span class="cf-eyebrow">03 / 06</span><div class="cf-num" style="color:var(--coral)">8,000+</div><div class="cf-label">кандидати достигнати</div><p class="cf-desc">Студенти и млади професионалисти, включени в кампаниите на сезоните.</p></div>
+          <div class="cube-face back"><span class="cf-eyebrow">04 / 06</span><div class="cf-num" style="color:var(--amber)">900+</div><div class="cf-label">проведени интервюта</div><p class="cf-desc">Реални срещи между участници и партньорски компании.</p></div>
+          <div class="cube-face left"><span class="cf-eyebrow">05 / 06</span><div class="cf-num" style="color:var(--cyan-deep)">250+</div><div class="cf-label">наети таланти</div><p class="cf-desc">Участници, получили стаж, работа или друга реална възможност.</p></div>
+          <div class="cube-face bottom"><span class="cf-eyebrow">06 / 06</span><div class="cf-num" style="color:var(--coral-deep)">73+</div><div class="cf-label">компании партньори</div><p class="cf-desc">Работодатели, включени с реални позиции във всеки сезон.</p></div>
+        </div>
+      </div>
+
+      <div class="hero-bg" id="heroBgOverlay"></div>
+      <span class="side-label">РАЗГЛЕДАЙ ↓</span>
+      <div class="container hero-inner">
+        <div class="hero-grid">
+          <div class="hero-badge"><span class="rule"></span><span>Практическо HR състезание</span></div>
+          <h1 class="display">Твоята кариера не започва със <span class="strike">CV</span>.<br>Започва с <span class="cy">практика.</span></h1>
+          <p class="lede">HR:RUSH FOR PRACTICE свързва студенти с реални компании, практически задачи, ментори и възможности за кариерен старт.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#apply">Кандидатствай сега →</a>
+            <a class="btn btn-secondary" href="#how">Виж как работи</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cube-hud">
+        <div class="pct" id="cubePct">000%</div>
+        <div class="bar"><div class="bar-fill" id="cubeBarFill"></div></div>
+        <div class="scene" id="cubeScene">8 сезона зад нас</div>
+      </div>
+      <div class="cube-dots">
+        <button type="button" aria-label="Факт 1" class="active"></button>
+        <button type="button" aria-label="Факт 2"></button>
+        <button type="button" aria-label="Факт 3"></button>
+        <button type="button" aria-label="Факт 4"></button>
+        <button type="button" aria-label="Факт 5"></button>
+        <button type="button" aria-label="Факт 6"></button>
+      </div>
+      <div class="cube-caption">
+        <div class="n" id="cubeCaptionN">1 / 6</div>
+        <div class="name" id="cubeCaptionName">8 сезона зад нас</div>
+      </div>
+    </div>
+  </div>
+  <div class="season-pill">
+    <span class="tag">Сезон 9</span>
+    <span class="date">04.11.2026 <em>до</em> 05.01.2027</span>
+  </div>
+</section>
+
+<section class="stats-strip">
+  <div class="container">
+    <div class="stats-row">
+      <div class="lead-label">Реални резултати<br>от 8 сезона</div>
+      <div class="stat"><div class="num" data-count="1130" data-suffix="+">0</div><div class="lbl">студенти</div></div>
+      <div class="stat"><div class="num" data-count="8000" data-suffix="+">0</div><div class="lbl">кандидати</div></div>
+      <div class="stat"><div class="num" data-count="900" data-suffix="+">0</div><div class="lbl">интервюта</div></div>
+      <div class="stat"><div class="num" data-count="250" data-suffix="+">0</div><div class="lbl">наети</div></div>
+    </div>
+    <div class="partner-strip">
+      <span>Инициатива на <b>Pleggi</b></span>
+      <span class="dot"></span>
+      <span>Водещи университети</span>
+      <span class="dot"></span>
+      <span><b>73+</b> компании партньори</span>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="eyebrow"><span class="rule"></span><span>01 / За инициативата</span></div>
+        <h2 class="display section-head" style="display:block;">Не симулация.<br><span style="color:var(--cyan-deep)">Реален старт.</span></h2>
+      </div>
+      <p class="section-lede" style="margin-top:0;">HR:RUSH FOR PRACTICE е практическо състезание, което открива, развива и свързва хора с потенциал. Студентите влизат в ролята на HR екипи, а компаниите получават достъп до мотивирани млади таланти. Компанията не е просто лого в програмата — тя участва с реален бизнес казус и изгражда връзка със следващото поколение професионалисти.</p>
+      </div>
+
+    <div class="highlight-grid">
+      <div class="highlight-cell"><div class="top"><span class="idx">01</span><span class="arrow-circle">→</span></div><h4>Практически HR умения</h4><p>Развиваш реални умения чрез обучения и менторство, не само теория.</p></div>
+      <div class="highlight-cell"><div class="top"><span class="idx">02</span><span class="arrow-circle">→</span></div><h4>Работа по реални позиции</h4><p>Включваш се в казуси на партньорски компании, не в измислени примери.</p></div>
+      <div class="highlight-cell"><div class="top"><span class="idx">03</span><span class="arrow-circle">→</span></div><h4>Менторство и обратна връзка</h4><p>Получаваш насоки от HR професионалисти през целия сезон.</p></div>
+      <div class="highlight-cell"><div class="top"><span class="idx">04</span><span class="arrow-circle">→</span></div><h4>Контакти с работодатели</h4><p>Изграждаш връзки, които могат да прераснат в стаж или работа.</p></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="split-panel dark">
+      <div class="split-inner">
+        <div class="kicker">За студентите</div>
+        <h3>Покажи какво можеш, преди първата си работа.</h3>
+        <p>За проактивни студенти, които искат да учат чрез действие, да работят в екип и да превърнат знанията си в реален опит.</p>
+        <ul class="check-list">
+          <li>Практически HR умения</li>
+          <li>Работа по реални позиции</li>
+          <li>Менторство и обратна връзка</li>
+          <li>Контакти с работодатели</li>
+        </ul>
+        <button class="btn btn-secondary" style="margin-top:30px;">Виж как протича →</button>
+      </div>
+    </div>
+    <div class="split-panel cyan">
+      <div class="split-inner">
+        <div class="kicker">За компаниите</div>
+        <h3>Открийте талантите, докато още се развиват.</h3>
+        <p>Включете реални позиции, работете със студентски HR екипи и изградете разпознаваема работодателска марка сред младите хора.</p>
+        <ul class="check-list">
+          <li>Достъп до мотивирани студенти</li>
+          <li>Подкрепа по реални позиции</li>
+          <li>Съдържание и позициониране</li>
+          <li>Участие в ключови събития</li>
+        </ul>
+        <button class="btn btn-dark" style="margin-top:30px;">Възможности за участие →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint" id="how">
+  <div class="container">
+    <div class="eyebrow"><span class="rule" style="background:var(--cyan)"></span><span style="color:var(--cyan-deep)">02 / Как работи</span></div>
+    <div class="section-head"><h2 class="display">От първата мисия<br>до <span style="color:var(--cyan-deep)">реалното наемане.</span></h2></div>
+    <p class="section-lede">Един ясен процес, който превежда теорията през реалните етапи на подбор и превръща усилията на екипа в измерим резултат.</p>
+
+    <div class="process-list">
+      <div class="process-item"><span class="idx">01</span><div class="body"><h4>Кандидатстваш</h4><p>Попълваш кратката регистрационна форма.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">02</span><div class="body"><h4>Откриваме подходящите възможности</h4><p>Профилът ти се разглежда спрямо компаниите и позициите в инициативата.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">03</span><div class="body"><h4>Участваш</h4><p>Включваш се в практически задачи, срещи, интервюта и активности.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">04</span><div class="body"><h4>Показваш какво можеш</h4><p>Компаниите виждат реалните ти умения, мотивация и начин на работа.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">05</span><div class="body"><h4>Получаваш възможност</h4><p>Най-добрите участници получават стаж, работа или друга възможност.</p></div><span class="arrow-circle">→</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>03 / Ефектът</span></div>
+    <h2 class="display section-head">Резултати, които се <span style="color:var(--coral-deep)">броят.</span></h2>
+    <p class="section-lede">Зад всяко число има студент, който е натрупал опит, кандидат, който е получил възможност, и компания, която е открила човек с потенциал.</p>
+    <div class="impact-wrap">
+      <div class="impact-grid">
+        <div class="impact-cell c1"><div class="num" data-count="690" data-suffix="+">0</div><div class="lbl">реални позиции</div></div>
+        <div class="impact-cell c2"><div class="num" data-count="8000" data-suffix="+">0</div><div class="lbl">намерени кандидати</div></div>
+        <div class="impact-cell c3"><div class="num" data-count="900" data-suffix="+">0</div><div class="lbl">проведени интервюта</div></div>
+        <div class="impact-cell c4"><div class="num" data-count="250" data-suffix="+">0</div><div class="lbl">наети таланти</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint">
+  <div class="container">
+    <div class="season-head">
+      <div>
+        <div class="season-num-label">04 / Сезон</div>
+        <div class="season-num num">9</div>
+      </div>
+      <div>
+        <div class="eyebrow"><span class="rule"></span><span>Предстоящ сезон</span></div>
+        <h2 class="display">Ноември 2026 — Януари 2027</h2>
+        <p class="section-lede">Двумесечна практическа програма в партньорство с водещи университети, компании и HR професионалисти.</p>
+      </div>
+    </div>
+    <div class="timeline-grid">
+      <div class="timeline-card t1"><div><div class="range num">04–12</div><div class="cap">Ноември 2026</div></div><div><h4>Откриващи събития</h4><p>Среща с компании, ментори и останалите участници.</p></div></div>
+      <div class="timeline-card t2"><div><div class="range num">05.11–05.01</div><div class="cap">Два месеца</div></div><div><h4>Работа на екипите</h4><p>Обучения, мисии и работа по реални позиции.</p></div></div>
+      <div class="timeline-card t3"><div><div class="range num">26–30</div><div class="cap">Януари 2027</div></div><div><h4>Финално награждаване</h4><p>Резултати, класиране, признание и нови възможности.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light" id="whom">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>За кого е инициативата</span></div>
+    <h2 class="display section-head">Каквото и да е нивото ти,<br>има място за теб.</h2>
+    <div class="cards-grid cols-4">
+      <div class="whom-card"><div class="whom-icon" style="border-color:rgba(18,201,219,.4);color:var(--cyan-deep);">01</div><h3>Студенти без опит</h3><p>За хора, които искат да направят първата реална крачка в кариерата си.</p></div>
+      <div class="whom-card"><div class="whom-icon" style="border-color:rgba(255,91,114,.4);color:var(--coral-deep);">02</div><h3>Студенти с първи опит</h3><p>За хора, които вече имат стаж или работа, но искат следващото си развитие.</p></div>
+      <div class="whom-card"><div class="whom-icon" style="border-color:rgba(255,171,46,.5);color:var(--amber-deep);">03</div><h3>Завършващи студенти</h3><p>За хора, които търсят първата си постоянна професионална позиция.</p></div>
+      <div class="whom-card"><div class="whom-icon" style="border-color:rgba(92,124,174,.4);color:var(--steel);">04</div><h3>Млади професионалисти</h3><p>За хора в началото на кариерата си, които искат да открият нова възможност.</p></div>
+    </div>
+    <div style="margin-top:48px;text-align:center;">
+      <a class="btn btn-primary" href="#apply">Кандидатствай сега →</a>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint" id="apply">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>Кандидатствай</span></div>
+    <h2 class="display section-head">Регистрирай се за <span style="color:var(--cyan-deep)">Сезон 9.</span></h2>
+    <p class="section-lede">Остави основните си данни — ще се свържем с теб с повече информация за следващите стъпки. (Пълната форма с CV и въпроси за интереси е на страницата /apply в реалния сайт.)</p>
+    <div class="apply-form-wrap">
+      <form id="applyForm">
+        <div class="form-grid">
+          <div class="form-field"><label for="fName">Име</label><input id="fName" name="firstName" type="text" placeholder="Иван" required></div>
+          <div class="form-field"><label for="fLast">Фамилия</label><input id="fLast" name="lastName" type="text" placeholder="Иванов" required></div>
+          <div class="form-field"><label for="fUni">Университет</label><input id="fUni" name="university" type="text" placeholder="СУ „Св. Климент Охридски“" required></div>
+          <div class="form-field"><label for="fSpec">Специалност</label><input id="fSpec" name="specialty" type="text" placeholder="Маркетинг" required></div>
+          <div class="form-field"><label for="fPhone">Телефон</label><input id="fPhone" name="phone" type="tel" placeholder="+359 88 888 8888" required></div>
+          <div class="form-field"><label for="fEmail">Имейл</label><input id="fEmail" name="email" type="email" placeholder="ivan@example.com" required></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Изпрати кандидатурата →</button>
+          <span class="form-note">Данните се пазят поверително и се използват само за връзка с теб относно инициативата.</span>
+        </div>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="check">✓</div>
+        <h3>Изпратено успешно!</h3>
+        <p>Благодарим ти, че кандидатства за HR:RUSH FOR PRACTICE — Сезон 9. Ще прегледаме информацията ти и ще се свържем скоро.</p>
+      </div>
+      <div class="form-error" id="formError" role="alert">
+        <p>Възникна проблем при изпращането. Провери връзката си и опитай отново — ако продължи, пиши ни directly на <a href="mailto:hello@sofiasummit.bg">hello@sofiasummit.bg</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint" id="mentors">
+  <div class="container">
+    <div class="eyebrow"><span class="rule" style="background:var(--amber)"></span><span style="color:var(--amber-deep)">Ментори</span></div>
+    <h2 class="display section-head">Хората, които подкрепят участниците.</h2>
+    <p class="section-lede">Опитни професионалисти, които дават обратна връзка, менторство и реална гледна точка от индустрията през целия сезон.</p>
+    <div class="cards-grid cols-4">
+      <div class="mentor-card"><div class="mentor-photo">Снимка</div><div class="mentor-body"><h4>Име Фамилия</h4><div class="role">HR Business Partner · Компания</div><p>Кратка биография — опит, фокус и с какво може да помогне на участниците. (placeholder)</p><span class="li">in LinkedIn</span></div></div>
+      <div class="mentor-card"><div class="mentor-photo">Снимка</div><div class="mentor-body"><h4>Име Фамилия</h4><div class="role">Talent Acquisition Lead · Компания</div><p>Кратка биография — опит, фокус и с какво може да помогне на участниците. (placeholder)</p><span class="li">in LinkedIn</span></div></div>
+      <div class="mentor-card"><div class="mentor-photo">Снимка</div><div class="mentor-body"><h4>Име Фамилия</h4><div class="role">Marketing Manager · Компания</div><p>Кратка биография — опит, фокус и с какво може да помогне на участниците. (placeholder)</p><span class="li">in LinkedIn</span></div></div>
+      <div class="mentor-card"><div class="mentor-photo">Снимка</div><div class="mentor-body"><h4>Име Фамилия</h4><div class="role">Team Lead, Product · Компания</div><p>Кратка биография — опит, фокус и с какво може да помогне на участниците. (placeholder)</p><span class="li">in LinkedIn</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light" id="companies-pitch" style="padding-top:0;">
+  <div class="container">
+    <div class="eyebrow"><span class="rule" style="background:var(--coral)"></span><span style="color:var(--coral-deep)">05 / За работодателите</span></div>
+    <div class="employer-grid">
+      <div class="employer-left">
+        <h3 class="display">Повече от <span class="cy">присъствие.</span></h3>
+        <p>Компанията не е просто лого в програмата. Тя участва с реален бизнес казус, среща хората зад резултатите и изгражда връзка със следващото поколение професионалисти.</p>
+      </div>
+      <div class="employer-right">
+        <div class="employer-cell"><span class="idx">01</span><h4>Таланти и кадри</h4><p>Достъп до активни студенти и кандидати, открити по вашите реални позиции.</p></div>
+        <div class="employer-cell"><span class="idx">02</span><h4>Работодателска марка</h4><p>Позициониране пред университетската общност чрез събития и съдържание.</p></div>
+        <div class="employer-cell" style="border-bottom:none;"><span class="idx">03</span><h4>Студентски HR екип</h4><p>Млади хора, които работят конкретно по зададените от вас роли.</p></div>
+        <div class="employer-cell" style="border-bottom:none;"><span class="idx">04</span><h4>Две ключови събития</h4><p>Присъствие в началото и във финала на сезона с директен контакт.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light" id="universities">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>Университети партньори</span></div>
+    <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Водещи университети застават зад инициативата.</h2>
+    <div class="logo-grid uni">
+      <div class="logo-box">СУ „Св. Климент Охридски“</div>
+      <div class="logo-box">Нов български университет</div>
+      <div class="logo-box">ИУ – Варна</div>
+      <div class="logo-box">УНСС</div>
+      <div class="logo-box">ТУ – София</div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint" id="companies">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>Компании</span></div>
+    <div class="company-head">
+      <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Компании, които застават зад младите таланти.</h2>
+      <button class="btn btn-outline">Искате да включите компанията си? →</button>
+    </div>
+    <div class="logo-grid comp">
+      <div class="logo-box comp">Лого 1</div><div class="logo-box comp">Лого 2</div><div class="logo-box comp">Лого 3</div><div class="logo-box comp">Лого 4</div>
+      <div class="logo-box comp">Лого 5</div><div class="logo-box comp">Лого 6</div><div class="logo-box comp">Лого 7</div><div class="logo-box comp">Лого 8</div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>От участие до кариера</span></div>
+    <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Истории на участници.</h2>
+    <p class="section-lede">Съдържанието по-долу е примерна структура — реалните истории на участници ще бъдат добавени тук през идните сезони.</p>
+    <div class="cards-grid cols-3">
+      <div class="story-card"><span class="placeholder-tag">Placeholder</span><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>Тук ще стои реална история на участник — какво е научил/а и как HR:RUSH FOR PRACTICE му/ѝ е помогнала за старта в кариерата.</blockquote><div class="story-person"><div class="story-avatar"></div><div><strong>Име Фамилия</strong><span>Университет · Компания, Позиция</span></div></div></div>
+      <div class="story-card"><span class="placeholder-tag">Placeholder</span><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>Тук ще стои реална история на участник — какво е научил/а и как HR:RUSH FOR PRACTICE му/ѝ е помогнала за старта в кариерата.</blockquote><div class="story-person"><div class="story-avatar"></div><div><strong>Име Фамилия</strong><span>Университет · Компания, Позиция</span></div></div></div>
+      <div class="story-card"><span class="placeholder-tag">Placeholder</span><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>Тук ще стои реална история на участник — какво е научил/а и как HR:RUSH FOR PRACTICE му/ѝ е помогнала за старта в кариерата.</blockquote><div class="story-person"><div class="story-avatar"></div><div><strong>Име Фамилия</strong><span>Университет · Компания, Позиция</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light" id="faq">
+  <div class="container faq-layout">
+    <div>
+      <div class="eyebrow"><span class="rule"></span><span>06 / Въпроси</span></div>
+      <h2 class="display" style="font-size:clamp(1.8rem,3.6vw,2.5rem);color:var(--navy-950);">Преди да<br>се включиш.</h2>
+      <p style="margin-top:18px;max-width:300px;color:var(--navy-500);font-weight:500;font-size:14px;">Не намери отговор на въпроса си? Пиши ни през секция „Контакти“ по-долу.</p>
+    </div>
+    <div id="faqList">
+      <div class="faq-item open">
+        <button class="faq-q"><span class="txt"><span class="n">01</span><span class="q">Кой може да кандидатства?</span></span><span class="faq-toggle">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner"><p>Всеки студент, скоро завършил или млад професионалист, който иска да натрупа реален практически опит — независимо дали има, или няма предишен опит.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="txt"><span class="n">02</span><span class="q">Трябва ли да имам професионален опит?</span></span><span class="faq-toggle">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner"><p>Не. Инициативата развива практическите ти умения чрез обучения, менторство и работа по реални задачи — с или без предходен опит.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="txt"><span class="n">03</span><span class="q">Участието платено ли е?</span></span><span class="faq-toggle">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner"><p>Участието на студентите в HR:RUSH FOR PRACTICE е безплатно.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="txt"><span class="n">04</span><span class="q">Гарантира ли участието работа или стаж?</span></span><span class="faq-toggle">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner"><p>Не. Инициативата дава достъп до практически задачи, обучения и контакт с компании, но не гарантира автоматично работа или стаж.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span class="txt"><span class="n">05</span><span class="q">Мога ли да участвам, ако университетът ми не е партньор?</span></span><span class="faq-toggle">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner"><p>Да. Можеш да кандидатстваш независимо от университета си — при регистрация просто избери опция „Друг университет“.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-tint" id="contact">
+  <div class="container">
+    <div class="eyebrow"><span class="rule" style="background:var(--steel)"></span><span style="color:var(--steel-deep)">Контакти</span></div>
+    <h2 class="display section-head">Избери своята роля.</h2>
+    <p class="section-lede">Каквато и да е ролята ти, има директен път да се включиш в HR:RUSH FOR PRACTICE.</p>
+    <div class="cards-grid cols-3">
+      <div class="contact-card"><div class="contact-icon">01</div><h3>Аз съм студент</h3><p>Кандидатствай директно през формата на инициативата.</p><a class="btn btn-outline" href="#apply">Кандидатствай →</a></div>
+      <div class="contact-card"><div class="contact-icon">02</div><h3>Представлявам компания</h3><p>Открийте мотивирани млади таланти и включете реални позиции.</p><button class="btn btn-outline" type="button">Свържете се с нас →</button></div>
+      <div class="contact-card"><div class="contact-icon">03</div><h3>Представлявам университет</h3><p>Станете партньор и дайте на студентите си достъп до практика.</p><button class="btn btn-outline" type="button">Свържете се с нас →</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="container final-cta-inner">
+    <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--cyan);">Следващият сезон започва с теб</span>
+    <h2 class="display"><span style="color:#fff;">Не чакай опита.</span><br><span class="grad">Създай го.</span></h2>
+    <p>Избери своята роля в HR:RUSH FOR PRACTICE и стани част от инициативата, която свързва потенциала с реалните възможности.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="#apply">Кандидатствай като студент →</a>
+      <a class="btn btn-secondary" href="#contact">Включи компания</a>
+    </div>
+    <p class="fine">Формите за участие и актуалните условия се публикуват чрез Pleggi.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <span class="logo">HR<span class="colon">:</span>Rush<small>for practice</small></span>
+      <p>Практическото HR състезание на Pleggi, водещи университети и БАУХ.</p>
+      <div class="footer-links">
+        <a href="#about">За инициативата</a>
+        <a href="#whom">За студенти</a>
+        <a href="#companies">За компании</a>
+        <a href="#universities">Университети</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="legal">
+        <a href="#">Политика за поверителност</a>
+        <a href="#">Политика за бисквитки</a>
+      </div>
+      <div class="meta">
+        <span>© 2026 HR:RUSH FOR PRACTICE</span>
+        <div class="social-row"><a href="#">in</a><a href="#">ig</a><a href="#">fb</a></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" type="button" aria-label="Обратно в началото">↑</button>
+
+<script>
+  // Same pattern as sofiasummit.bg: one config object at the top holding the
+  // live backend URL, so the only thing to edit after `wrangler deploy` is
+  // this one line — swap in the real Workers.dev (or custom) URL it prints.
+  var SITE_CONFIG = {
+    apiBaseUrl: 'https://hr-rush-for-practice-api.krasen2000-k-stanev.workers.dev'
+  };
+
+  // All in-page links are anchors like href="#about" — always handle them
+  // ourselves and scroll within the page, never let the browser perform its
+  // own navigation for a "#" link.
+  var reduceMotionNav = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('a[href^="#"]').forEach(function(link){
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      var id = link.getAttribute('href').slice(1);
+      if(!id) return;
+      var target = document.getElementById(id);
+      if(target){ target.scrollIntoView({ behavior: reduceMotionNav ? 'auto' : 'smooth', block: 'start' }); }
+    });
+  });
+
+  // Same shape as sofiasummit.bg's registration form: plain fetch() POST to
+  // the Cloudflare Worker's /api/apply, no framework involved. The Worker
+  // validates and writes the row into D1.
+  var applyForm = document.getElementById('applyForm');
+  var formSuccess = document.getElementById('formSuccess');
+  var formError = document.getElementById('formError');
+  if(applyForm){
+    applyForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      formError.classList.remove('show');
+      var submitBtn = applyForm.querySelector('button[type="submit"]');
+      var originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Изпращане…';
+
+      var payload = {
+        firstName: document.getElementById('fName').value.trim(),
+        lastName: document.getElementById('fLast').value.trim(),
+        university: document.getElementById('fUni').value.trim(),
+        specialty: document.getElementById('fSpec').value.trim(),
+        phone: document.getElementById('fPhone').value.trim(),
+        email: document.getElementById('fEmail').value.trim()
+      };
+
+      fetch(SITE_CONFIG.apiBaseUrl + '/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function(res){
+          if(!res.ok) throw new Error('Request failed: ' + res.status);
+          return res.json();
+        })
+        .then(function(){
+          applyForm.style.display = 'none';
+          formSuccess.classList.add('show');
+        })
+        .catch(function(err){
+          console.error('Apply form submit failed', err);
+          formError.classList.add('show');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalLabel;
+        });
+    });
+  }
+
+  var header = document.getElementById('site-header');
+  var backToTop = document.getElementById('backToTop');
+  window.addEventListener('scroll', function(){
+    header.classList.toggle('scrolled', window.scrollY > 8);
+    backToTop.classList.toggle('visible', window.scrollY > 500);
+  });
+  backToTop.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: reduceMotionNav ? 'auto' : 'smooth' });
+  });
+
+  var panel = document.getElementById('mobilePanel');
+  document.getElementById('hamburgerBtn').addEventListener('click', function(){ panel.classList.add('open'); document.body.classList.add('nav-open'); document.body.style.overflow='hidden'; });
+  document.getElementById('closeMobileBtn').addEventListener('click', function(){ panel.classList.remove('open'); document.body.classList.remove('nav-open'); document.body.style.overflow=''; });
+  panel.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ panel.classList.remove('open'); document.body.classList.remove('nav-open'); document.body.style.overflow=''; }); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    item.querySelector('.faq-q').addEventListener('click', function(){
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
+      if(!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // ---------- Hero "Highlights" cube: scroll-linked 3D rotation ----------
+  // Lives inside the hero now, in place of the old static photo. Uses a tall
+  // track + a sticky stage, deriving rotation purely from scroll position
+  // (no wheel-hijacking). On screens under 900px, or with reduced motion,
+  // CSS collapses the track back to a normal-height hero and hides the cube
+  // entirely — this code then simply finds no visible track to act on.
+  (function(){
+    var track = document.getElementById('cubeTrack');
+    var wrap = document.getElementById('cubeWrap');
+    if(!track || !wrap) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // First slice of the track's scroll just brings the cube to center stage
+    // and clears the headline out of the way; actual face-to-face rotation
+    // (and the background swap that rides along with it) only starts after.
+    var INTRO_FRACTION = 0.12;
+
+    var stops = [
+      { rx: 90, ry: 0 },     // top
+      { rx: 0, ry: 0 },      // front
+      { rx: 0, ry: -90 },    // right
+      { rx: 0, ry: -180 },   // back
+      { rx: 0, ry: -270 },   // left
+      { rx: -90, ry: -360 }  // bottom
+    ];
+    var names = ['8 сезона зад нас', '1,130+ студенти', '8,000+ кандидати', '900+ интервюта', '250+ наети таланти', '73+ компании'];
+    var pctEl = document.getElementById('cubePct');
+    var barFill = document.getElementById('cubeBarFill');
+    var sceneEl = document.getElementById('cubeScene');
+    var capN = document.getElementById('cubeCaptionN');
+    var capName = document.getElementById('cubeCaptionName');
+    var dots = document.querySelectorAll('.cube-dots button');
+    var heroInner = document.querySelector('.hero-inner');
+    var viewport = document.querySelector('.hero-cube-viewport');
+    var bgSlides = document.querySelectorAll('.bg-slide');
+    var heroBgOverlay = document.getElementById('heroBgOverlay');
+
+    function easeInOutCubic(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+    function update(){
+      var rect = track.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var progress = total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 0;
+
+      var introProgress = Math.min(progress / INTRO_FRACTION, 1);
+      var rotateProgress = Math.min(Math.max((progress - INTRO_FRACTION) / (1 - INTRO_FRACTION), 0), 1);
+
+      // Intro: fade + lift the headline text out of the way.
+      if(heroInner){
+        heroInner.style.opacity = String(1 - introProgress);
+        heroInner.style.transform = 'translateY(' + (-24 * introProgress) + 'px)';
+        heroInner.style.pointerEvents = introProgress > 0.85 ? 'none' : '';
+      }
+      // That dark left-to-right gradient exists only to keep the headline
+      // readable over the cube. Once the text is gone, fade it way down too —
+      // otherwise it sits on top of the cube (z-index above it) and dulls
+      // every color and glow on the faces as the cube moves toward center.
+      if(heroBgOverlay){
+        heroBgOverlay.style.opacity = String(1 - introProgress * 0.92);
+      }
+
+      // Intro: grow the cube and slide it from its resting right-side spot
+      // to dead center. Only on wide desktop — at ≤1180px the cube is
+      // already centered by the layout, so there's nothing to slide.
+      var width = window.innerWidth;
+      if(viewport && width >= 1180){
+        var baseSize = Math.min(Math.max(230, width * 0.30), 400);
+        var bigSize = Math.min(width * 0.42, 520, window.innerHeight * 0.62);
+        var size = baseSize + (bigSize - baseSize) * introProgress;
+        wrap.style.setProperty('--cube-size', size + 'px');
+        var shift = (-0.43 * width) + (size / 2);
+        viewport.style.transform = 'translateX(' + (shift * introProgress) + 'px)';
+      } else if(viewport){
+        viewport.style.transform = '';
+        wrap.style.removeProperty('--cube-size');
+      }
+
+      var segments = stops.length - 1;
+      var segPos = rotateProgress * segments;
+      var idx = Math.min(Math.floor(segPos), segments - 1);
+      var eased = easeInOutCubic(segPos - idx);
+      var a = stops[idx], b = stops[idx + 1];
+      var rx = a.rx + (b.rx - a.rx) * eased;
+      var ry = a.ry + (b.ry - a.ry) * eased;
+      wrap.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+
+      var activeIdx = Math.min(Math.round(segPos), segments);
+      if(pctEl) pctEl.textContent = String(Math.round(rotateProgress * 100)).padStart(3, '0') + '%';
+      if(barFill) barFill.style.width = (rotateProgress * 100) + '%';
+      if(sceneEl) sceneEl.textContent = names[activeIdx];
+      if(capN) capN.textContent = (activeIdx + 1) + ' / ' + stops.length;
+      if(capName) capName.textContent = names[activeIdx];
+      dots.forEach(function(d, i){ d.classList.toggle('active', i === activeIdx); });
+      bgSlides.forEach(function(s, i){ s.classList.toggle('active', i === activeIdx); });
+    }
+
+    dots.forEach(function(d, i){
+      d.addEventListener('click', function(){
+        var rect = track.getBoundingClientRect();
+        var total = rect.height - window.innerHeight;
+        var targetProgress = INTRO_FRACTION + (i / (stops.length - 1)) * (1 - INTRO_FRACTION);
+        var targetY = window.scrollY + rect.top + targetProgress * total;
+        window.scrollTo({ top: targetY, behavior: reduceMotionNav ? 'auto' : 'smooth' });
+      });
+    });
+
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var counters = document.querySelectorAll('[data-count]');
+  function animateCounter(el){
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    if(reduceMotion){ el.textContent = target.toLocaleString('bg-BG') + suffix; return; }
+    var start = performance.now();
+    var duration = 1300;
+    function tick(now){
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target).toLocaleString('bg-BG') + (progress >= 1 ? suffix : '');
+      if(progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ animateCounter(entry.target); observer.unobserve(entry.target); }
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(function(c){ observer.observe(c); });
+</script>
+
+</body>
+</html>
