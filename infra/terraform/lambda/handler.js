@@ -1,5 +1,5 @@
 const crypto = require('node:crypto');
-const { DynamoDBClient, TransactWriteItemsCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, TransactWriteItemsCommand, PutItemCommand, ScanCommand, UpdateItemCommand, GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
 
 const db = new DynamoDBClient({});
@@ -101,6 +101,17 @@ async function adminInquiries(event) {
   const id = (event.pathParameters || {}).id || (event.rawPath || '').split('/').pop();
   let input; try { input = JSON.parse(event.body || '{}'); } catch { return response(400, { error: 'Invalid JSON' }); }
   if (!['confirmed', 'rejected'].includes(input.status) || !id) return response(400, { error: 'Невалиден статус.' });
+  const existing = await db.send(new GetItemCommand({ TableName: tableName, Key: { id: { S: `inquiry#${id}` } } }));
   await db.send(new UpdateItemCommand({ TableName: tableName, Key: { id: { S: `inquiry#${id}` } }, UpdateExpression: 'SET #status = :status', ExpressionAttributeNames: { '#status': 'status' }, ExpressionAttributeValues: { ':status': { S: input.status } } }));
-  return response(200, { ok: true, status: input.status });
+  let emailSent = false;
+  const item = existing.Item || {};
+  if (item.email?.S && process.env.EMAIL_FROM) try {
+    const approved = input.status === 'confirmed';
+    await ses.send(new SendEmailCommand({ FromEmailAddress: process.env.EMAIL_FROM, Destination: { ToAddresses: [item.email.S] }, Content: { Simple: {
+      Subject: { Data: approved ? 'Запитването ви е потвърдено — Sofia Summit Center' : 'Относно вашето запитване — Sofia Summit Center', Charset: 'UTF-8' },
+      Body: { Text: { Data: `Здравейте, ${item.name?.S || ''}!\n\n${approved ? `Потвърждаваме вашето запитване за ${item.space?.S || 'пространството'} на ${item.requested_date?.S || ''}.` : 'За съжаление не можем да потвърдим запитването за избраната дата.'}\n\nSofia Summit Center`, Charset: 'UTF-8' }
+    } } } }));
+    emailSent = true;
+  } catch {}
+  return response(200, { ok: true, status: input.status, email_sent: emailSent });
 }
