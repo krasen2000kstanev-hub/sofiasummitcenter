@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [memory.md](memory.md) — обновено на 15 септември 2026 г.
+Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 17 септември 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -29,7 +29,9 @@ The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the ma
 
 ## Event backend status
 
-The NAIL BUSINESS RE:START page is wired for registration through `https://api.sofiasummit.bg`. The Worker validates ticket type, promo codes, attendee data and capacity, then creates a temporary order. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend remains available and automatic webhook processing is idempotent.
+The NAIL BUSINESS RE:START page is wired for registration through the Cloudflare Worker `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. The Worker validates ticket type, promo codes, attendee data and the 100-person capacity, then creates a temporary order in D1. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend is available and webhook processing is idempotent.
+
+Current active promo codes: `BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20` and `OGI20`. They provide 20% server-side discount. The `/api/promo/quote` endpoint calculates the discounted amount before an order is created.
 
 The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 

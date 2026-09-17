@@ -17,7 +17,7 @@
 - Формата вече изпраща към `/api/orders`, подава `agreeTerms: true`, `masterClasses` и `fullName` за допълнителните участници; UX изборът е 1–3 участници.
 - Базовите DSK links са в D1 `ticket_types.dsk_url`; промо link-овете са в `promo_payment_links` по `promo_code_id + ticket_key + attendee_count`.
 - Промокодовете са в D1 `promo_codes`, с активност, срокове, лимит, позволени билети и 20%/25% server-side отстъпка. Admin UI/API: Worker `/admin/promos`, `/api/admin/promos` и `/api/admin/promo-links`.
-- Seed-нати са активните кодове `BIBI20`, `EVA20` и `EMI20`; те се използват само за единична регистрация с 20% отстъпка.
+- Активни са кодовете `BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20` и `OGI20`; всеки дава 20% отстъпка. `OGNYAN20` е преименуван на `OGI20`.
 - При 2 или 3 участници промокод не е нужен: backend-ът прилага автоматични 25%, обновява всички билетни карти и избира отделен x2 или x3 DSK link за Standard, Standard + запис и VIP.
 - Admin `/api/admin/promos` показва usage count, а `/api/admin/promo-usage?code=...` показва кой е използвал кода, кога, за кой билет, с колко участници и какъв е статусът на поръчката.
 - Полето „Промо код“ е отделно от регистрационната форма; приложението прави quote към Worker, а submit създава поръчка и пренасочва към DSK.
@@ -32,7 +32,9 @@
 - GitHub Actions workflow `.github/workflows/deploy-worker.yml` deploy-ва `backend/` към Cloudflare при push към `main`; преди deploy прилага D1 миграциите към `sofiasummit-events`.
 - GitHub Actions използва `CLOUDFLARE_API_TOKEN`; публичният Cloudflare Account ID е зададен директно в workflow-а. Runtime secrets за Resend, DSK и Cloudflare Access не се съхраняват в GitHub repository-то.
 - Реален email delivery тест не се изпълнява в CI, защото би изпратил писма и би създал registration side effect; проверката на имейлите изисква контролирана тестова регистрация и DSK webhook.
-- Последният GitHub commit е `45279cb` (`chore: preserve worker runtime variables`). Преди него `4604dda` запази груповата отстъпка визуално при quote грешка. Live Worker-ът е публикуван с версия `a9c9c5cc-80de-4adb-be79-8ad63276d63d`; D1 миграциите са приложени и `EVA20` е проверен live с 20% отстъпка (Standard 89 € → 71,20 €).
+- Добавен е публичен Worker endpoint `/api/promo/quote`, който проверява кода и изчислява отстъпката без да създава поръчка. Всички активни кодове са проверени live с 20% отстъпка (Standard 89 € → 71,20 €).
+- DSK плащанията и webhook-ът са активирани и са тествани. След успешно плащане Resend изпраща билетите; ръчният resend от админ панела е тестван успешно.
+- GitHub Pages deployment-ът е фиксиран чрез премахване на счупените submodule артефакти `.sync` и `.upload-temp2`. Последният deployment commit е `3c5aaf4`.
 - Подготвен е лек pointer-aware 3D tilt ефект върху основните карти, галерията, изображенията, бутоните и форматите на събитията. Hover/focus върху контролите добавя дискретен контур по ръба, а `prefers-reduced-motion` изключва анимацията.
 - Към актуалния `main` са добавени и останалите визуални ефекти от локалния preview: интерактивна 3D сфера в галерията с drag/scroll управление и momentum, движещ се фон от снимки с линии, карта на София със Sofia Summit Center маркер и бутон за връщане в началото.
 - В `index.html` има отделни секции `#podcasts`, `#productions` и `#initiatives`; `#services` сочи към съществуващата секция за услуги. Навигацията е responsive: широкият изглед е на един ред, а под 1180px се показва хамбургер меню.
