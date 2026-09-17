@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Кариерно кафе</title>
+  <desc id="desc">Минималистична визуална картичка за Кариерно кафе</desc>
+  <rect width="1200" height="680" fill="#241c14"/>
+  <circle cx="1010" cy="130" r="180" fill="none" stroke="#c08a4e" stroke-opacity=".28" stroke-width="2"/>
+  <circle cx="1010" cy="130" r="132" fill="none" stroke="#e0b37f" stroke-opacity=".2" stroke-width="2"/>
+  <path d="M0 540C230 430 360 620 590 510S950 430 1200 540" fill="none" stroke="#c08a4e" stroke-opacity=".22" stroke-width="3"/>
+  <path d="M0 590C230 480 360 670 590 560S950 480 1200 590" fill="none" stroke="#e0b37f" stroke-opacity=".14" stroke-width="2"/>
+  <rect x="62" y="58" width="1080" height="564" rx="22" fill="#2f2519" stroke="#c08a4e" stroke-opacity=".48" stroke-width="2"/>
+  <text x="108" y="132" fill="#e0b37f" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="7">PLEGI × CAREERPRO.BG</text>
+  <text x="108" y="270" fill="#f3e9da" font-family="Georgia, serif" font-size="92" font-weight="700">Кариерно</text>
+  <text x="108" y="366" fill="#f3e9da" font-family="Georgia, serif" font-size="92" font-weight="700">кафе</text>
+  <path d="M112 414h220" stroke="#c08a4e" stroke-width="4"/>
+  <text x="108" y="484" fill="#bda88c" font-family="Montserrat, Arial, sans-serif" font-size="25" letter-spacing="2">СРЕЩИ · ИДЕИ · ВЪЗМОЖНОСТИ</text>
+  <text x="108" y="554" fill="#e0b37f" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="600">21 НОЕМВРИ 2026 · СОФИЯ</text>
+  <g transform="translate(900 360)" fill="none" stroke="#e0b37f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-75-30h130v65a45 45 0 0 1-45 45h-40a45 45 0 0 1-45-45z"/>
+    <path d="M55-10h25a34 34 0 0 1 0 68H58"/>
+    <path d="M-32 80h80M8 80v26"/>
+  </g>
+</svg>
