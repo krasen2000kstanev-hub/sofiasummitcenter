@@ -12,7 +12,7 @@ const text = (value, max = 500) => typeof value === 'string' ? value.trim().slic
 
 exports.handler = async (event) => {
   const path = event.rawPath || '/';
-  if (path === '/admin/inquiries') return adminInquiries(event);
+  if (path === '/admin/inquiries' || path.startsWith('/admin/inquiries/')) return adminInquiries(event);
   if (event.requestContext?.http?.method === 'GET' && path === '/availability') {
     const space = text(event.queryStringParameters?.space, 80);
     if (!space) return response(400, { error: 'Липсва пространство.' });
