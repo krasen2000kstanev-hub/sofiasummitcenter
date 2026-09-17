@@ -195,6 +195,22 @@ async function sendTicketEmails(env, order, attendees, event, force = false) {
   return results;
 }
 
+async function quotePromo(request, env) {
+  const headers = cors(request);
+  const body = await readBody(request);
+  const event = await env.DB.prepare('SELECT id FROM events WHERE slug=? AND status=?').bind(clean(body.eventSlug || 'nail-business-restart', 80), 'active').first();
+  const ticket = await env.DB.prepare('SELECT price_cents,currency,ticket_key FROM ticket_types WHERE event_id=? AND ticket_key=? AND active=1').bind(event?.id, clean(body.ticketType || 'standard', 50)).first();
+  const count = Math.max(1, Math.min(100, Number(body.attendeesCount || 1)));
+  const code = clean(body.promoCode, 50).toUpperCase();
+  if (!event || !ticket || !code) return json({ error: 'Невалиден промокод.' }, 400, headers);
+  const promo = await env.DB.prepare('SELECT * FROM promo_codes WHERE event_id=? AND code=? AND active=1').bind(event.id, code).first();
+  if (!promo) return json({ error: 'Невалиден промокод.' }, 400, headers);
+  const allowed = JSON.parse(promo.ticket_keys_json || '[]');
+  if (allowed.length && !allowed.includes(ticket.ticket_key)) return json({ error: 'Промокодът не важи за избрания билет.' }, 400, headers);
+  const percent = count > 1 ? Number(promo.group_discount_percent || promo.discount_value) : Number(promo.single_discount_percent || promo.discount_value);
+  return json({ valid: true, code, discountPercent: percent, amountCents: Math.round(ticket.price_cents * count * (100 - percent) / 100), currency: ticket.currency }, 200, headers);
+}
+
 async function createOrder(request, env) {
   const headers = cors(request);
   const body = await readBody(request);
@@ -297,6 +313,7 @@ export default {
         return json({ event, tickets: tickets.results || [], seatsRemaining: Math.max(0, event.capacity - Number(used.total || 0)) }, 200, headers);
       }
       if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env);
+      if (request.method === 'POST' && url.pathname === '/api/promo/quote') return quotePromo(request, env);
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
         const token = clean(url.pathname.split('/').pop(), 100);
