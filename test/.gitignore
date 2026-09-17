@@ -1,0 +1,10 @@
+# Keep the WordPress hosting backup out of the GitHub Pages repository.
+*.zip
+*-installer-backup.php
+dup-installer/
+wp-admin/
+wp-includes/
+cgi-bin/
+*.sql
+wp-config.php
+wp-content/wflogs/
