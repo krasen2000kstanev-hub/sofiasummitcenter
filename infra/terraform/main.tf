@@ -85,7 +85,7 @@ resource "aws_apigatewayv2_api" "events" {
   cors_configuration {
     allow_origins = ["https://sofiasummit.bg"]
     allow_methods = ["GET", "POST", "OPTIONS"]
-    allow_headers = ["content-type"]
+    allow_headers = ["content-type", "authorization"]
   }
 }
 
