@@ -1,5 +1,5 @@
 const crypto = require('node:crypto');
-const { DynamoDBClient, TransactWriteItemsCommand, PutItemCommand, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, TransactWriteItemsCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
 const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
 
 const db = new DynamoDBClient({});
@@ -12,6 +12,7 @@ const text = (value, max = 500) => typeof value === 'string' ? value.trim().slic
 
 exports.handler = async (event) => {
   const path = event.rawPath || '/';
+  if (path === '/admin/inquiries') return adminInquiries(event);
   if (event.requestContext?.http?.method === 'GET' && path === '/availability') {
     const space = text(event.queryStringParameters?.space, 80);
     if (!space) return response(400, { error: 'Липсва пространство.' });
@@ -87,4 +88,19 @@ async function createInquiry(event) {
     emailSent = true;
   } catch {}
   return response(201, { ok: true, inquiry_id: id, status: 'pending', email_sent: emailSent });
+}
+
+async function adminInquiries(event) {
+  const auth = event.headers?.authorization || '';
+  const expected = 'Basic ' + Buffer.from(`${process.env.ADMIN_USER || ''}:${process.env.ADMIN_PASSWORD || ''}`).toString('base64');
+  if (!process.env.ADMIN_USER || auth !== expected) return { statusCode: 401, headers: { 'content-type': 'application/json', 'www-authenticate': 'Basic realm="Sofia Summit"' }, body: JSON.stringify({ error: 'Unauthorized' }) };
+  if (event.requestContext?.http?.method === 'GET') {
+    const result = await db.send(new ScanCommand({ TableName: tableName, FilterExpression: '#type = :type', ExpressionAttributeNames: { '#type': 'type' }, ExpressionAttributeValues: { ':type': { S: 'inquiry' } } }));
+    return response(200, (result.Items || []).map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => k !== 'type').map(([k, v]) => [k, v.S ?? (v.N ? Number(v.N) : v.BOOL)]))));
+  }
+  const id = (event.pathParameters || {}).id || (event.rawPath || '').split('/').pop();
+  let input; try { input = JSON.parse(event.body || '{}'); } catch { return response(400, { error: 'Invalid JSON' }); }
+  if (!['confirmed', 'rejected'].includes(input.status) || !id) return response(400, { error: 'Невалиден статус.' });
+  await db.send(new UpdateItemCommand({ TableName: tableName, Key: { id: { S: `inquiry#${id}` } }, UpdateExpression: 'SET #status = :status', ExpressionAttributeNames: { '#status': 'status' }, ExpressionAttributeValues: { ':status': { S: input.status } } }));
+  return response(200, { ok: true, status: input.status });
 }

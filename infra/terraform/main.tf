@@ -72,6 +72,8 @@ resource "aws_lambda_function" "registration" {
       API_BASE_URL = var.api_base_url
       EMAIL_FROM   = "noreply@sofiasummit.bg"
       INQUIRY_NOTIFY_EMAIL = var.inquiry_notify_email
+      ADMIN_USER = var.admin_user
+      ADMIN_PASSWORD = var.admin_password
     }
   }
 }
@@ -110,6 +112,18 @@ resource "aws_apigatewayv2_route" "availability" {
   api_id    = aws_apigatewayv2_api.events.id
   route_key = "GET /availability"
   target    = "integrations/${aws_apigatewayv2_integration.registration.id}"
+}
+
+resource "aws_apigatewayv2_route" "admin_inquiries" {
+  api_id = aws_apigatewayv2_api.events.id
+  route_key = "GET /admin/inquiries"
+  target = "integrations/${aws_apigatewayv2_integration.registration.id}"
+}
+
+resource "aws_apigatewayv2_route" "admin_inquiry_status" {
+  api_id = aws_apigatewayv2_api.events.id
+  route_key = "POST /admin/inquiries/{id}/status"
+  target = "integrations/${aws_apigatewayv2_integration.registration.id}"
 }
 
 resource "aws_apigatewayv2_route" "dsk_webhook" {
