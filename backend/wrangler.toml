@@ -2,10 +2,6 @@ name = "sofiasummit-events-api"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 
-[[routes]]
-pattern = "sofiasummit.bg/events/hr-rushforpractice/ranking*"
-zone_name = "sofiasummit.bg"
-
 [[rules]]
 type = "Data"
 globs = ["**/*.ttf"]
