@@ -297,12 +297,29 @@ function ticketPage(order, attendee, event) {
   return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет — ${html(event.name)}</title><style>:root{--ink:#0b0b0d;--paper:#faf8f5;--cyan:#1e8cae;--orange:#e2542a}body{font-family:Arial,sans-serif;background:var(--ink);color:#17151a;padding:24px}.ticket{max-width:640px;margin:auto;background:var(--paper);border-top:8px solid var(--cyan);border-bottom:4px solid var(--orange);padding:32px;box-shadow:0 12px 30px #0005}h1{margin:0 0 12px;font-size:28px;color:var(--ink)}.status{color:var(--cyan);font-weight:700;letter-spacing:.08em}.meta{line-height:1.9;margin-top:24px}.code{font:700 16px monospace;background:#eaf6fa;padding:12px;border-radius:4px;display:inline-block;word-break:break-all}.used{color:var(--orange);font-weight:700}</style><main class="ticket"><h1>${html(event.name)}</h1><p class="status">${used ? 'БИЛЕТЪТ Е ВЕЧЕ ИЗПОЛЗВАН' : 'РЕГИСТРАЦИЯ ПОТВЪРДЕНА'}</p><div class="meta"><strong>Участник:</strong> ${html(attendee.full_name)}<br><strong>Билет:</strong> ${html(event.ticket_name || 'Билет')}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Адрес:</strong> ${html(EVENT_ADDRESS)}<br><strong>Поръчка:</strong> ${html(order.id)}</div><p class="code">${html(attendee.ticket_token)}</p>${used ? `<p class="used">Чекиран на ${html(attendee.checked_in_at)}</p>` : '<p>Покажете този билет при регистрация на събитието.</p>'}</main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
+const RANKING_ORIGIN = 'https://krasen2000kstanev-hub.github.io/hr-rush-for-practice/';
+
+async function rankingProxy(request) {
+  if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', { status: 405 });
+  const upstream = await fetch(RANKING_ORIGIN, { method: request.method });
+  if (!upstream.ok) return new Response('Ranking page unavailable', { status: 502 });
+  const type = upstream.headers.get('content-type') || '';
+  if (!type.includes('text/html')) return new Response(upstream.body, { status: upstream.status, headers: upstream.headers });
+  let body = await upstream.text();
+  body = body.replace('<head>', `<head><base href="${RANKING_ORIGIN}">`);
+  return new Response(body, {
+    status: upstream.status,
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const headers = cors(request);
-    if (request.method === 'OPTIONS') return new Response(null, { headers });
-    const url = new URL(request.url);
-    try {
+      if (request.method === 'OPTIONS') return new Response(null, { headers });
+      const url = new URL(request.url);
+      try {
+      if (url.pathname === '/events/hr-rushforpractice/ranking' || url.pathname === '/events/hr-rushforpractice/ranking/') return rankingProxy(request);
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
       if (request.method === 'GET' && url.pathname.startsWith('/api/events/')) {
         const slug = decodeURIComponent(url.pathname.split('/').pop());
