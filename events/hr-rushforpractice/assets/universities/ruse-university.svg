@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="71.0261mm" height="79.1007mm" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 41.9241 46.6902"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str0 {stroke:black;stroke-width:0.47221;stroke-linejoin:bevel}
+    .str1 {stroke:#1F1A17;stroke-width:0.47221;stroke-linejoin:bevel}
+    .fil2 {fill:#1F1A17}
+    .fil1 {fill:#CCCCCC}
+    .fil0 {fill:yellow}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <ellipse class="fil0" cx="25.5087" cy="16.4155" rx="16.4154" ry="16.4155"/>
+  <path class="fil1 str0" d="M21.5266 46.455c-7.68333,-0.495349 -12.0156,-5.34548 -12.6673,-10.87 -0.358172,-3.05579 -0.240473,-6.97974 -0.225894,-10.4713l6.60404 -0.0387803 0.0918449 9.61137c0.680868,3.05432 2.93331,4.83408 6.01826,5.03087l0.450194 0.196735 0 6.53144 -0.271108 0.00973934z"/>
+  <path class="fil1 str1" d="M13.6207 13.8419c2.30244,0 5.38237,2.57833 5.84236,4.94215 0.337099,1.01803 0.250094,2.03611 0.0887165,3.05432 -0.243661,1.12923 -1.40536,2.58624 -1.79582,2.87505l0.0887165 7.81579c2.13935,-0.918095 4.59673,-2.80593 6.11011,-4.9405 2.81237,-3.9691 2.7995,-10.244 -0.540327,-15.0941 -1.98942,-2.88963 -5.74237,-5.03063 -9.25337,-5.03063l-13.8355 0 0.179086 6.37791 13.1161 0z"/>
+  <path class="fil2 str1" d="M21.8671 46.455c7.68499,-0.495349 12.017,-5.34548 12.6673,-10.87 0.358172,-3.05579 0.240296,-6.97974 0.227369,-10.4713l-6.60551 -0.0387803 -0.0903693 9.61137c-0.680691,3.05432 -2.93313,4.83408 -6.01974,5.03087l-0.448541 0.196735 0 6.53144 0.269455 0.00973934z"/>
+  <polygon class="fil1 str0" points="0.32553,16.1782 0.235161,46.1856 6.25513,46.2758 6.3455,16.2686 "/>
+ </g>
+</svg>
