@@ -480,7 +480,9 @@ fbq('track','PageView');
     }
     @media(prefers-reduced-motion:reduce){#how .process-item,#how .process-item:nth-child(2),#how .process-item:nth-child(4){transition:none;transform:none;}#how .process-item:hover{transform:none;}}
   </style>
-</head>
+<style>
+.live-links-section{background:var(--mist-50);padding:clamp(64px,9vw,120px) 0}.live-links-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:34px}.live-link-card{display:flex;flex-direction:column;gap:14px;min-height:190px;padding:26px;border:1px solid var(--navy-200);background:var(--white);color:var(--navy-950);text-decoration:none;transition:transform .2s ease,box-shadow .2s ease}.live-link-card:hover{transform:translateY(-3px);box-shadow:0 16px 32px #20243d1c}.live-link-number{color:var(--cyan-deep);font:700 12px var(--font-display);letter-spacing:.12em}.live-link-card strong{font:800 clamp(1.25rem,2.5vw,2rem) var(--font-display)}.live-link-card span:last-child{margin-top:auto;color:var(--steel-deep);font-weight:700}@media(max-width:700px){.live-links-grid{grid-template-columns:1fr;gap:12px;margin-top:24px}.live-link-card{min-height:0;padding:20px}.live-link-card strong{font-size:1.2rem}}
+</style></head>
 <body>
 
 
@@ -615,6 +617,16 @@ fbq('track','PageView');
   </div>
 </section>
 
+<section class="live-links-section" id="live-pages">
+  <div class="container">
+    <div class="eyebrow"><span class="rule"></span><span>На живо</span></div>
+    <h2 class="display section-head">Избери своята<br><span style="color:var(--cyan-deep)">страница.</span></h2>
+    <div class="live-links-grid">
+      <a class="live-link-card" href="https://sofiasummit.bg/events/hr-rushforpractice/misii/" target="_blank" rel="noopener"><span class="live-link-number">01</span><strong>Мисии</strong><span>Виж практическите мисии →</span></a>
+      <a class="live-link-card" href="https://sofiasummit.bg/events/hr-rushforpractice/ranking/" target="_blank" rel="noopener"><span class="live-link-number">02</span><strong>Класация</strong><span>Виж резултатите на живо →</span></a>
+    </div>
+  </div>
+</section>
 <section class="bg-light" id="about">
   <div class="container">
     <div class="about-grid">
