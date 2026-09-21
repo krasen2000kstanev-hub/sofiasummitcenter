@@ -1,1 +1,80 @@
-<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Мисии | HR:Rush for Practice</title><meta name="description" content="Мисии и точки в HR:Rush for Practice."><link rel="stylesheet" href="../hrr-pages.css"><script async src="https://www.googletagmanager.com/gtag/js?id=G-33S1BQPVQB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-33S1BQPVQB');</script></head><body><header class="top"><div class="wrap"><div class="topbar"><a class="brand" href="../">HR:RUSH FOR PRACTICE<small>класация и мисии</small></a><nav class="nav"><a href="../ranking/">Класация</a><a class="active" href="./">Мисии</a><a href="../">Събитие</a></nav></div><section class="hero"><div class="eyebrow">Сезон 8</div><h1>Мисии</h1><p>Всички мисии, срокове, награди и точки на едно място.</p></section></div></header><main class="content wrap"><section class="cards" id="missions"></section><p class="footer">Последно обновяване: <span id="updated"></span> · <a href="https://docs.google.com/spreadsheets/d/1BLLIXe15hKntoJgat_zftCYp_CDsz3jJkuFhSwSq8OM/edit?gid=1475655488" target="_blank" rel="noopener">Източник на данните</a></p></main><script src="../hrr-data.js"></script><script>const esc=s=>String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));document.getElementById('missions').innerHTML=HRR_DATA.missions.map(m=>'<article class="mission"><div class="mission-head"><h2>'+esc(m.title)+'</h2><span class="badge">'+esc(m.points||'0')+' т.</span></div><dl><dt>Възложител</dt><dd>'+esc(m.owner||'Не е посочен')+'</dd><dt>Срок</dt><dd>'+esc(m.deadline||'Не е посочен')+'</dd><dt>Награда</dt><dd>'+esc(m.reward||'Няма')+'</dd></dl>'+(m.note?'<div class="note">'+esc(m.note)+'</div>':'')+'</article>').join('');document.getElementById('updated').textContent=HRR_DATA.updatedAt;</script></body></html>
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мисии | HR:Rush for Practice</title>
+  <meta name="description" content="Mission control за HR:Rush for Practice.">
+  <link rel="stylesheet" href="mission-dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="../" aria-label="HR Rush начало"><span class="brand-mark">R</span><span>HR:<b> Rush</b></span></a>
+      <nav class="side-nav" aria-label="Основна навигация">
+        <a class="nav-item active" href="./"><span class="nav-icon">⌘</span>Dashboard</a>
+        <a class="nav-item" href="#missions"><span class="nav-icon">☑</span>Мисии</a>
+        <a class="nav-item" href="#team"><span class="nav-icon">♙</span>Моят отбор</a>
+        <a class="nav-item" href="../ranking/"><span class="nav-icon">♜</span>Класация</a>
+      </nav>
+      <div class="season-card"><strong>Сезон 8</strong><span>Остават 18 дни до финала на HR:Rush.</span></div>
+    </aside>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" aria-label="Отвори меню">☰</button>
+        <div class="topbar-spacer"></div>
+        <button class="bell" type="button" aria-label="Известия">♧<i></i></button>
+        <div class="profile"><span class="profile-avatar">ИП</span><span><strong>Иван Петров</strong><small>Team Alpha</small></span></div>
+      </header>
+
+      <main class="dashboard">
+        <div class="page-intro">
+          <div><p class="eyebrow">СЕЗОН 8 · MISSION CONTROL</p><h1>Добро утро, Иван.</h1><p class="intro-copy">Ето какво се случва с твоите мисии днес.</p></div>
+          <time datetime="2026-09-20">20 септември 2026 · неделя</time>
+        </div>
+
+        <section class="hero-grid" aria-label="Текущ прогрес">
+          <article class="progress-card">
+            <p class="overline">ТВОЯТ ПРОГРЕС</p><h2>Вече си в движение.</h2><p>Остават ти 8 мисии, за да завършиш личния си Rush маршрут.</p>
+            <div class="progress-track"><span style="width:42%"></span></div><div class="progress-meta"><span>5 от 12 мисии</span><b>42%</b></div>
+          </article>
+          <article class="next-card"><div class="next-top"><span class="status-pill warm">СЛЕДВАЩА МИСИЯ</span><strong>+50 т.</strong></div><h2>Намери 5 кандидата по позицията в Pleggi</h2><p>Това е най-голямата активна мисия в твоя списък.</p><button class="primary-button" data-open-mission="Намери 5 кандидата по позицията в Pleggi">Виж мисията</button></article>
+        </section>
+
+        <section class="stats-grid" aria-label="Обобщение">
+          <div class="stat-card"><p>ТОЧКИ ОТ МИСИИ</p><strong>180</strong><span>+50 тази седмица</span></div>
+          <div class="stat-card"><p>ЗА ПРОВЕРКА</p><strong>2</strong><span>Средно 1 ден чакане</span></div>
+          <div class="stat-card"><p>ОТБОРЕН ПРОГРЕС</p><strong>64%</strong><span>+8% от вчера</span></div>
+          <div class="stat-card"><p>ПОЗИЦИЯ</p><strong>#12</strong><span>↑ 2 места</span></div>
+        </section>
+
+        <section id="missions" class="missions-section">
+          <div class="section-heading"><h2>Активни мисии</h2><div class="filters" role="tablist" aria-label="Филтри на мисии"><button class="filter active" data-filter="all">Всички</button><button class="filter" data-filter="fast">Бързи</button><button class="filter" data-filter="content">Съдържание</button><button class="filter" data-filter="events">Събития</button><button class="filter" data-filter="high">50+ точки</button></div></div>
+          <div id="missionGrid" class="mission-grid"></div>
+        </section>
+
+        <section class="lower-grid">
+          <article id="team" class="panel team-panel"><div class="panel-heading"><h2>Team Alpha</h2><button class="ghost-button" type="button">Виж отбора</button></div><div class="member"><span class="member-avatar">МП</span><span><b>Мария Петрова</b><small>12 мисии · най-активна</small></span><strong>230 т.</strong></div><div class="member"><span class="member-avatar">ИП</span><span><b>Иван Петров</b><small>5 мисии · ти</small></span><strong>180 т.</strong></div><div class="member"><span class="member-avatar">ГН</span><span><b>Георги Николов</b><small>4 мисии · в процес</small></span><strong>120 т.</strong></div></article>
+          <article class="panel news-panel"><h2>Последни известия</h2><div class="news-item"><i></i><span><b>Мисията е одобрена</b><small>LinkedIn профил · +1 точка</small></span></div><div class="news-item"><i></i><span><b>Нова бележка</b><small>Публикация HR:Rush · за корекция</small></span></div><div class="news-item"><i></i><span><b>Team Alpha се изкачи</b><small>Вече сте на #12 в класацията</small></span></div></article>
+        </section>
+
+        <section class="panel points-panel"><div class="panel-heading"><h2>Откъде идват точките ти</h2><span class="muted-label">Последни одобрения</span></div><div class="point-row"><strong>+50</strong><span><b>Намери 5 кандидата в Pleggi</b><small>Одобрена от Цецо · днес</small></span><em>+50 т.</em></div><div class="point-row"><strong>+8</strong><span><b>Интервюта с ментори</b><small>Одобрена от Вики Л · вчера</small></span><em>+8 т.</em></div><div class="point-row"><strong>+5</strong><span><b>Посети лекция и продавай позиция</b><small>Одобрена от Цецо · преди 3 дни</small></span><em>+5 т.</em></div><button class="ghost-button" type="button">Виж цялата история</button></section>
+      </main>
+    </div>
+  </div>
+  <div class="modal" id="missionModal" hidden><div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" type="button" aria-label="Затвори">×</button><span class="status-pill warm">МИСИЯ</span><h2 id="modalTitle"></h2><p id="modalBody"></p><button class="primary-button" type="button" data-close-modal>Разбрах</button></div></div>
+  <script src="../hrr-data.js"></script>
+  <script>
+    const esc = s => String(s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const category = title => /профил/i.test(title) ? 'profile' : /меме|публикация|видео/i.test(title) ? 'content' : /изложение|лекция|уебинар|среща/i.test(title) ? 'events' : /5 кандидата|12 асистенции/i.test(title) ? 'high' : 'fast';
+    const description = title => ({'Pleggi профил':'Създай и попълни профила си в Pleggi.','LinkedIn профил':'Подреди профила си така, че да те представя професионално.','Публикация HR:Rush for Practice':'Публикувай във Facebook, LinkedIn и Instagram.','Меме':'Създай меме за HR:Rush. Победителят взима точките.','Намери 5 кандидата по позицията в Pleggi':'Намери петима подходящи кандидати за позицията.','Интервюта с ментори':'Проведи интервюта с ментори и сподели наученото.','12 асистенции / намерени кандидати за всяка друга комапния (освен твоята)':'Помогни на други компании да намерят кандидати.','Стартъп изложението в УниБИТ на 13.11 от 10:00ч.':'Посети изложението, тагни HR:Rush и изпрати снимка.'}[title] || 'Изпълни мисията и добави доказателство за проверка.');
+    const grid = document.querySelector('#missionGrid');
+    grid.innerHTML = HRR_DATA.missions.map(m => `<article class="mission-card" data-category="${category(m.title)}" data-points="${Number(m.points || 0)}"><div class="mission-card-top"><span class="status-pill ${category(m.title)==='events'?'green':''}">${category(m.title)==='profile'?'ПРОФИЛ':category(m.title)==='content'?'СЪДЪРЖАНИЕ':category(m.title)==='events'?'СЪБИТИЕ':category(m.title)==='high'?'HIGH IMPACT':'ОБУЧЕНИЕ'}</span><strong>+${esc(m.points || '0')}</strong></div><h3>${esc(m.title)}</h3><p>${esc(description(m.title))}</p><div class="mission-card-bottom"><span>${esc(m.deadline ? 'Отворена · ' + m.deadline : 'Отворена')}</span><button class="ghost-button" type="button" data-open-mission="${esc(m.title)}">Отвори</button></div></article>`).join('');
+    document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => { document.querySelector('.filter.active').classList.remove('active'); button.classList.add('active'); const filter = button.dataset.filter; document.querySelectorAll('.mission-card').forEach(card => { card.hidden = !(filter === 'all' || card.dataset.category === filter || (filter === 'fast' && Number(card.dataset.points) <= 5)); }); }));
+    const modal = document.querySelector('#missionModal'); const title = document.querySelector('#modalTitle'); const body = document.querySelector('#modalBody');
+    document.addEventListener('click', event => { const button = event.target.closest('[data-open-mission]'); if (button) { title.textContent = button.dataset.openMission; body.textContent = description(button.dataset.openMission) + ' Данните за персоналния статус ще бъдат добавени при свързване с профилите и проверките.'; modal.hidden = false; } if (event.target.closest('[data-close-modal], .modal-close') || event.target === modal) modal.hidden = true; });
+    document.querySelector('.mobile-menu').addEventListener('click', () => document.querySelector('.sidebar').classList.toggle('open'));
+  </script>
+</body>
+</html>
