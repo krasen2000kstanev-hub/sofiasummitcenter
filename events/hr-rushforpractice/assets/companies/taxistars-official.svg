@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" role="img" aria-labelledby="title desc">
+  <title id="title">TaxiStars</title>
+  <desc id="desc">TaxiStars blue wordmark with a star</desc>
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#148ed3"/>
+      <stop offset="1" stop-color="#0872bd"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#blue)" font-family="Arial, Helvetica, sans-serif" font-size="58" font-style="italic" font-weight="900" letter-spacing="-3">
+    <text x="8" y="70">TAXIST</text>
+    <text x="283" y="70">RS</text>
+  </g>
+  <path fill="#0872bd" d="m265 12 8.5 20.2 21.7 1.7-16.5 14.1 5 21.1-18.7-11.1-18.7 11.1 5-21.1-16.5-14.1 21.7-1.7L265 12Z"/>
+  <path fill="#fff" opacity=".65" d="m265 20 4.2 12.4 13.2 1-10.1 7.4 3.1 12.8-10.4-6.3V20Z"/>
+</svg>
