@@ -1392,8 +1392,6 @@ fbq('track','PageView');
     function restart(){ clearInterval(timer); timer = setInterval(function(){ move(1); }, 4200); }
     prev.addEventListener('click', function(){ move(-1); restart(); });
     next.addEventListener('click', function(){ move(1); restart(); });
-    carousel.addEventListener('mouseenter', function(){ clearInterval(timer); });
-    carousel.addEventListener('mouseleave', restart);
     render();
     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) restart();
   })();
