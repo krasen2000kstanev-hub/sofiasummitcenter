@@ -1,6 +1,6 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-33S1BQPVQB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-33S1BQPVQB');</script>
 <!doctype html>
-<!-- GitHub Pages deploy marker: global bokeh wash 2026-09-21 -->
+<!-- GitHub Pages deploy marker: subdued bokeh background 2026-09-21 -->
 <html lang="bg">
 <head>
 <meta charset="UTF-8" />
@@ -119,7 +119,7 @@
 
   .hero-cube-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(155deg,#3a4066,#20233b 70%);}
   /* The animation is a true page background, never a foreground layer. */
-  .ambient-bokeh{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;opacity:.9;mix-blend-mode:normal;}
+  .ambient-bokeh{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;opacity:.62;mix-blend-mode:normal;}
   .bg-slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;}
   .bg-slide.active{opacity:1;}
   .bg-slide.slide-0{background:radial-gradient(circle at 75% 30%,rgba(93,110,166,.55),transparent 60%),linear-gradient(155deg,#3a4066,#20233b 70%);}
@@ -1471,10 +1471,6 @@ fbq('track','PageView');
     }
     function draw(time){
       ctx.clearRect(0,0,width,height);
-      var washPosition = (time / 11000) % paletteRgb.length;
-      var wash = mix(paletteRgb[Math.floor(washPosition)],paletteRgb[(Math.floor(washPosition) + 1) % paletteRgb.length],washPosition % 1);
-      ctx.fillStyle = rgba(wash,.18);
-      ctx.fillRect(0,0,width,height);
       lights.forEach(function(light){
         var x = (light.x + Math.sin(time * light.speed + light.drift) * .08) * width;
         var y = (light.y + Math.cos(time * light.speed * .8 + light.drift) * .06) * height;
@@ -1484,8 +1480,8 @@ fbq('track','PageView');
         var colorTo = paletteRgb[(Math.floor(colorPosition) + 1) % paletteRgb.length];
         var color = mix(colorFrom,colorTo,colorPosition % 1);
         var gradient = ctx.createRadialGradient(x,y,0,x,y,radius);
-        gradient.addColorStop(0,rgba(color,.52));
-        gradient.addColorStop(.45,rgba(color,.2));
+        gradient.addColorStop(0,rgba(color,.34));
+        gradient.addColorStop(.45,rgba(color,.12));
         gradient.addColorStop(1,rgba(color,0));
         ctx.fillStyle = gradient;
         ctx.beginPath();
