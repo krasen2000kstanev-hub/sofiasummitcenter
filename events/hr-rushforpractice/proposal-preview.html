@@ -1,4 +1,3 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-33S1BQPVQB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-33S1BQPVQB');</script>
 <!doctype html>
 <html lang="bg">
 <head>
@@ -306,22 +305,10 @@
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
   @media(max-width:700px){.form-grid{grid-template-columns:1fr;}}
   .form-field{display:flex;flex-direction:column;gap:8px;}
-  .form-field[hidden]{display:none;}
   .form-field label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--navy-500);}
   .form-field input{border:1px solid var(--mist-100);background:var(--mist-50);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--navy-950);transition:border-color .15s ease, background .15s ease;}
-  .form-field select{border:1px solid var(--mist-100);background:var(--mist-50);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--navy-950);transition:border-color .15s ease, background .15s ease;}
   .form-field input:focus{outline:none;border-color:var(--cyan);background:#fff;}
-  .form-field select:focus{outline:none;border-color:var(--cyan);background:#fff;}
   .form-field input::placeholder{color:var(--navy-300);font-weight:500;}
-  .gdpr-consent{display:flex;align-items:flex-start;gap:10px;margin-top:18px;color:var(--navy-500);font-size:12px;line-height:1.5;}
-  .gdpr-consent input{width:16px;height:16px;flex:0 0 16px;margin:1px 0 0;accent-color:var(--cyan-deep);}
-  .gdpr-consent label{font-size:12px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--navy-500);}
-  .gdpr-consent a{color:var(--cyan-deep);text-decoration:underline;}
-  .role-picker{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:4px;}
-  .role-option{position:relative;display:flex;align-items:center;gap:10px;padding:14px 16px;border:1px solid var(--mist-100);border-radius:14px;background:var(--mist-50);color:var(--navy-950);font-size:13px;font-weight:700;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;}
-  .role-option input{width:16px;height:16px;margin:0;accent-color:var(--cyan-deep);}
-  .role-option:has(input:checked){border-color:var(--cyan);background:rgba(18,201,219,.08);box-shadow:0 0 0 2px rgba(18,201,219,.12);}
-  @media(max-width:700px){.role-picker{grid-template-columns:1fr;}}
   .form-actions{margin-top:28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
   .form-note{font-size:12px;color:var(--navy-400);max-width:280px;}
   .form-success{display:none;text-align:center;padding:30px 20px;}
@@ -356,30 +343,9 @@
 
   .logo-grid{margin-top:44px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
   @media(min-width:640px){.logo-grid{grid-template-columns:repeat(3,1fr);}}
-  @media(min-width:1024px){.logo-grid.uni{grid-template-columns:repeat(3,1fr);}.logo-grid.comp{grid-template-columns:repeat(4,1fr);}}
+  @media(min-width:1024px){.logo-grid.uni{grid-template-columns:repeat(5,1fr);}.logo-grid.comp{grid-template-columns:repeat(8,1fr);}}
   .logo-box{height:84px;border:1px solid var(--mist-100);border-radius:12px;background:var(--mist-50);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;text-align:center;color:var(--navy-400);text-transform:uppercase;letter-spacing:.04em;padding:8px;}
-  .logo-box.uni-logo{height:156px;padding:18px 22px 14px;flex-direction:column;gap:10px;background:linear-gradient(150deg,#fff,var(--mist-50));box-shadow:0 18px 34px -28px rgba(24,28,48,.55);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
-  .logo-box.uni-logo:hover{transform:translateY(-4px);border-color:rgba(18,201,219,.55);box-shadow:0 22px 38px -26px rgba(10,148,163,.5);}
-  .logo-box.uni-logo img{display:block;flex:1;min-height:0;max-width:100%;max-height:88px;width:min(100%,230px);height:auto;object-fit:contain;}
-  .logo-box.uni-logo:first-child img{filter:invert(1);}
-  .logo-box.uni-logo--dark{background:linear-gradient(145deg,var(--navy-950),#303a68);border-color:rgba(255,255,255,.12);}
-  .logo-box.uni-logo--dark img{filter:none;}
-  .uni-name{font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--navy-500);text-transform:uppercase;white-space:nowrap;}
-  .logo-box.uni-logo--dark .uni-name{color:#fff;}
-  .logo-box.comp{height:112px;padding:18px 24px;background:linear-gradient(150deg,#fff,var(--mist-50));box-shadow:0 18px 34px -28px rgba(24,28,48,.55);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
-  .logo-box.comp:hover{transform:translateY(-4px);border-color:rgba(18,201,219,.55);box-shadow:0 22px 38px -26px rgba(10,148,163,.5);}
-  .logo-box.comp img{display:block;max-width:100%;max-height:58px;width:auto;height:auto;object-fit:contain;}
-  .logo-box.comp img[src*="raicommerce"],.logo-box.comp img[src*="weprevent"],.logo-box.comp img[src*="regiocom"]{transform:scale(1.8);}
-  .logo-box.comp img[src*="bta-google"],.logo-box.comp img[src*="alpha-consult"]{transform:scale(1.5);}
-  .logo-box.comp img[src*="ideal-standard"],.logo-box.comp img[src*="ficosota"],.logo-box.comp img[src*="dentaprime"]{transform:scale(1.25);}
-  .logo-box.comp--wordmark{font-size:clamp(14px,1.4vw,21px);letter-spacing:-.03em;text-transform:none;color:var(--navy-950);background:linear-gradient(145deg,#fff,#eef2f8);}
-  .logo-box.comp--wordmark strong{font-weight:850;text-align:center;line-height:1.05;}
-  .logo-box.comp--coca{flex-direction:column;gap:6px;color:#e31837;background:#fff;}
-  .logo-box.comp--coca img{max-height:38px;}
-  .logo-box.comp--coca strong{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#20243d;}
-  .logo-box.comp--wordmark:nth-last-child(-n+8){background:linear-gradient(145deg,#20243d,#303a68);color:#fff;border-color:rgba(255,255,255,.12);}
-  .logo-box.comp--dark{background:linear-gradient(145deg,var(--navy-950),#303a68);border-color:rgba(255,255,255,.12);}
-  @media(max-width:639px){.logo-box.comp{height:96px;padding:14px 18px;}.logo-box.comp img{max-height:48px;}}
+  .logo-box.comp{height:68px;background:#fff;}
 
   .company-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;}
 
@@ -472,66 +438,33 @@
     html{scroll-behavior:auto;}
   }
 </style>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1750795822810756');
-fbq('track','PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1750795822810756&ev=PageView&noscript=1" /></noscript>
-<!-- End Meta Pixel Code -->
-  <style id="proposal-v2-overrides">
-    #how{background:var(--navy-950);color:#fff;overflow:hidden;}
-    #how .eyebrow span{color:var(--cyan);}
-    #how .section-head .display{color:#fff;}
-    #how .section-lede{color:var(--navy-200);max-width:680px;}
-    #how .process-list{margin-top:56px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;border:0;}
-    #how .process-item{min-height:310px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:24px 20px;border:1px solid rgba(255,255,255,.14);border-radius:20px;background:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035));transition:transform .2s ease,border-color .2s ease,background .2s ease;}
-    #how .process-item:nth-child(2),#how .process-item:nth-child(4){transform:translateY(28px);}
-    #how .process-item:hover{transform:translateY(-8px);border-color:var(--cyan);background:linear-gradient(155deg,rgba(18,201,219,.22),rgba(255,255,255,.06));}
-    #how .process-item:nth-child(2):hover,#how .process-item:nth-child(4):hover{transform:translateY(20px);}
-    #how .process-item .idx{font-size:38px;line-height:1;color:var(--amber);opacity:.95;}
-    #how .process-item:nth-child(n+3) .idx{display:none;}
-    #how .process-item .body{display:block;margin-top:auto;}
-    #how .process-item h4{font-size:18px;line-height:1.25;color:#fff;margin-bottom:14px;}
-    #how .process-item p{font-size:14px;line-height:1.55;color:var(--navy-200);max-width:none;}
-    #how .process-item .arrow-circle{align-self:flex-end;margin-top:20px;border-color:rgba(255,255,255,.22);background:transparent;color:var(--cyan);}
-    #how .process-item::after{content:'';display:block;width:34px;height:3px;margin-top:20px;background:var(--cyan);}
-    @media(max-width:980px){
-      #how .process-list{grid-template-columns:repeat(2,minmax(0,1fr));}
-      #how .process-item:nth-child(2),#how .process-item:nth-child(4){transform:none;}
-      #how .process-item:nth-child(2):hover,#how .process-item:nth-child(4):hover{transform:translateY(-8px);}
-    }
+  <style id="proposal-overrides">
+    /* Proposal: clearer hierarchy, tighter rhythm, same brand language. */
+    header{background:rgba(24,28,48,.78);backdrop-filter:blur(10px);border-bottom-color:rgba(255,255,255,.1);}
+    .hero-inner{padding-top:clamp(90px,12vh,150px);padding-bottom:clamp(90px,12vh,150px);}
+    .hero-copy h1{max-width:900px;text-wrap:balance;}
+    .hero-copy .lede{max-width:620px;font-size:clamp(16px,1.5vw,20px);line-height:1.55;}
+    .btn-primary{box-shadow:0 14px 34px -18px rgba(18,201,219,.8);}
+    section.bg-tint{background:
+      radial-gradient(circle at 88% 12%,rgba(18,201,219,.08),transparent 30%),
+      var(--mist-50);}
+    .section-head .display{max-width:920px;}
+    .process-list{margin-top:44px;border-top:0;display:grid;gap:10px;}
+    .process-item{padding:18px 20px;border:1px solid var(--mist-100);border-radius:16px;background:rgba(255,255,255,.42);transition:transform .18s ease,background .18s ease,border-color .18s ease;}
+    .process-item:hover{transform:translateX(6px);background:#fff;border-color:rgba(18,201,219,.42);}
+    .process-item h4{font-size:19px;}
+    .process-item p{font-size:15px;line-height:1.5;max-width:390px;}
+    .process-item .arrow-circle{background:#fff;}
+    .split-panel,.stat-card,.story-card,.mentor-card{border-radius:20px;}
     @media(max-width:700px){
-      #how .process-list{grid-template-columns:1fr;gap:10px;margin-top:36px;}
-      #how .process-item,#how .process-item:nth-child(2),#how .process-item:nth-child(4){min-height:220px;transform:none;padding:22px 18px;}
-      #how .process-item:hover,#how .process-item:nth-child(2):hover,#how .process-item:nth-child(4):hover{transform:none;}
+      .hero-inner{padding-top:80px;padding-bottom:80px;}
+      .process-list{gap:8px;}
+      .process-item{padding:16px 14px;border-radius:14px;}
+      .process-item:hover{transform:none;}
     }
-    @media(prefers-reduced-motion:reduce){#how .process-item,#how .process-item:nth-child(2),#how .process-item:nth-child(4){transition:none;transform:none;}#how .process-item:hover{transform:none;}}
+    @media(prefers-reduced-motion:reduce){.process-item{transition:none;}.process-item:hover{transform:none;}}
   </style>
-  <style id="season-9-preview-overrides">
-    section:has(.season-head){background:radial-gradient(circle at 8% 50%,rgba(18,201,219,.12),transparent 30%),var(--mist-50);}
-    .season-head{grid-template-columns:220px 1fr;gap:52px;align-items:center;min-height:280px;}
-    .season-head>div:first-child{padding:24px 20px 28px;border-radius:24px;background:rgba(18,201,219,.12);border:1px solid rgba(18,201,219,.28);box-shadow:0 20px 50px -35px rgba(10,148,163,.8);}
-    .season-num-label{font-size:16px;letter-spacing:.18em;color:var(--cyan-deep);}
-    .season-num{font-size:clamp(9rem,13vw,13rem);line-height:.72;margin-top:22px;text-shadow:0 18px 40px rgba(10,148,163,.2);}
-    .season-head h2{font-size:clamp(2.2rem,4.2vw,4.5rem);line-height:1.02;max-width:1000px;}
-    .season-head .eyebrow{font-size:15px;margin-bottom:24px;}
-    @media(max-width:760px){
-      .season-head{grid-template-columns:1fr;gap:24px;min-height:0;}
-      .season-head>div:first-child{max-width:210px;}
-      .season-num-label{font-size:16px;}
-      .season-num{font-size:clamp(8rem,30vw,11rem);}
-      .season-head h2{font-size:clamp(2.3rem,9vw,4rem);}
-    }
-  </style>
-<style>
-.live-links-section{background:var(--mist-50);padding:clamp(64px,9vw,120px) 0}.live-links-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:34px}.live-link-card{display:flex;flex-direction:column;gap:14px;min-height:190px;padding:26px;border:1px solid var(--navy-200);background:var(--white);color:var(--navy-950);text-decoration:none;transition:transform .2s ease,box-shadow .2s ease}.live-link-card:hover{transform:translateY(-3px);box-shadow:0 16px 32px #20243d1c}.live-link-number{color:var(--cyan-deep);font:700 12px var(--font-display);letter-spacing:.12em}.live-link-card strong{font:800 clamp(1.25rem,2.5vw,2rem) var(--font-display)}.live-link-card span:last-child{margin-top:auto;color:var(--steel-deep);font-weight:700}@media(max-width:700px){.live-links-grid{grid-template-columns:1fr;gap:12px;margin-top:24px}.live-link-card{min-height:0;padding:20px}.live-link-card strong{font-size:1.2rem}}
-</style></head>
+</head>
 <body>
 
 
@@ -666,21 +599,11 @@ fbq('track','PageView');
   </div>
 </section>
 
-<section class="live-links-section" id="live-pages">
-  <div class="container">
-    <div class="eyebrow"><span class="rule"></span><span>На живо</span></div>
-    <h2 class="display section-head">Избери своята<br><span style="color:var(--cyan-deep)">страница.</span></h2>
-    <div class="live-links-grid">
-      <a class="live-link-card" href="https://sofiasummit.bg/events/hr-rushforpractice/misii/" target="_blank" rel="noopener"><span class="live-link-number">01</span><strong>Мисии</strong><span>Виж практическите мисии →</span></a>
-      <a class="live-link-card" href="https://sofiasummit.bg/events/hr-rushforpractice/ranking/" target="_blank" rel="noopener"><span class="live-link-number">02</span><strong>Класация</strong><span>Виж резултатите на живо →</span></a>
-    </div>
-  </div>
-</section>
 <section class="bg-light" id="about">
   <div class="container">
     <div class="about-grid">
       <div>
-        <div class="eyebrow"><span class="rule"></span><span>За инициативата</span></div>
+        <div class="eyebrow"><span class="rule"></span><span>01 / За инициативата</span></div>
         <h2 class="display section-head" style="display:block;">Не симулация.<br><span style="color:var(--cyan-deep)">Реален старт.</span></h2>
       </div>
       <p class="section-lede" style="margin-top:0;">HR:RUSH FOR PRACTICE е практическо състезание, което открива, развива и свързва хора с потенциал. Студентите влизат в ролята на HR екипи, а компаниите получават достъп до мотивирани млади таланти. Компанията не е просто лого в програмата — тя участва с реален бизнес казус и изгражда връзка със следващото поколение професионалисти.</p>
@@ -728,7 +651,7 @@ fbq('track','PageView');
 
 <section class="bg-tint" id="how">
   <div class="container">
-    <div class="eyebrow"><span class="rule" style="background:var(--cyan)"></span><span style="color:var(--cyan-deep)">Как работи</span></div>
+    <div class="eyebrow"><span class="rule" style="background:var(--cyan)"></span><span style="color:var(--cyan-deep)">02 / Как работи</span></div>
     <div class="section-head"><h2 class="display">От първата мисия<br>до <span style="color:var(--cyan-deep)">реалното наемане.</span></h2></div>
     <p class="section-lede">Един ясен процес, който превежда теорията през реалните етапи на подбор и превръща усилията на екипа в измерим резултат.</p>
 
@@ -744,7 +667,7 @@ fbq('track','PageView');
 
 <section class="bg-light">
   <div class="container">
-    <div class="eyebrow"><span class="rule"></span><span>Ефектът</span></div>
+    <div class="eyebrow"><span class="rule"></span><span>03 / Ефектът</span></div>
     <h2 class="display section-head">Резултати, които се <span style="color:var(--coral-deep)">броят.</span></h2>
     <p class="section-lede">Зад всяко число има студент, който е натрупал опит, кандидат, който е получил възможност, и компания, която е открила човек с потенциал.</p>
     <div class="impact-wrap">
@@ -762,7 +685,7 @@ fbq('track','PageView');
   <div class="container">
     <div class="season-head">
       <div>
-        <div class="season-num-label">Сезон</div>
+        <div class="season-num-label">04 / Сезон</div>
         <div class="season-num num">9</div>
       </div>
       <div>
@@ -772,9 +695,9 @@ fbq('track','PageView');
       </div>
     </div>
     <div class="timeline-grid">
-      <div class="timeline-card t1"><div><div class="range num">04–12</div><div class="cap">Ноември 2026</div></div><div><h4>Откриващи събития</h4><p>Среща с компании, ментори и останалите участници. Работа на живо със студенти, насоки от ментори.</p></div></div>
-      <div class="timeline-card t2"><div><div class="range num">05.11–05.01</div><div class="cap">Два месеца</div></div><div><h4>Работа на екипите</h4><p>Обучения, мисии и работа по реални позиции. Работа на живо със студенти, насоки от ментори.</p></div></div>
-      <div class="timeline-card t3"><div><div class="range num">26–30</div><div class="cap">Януари 2027</div></div><div><h4>Финално награждаване</h4><p>Резултати, класиране, признание и нови възможности. Работа на живо със студенти, насоки от ментори.</p></div></div>
+      <div class="timeline-card t1"><div><div class="range num">04–12</div><div class="cap">Ноември 2026</div></div><div><h4>Откриващи събития</h4><p>Среща с компании, ментори и останалите участници.</p></div></div>
+      <div class="timeline-card t2"><div><div class="range num">05.11–05.01</div><div class="cap">Два месеца</div></div><div><h4>Работа на екипите</h4><p>Обучения, мисии и работа по реални позиции.</p></div></div>
+      <div class="timeline-card t3"><div><div class="range num">26–30</div><div class="cap">Януари 2027</div></div><div><h4>Финално награждаване</h4><p>Резултати, класиране, признание и нови възможности.</p></div></div>
     </div>
   </div>
 </section>
@@ -803,20 +726,13 @@ fbq('track','PageView');
     <div class="apply-form-wrap">
       <form id="applyForm">
         <div class="form-grid">
-          <div class="role-picker" role="radiogroup" aria-label="Роля">
-            <label class="role-option"><input type="radio" name="applicantRole" value="student" checked required> Студент</label>
-            <label class="role-option"><input type="radio" name="applicantRole" value="company" required> Представлявам компания</label>
-            <label class="role-option"><input type="radio" name="applicantRole" value="university" required> Представлявам университет</label>
-          </div>
           <div class="form-field"><label for="fName">Име</label><input id="fName" name="firstName" type="text" placeholder="Иван" required></div>
           <div class="form-field"><label for="fLast">Фамилия</label><input id="fLast" name="lastName" type="text" placeholder="Иванов" required></div>
-          <div class="form-field" id="studentUniversityField"><label for="fUni">Университет</label><select id="fUni" name="university" required><option value="" selected disabled>Избери университет</option><option value="Софийски университет „Св. Климент Охридски“">Софийски университет „Св. Климент Охридски“</option><option value="Университет за национално и световно стопанство (УНСС)">Университет за национално и световно стопанство (УНСС)</option><option value="Нов български университет">Нов български университет</option><option value="УЗФ">УЗФ</option><option value="Друг">Друг</option></select><input id="fUniOther" name="otherUniversity" type="text" placeholder="Напиши университет" hidden></div>
-          <div class="form-field" id="studentSpecialtyField"><label for="fSpec">Специалност</label><input id="fSpec" name="specialty" type="text" placeholder="Маркетинг" required></div>
-          <div class="form-field" id="organizationField" hidden><label for="fOrganization">Име на компанията или университета</label><input id="fOrganization" name="organization" type="text" placeholder="Напиши име на организацията"></div>
+          <div class="form-field"><label for="fUni">Университет</label><input id="fUni" name="university" type="text" placeholder="СУ „Св. Климент Охридски“" required></div>
+          <div class="form-field"><label for="fSpec">Специалност</label><input id="fSpec" name="specialty" type="text" placeholder="Маркетинг" required></div>
           <div class="form-field"><label for="fPhone">Телефон</label><input id="fPhone" name="phone" type="tel" placeholder="+359 88 888 8888" required></div>
           <div class="form-field"><label for="fEmail">Имейл</label><input id="fEmail" name="email" type="email" placeholder="ivan@example.com" required></div>
         </div>
-        <div class="gdpr-consent"><input id="fGdpr" name="gdprConsent" type="checkbox" required><label for="fGdpr">Съгласявам се личните ми данни да бъдат събирани и обработвани за целите на кандидатстването и връзката с мен относно инициативата. Запознах се с <a href="../../privacy.html" target="_blank" rel="noopener">Политиката за поверителност</a>.</label></div>
         <div class="form-actions">
           <button class="btn btn-primary" type="submit">Изпрати кандидатурата →</button>
           <span class="form-note">Данните се пазят поверително и се използват само за връзка с теб относно инициативата.</span>
@@ -850,7 +766,7 @@ fbq('track','PageView');
 
 <section class="bg-light" id="companies-pitch" style="padding-top:0;">
   <div class="container">
-    <div class="eyebrow"><span class="rule" style="background:var(--coral)"></span><span style="color:var(--coral-deep)">За работодателите</span></div>
+    <div class="eyebrow"><span class="rule" style="background:var(--coral)"></span><span style="color:var(--coral-deep)">05 / За работодателите</span></div>
     <div class="employer-grid">
       <div class="employer-left">
         <h3 class="display">Повече от <span class="cy">присъствие.</span></h3>
@@ -871,16 +787,11 @@ fbq('track','PageView');
     <div class="eyebrow"><span class="rule"></span><span>Университети партньори</span></div>
     <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Водещи университети застават зад инициативата.</h2>
     <div class="logo-grid uni">
-      <div class="logo-box uni-logo"><img src="assets/universities/sofia-university.png" alt="Софийски университет „Св. Климент Охридски“"><span class="uni-name">Софийски университет</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/new-bulgarian-university.png" alt="Нов български университет"><span class="uni-name">Нов български университет</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/economic-university-varna.png" alt="Икономически университет – Варна"><span class="uni-name">ИУ – Варна</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/unwe.png" alt="Университет за национално и световно стопанство"><span class="uni-name">УНСС</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/veliko-tarnovo-university.png" alt="Великотърновски университет „Св. св. Кирил и Методий“"><span class="uni-name">Великотърновски университет</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/ruse-university.svg" alt="Русенски университет „Ангел Кънчев“"><span class="uni-name">Русенски университет</span></div>
-      <div class="logo-box uni-logo uni-logo--dark"><img src="assets/universities/vuzf.png" alt="Висше училище по застраховане и финанси"><span class="uni-name">ВУЗФ</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/technical-university-plovdiv.png" alt="Технически университет – София, филиал Пловдив"><span class="uni-name">ТУ – филиал Пловдив</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/uft-plovdiv.png" alt="Университет по хранителни технологии – Пловдив"><span class="uni-name">УХТ – Пловдив</span></div>
-      <div class="logo-box uni-logo"><img src="assets/universities/plovdiv-university.png" alt="Пловдивски университет „Паисий Хилендарски“"><span class="uni-name">Пловдивски университет</span></div>
+      <div class="logo-box">СУ „Св. Климент Охридски“</div>
+      <div class="logo-box">Нов български университет</div>
+      <div class="logo-box">ИУ – Варна</div>
+      <div class="logo-box">УНСС</div>
+      <div class="logo-box">ТУ – София</div>
     </div>
   </div>
 </section>
@@ -893,80 +804,8 @@ fbq('track','PageView');
       <button class="btn btn-outline">Искате да включите компанията си? →</button>
     </div>
     <div class="logo-grid comp">
-      <div class="logo-box comp comp--coca"><img src="assets/companies/coca-cola.png" alt="Coca-Cola"><strong>BSO</strong></div>
-      <div class="logo-box comp comp--coca"><img src="assets/companies/coca-cola.png" alt="Coca-Cola"><strong>Hellenic</strong></div>
-      <div class="logo-box comp comp--coca"><img src="assets/companies/coca-cola.png" alt="Coca-Cola"><strong>Europacific</strong></div>
-      <div class="logo-box comp"><img src="assets/companies/kaufland.svg" alt="Kaufland"></div>
-      <div class="logo-box comp"><img src="assets/companies/postbank.svg" alt="Пощенска банка"></div>
-      <div class="logo-box comp"><img src="assets/companies/wuerth.svg" alt="Würth"></div>
-      <div class="logo-box comp"><img src="assets/companies/ideal-standard.jpg" alt="Ideal Standard"></div>
-      <div class="logo-box comp"><img src="assets/companies/ficosota.png" alt="Ficosota"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/clunetech.svg" alt="CluneTech"></div>
-      <div class="logo-box comp"><img src="assets/companies/ardes.webp" alt="Ardes.bg"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/tavex.svg" alt="Tavex"></div>
-      <div class="logo-box comp"><img src="assets/companies/investbank.svg" alt="Инвестбанк"></div>
-      <div class="logo-box comp"><img src="assets/companies/dentaprime.svg" alt="DentaPrime"></div>
-      <div class="logo-box comp"><img src="assets/companies/raicommerce.jpg" alt="RaiCommerce"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/international.svg" alt="International Hotel & Casino"></div>
-      <div class="logo-box comp"><img src="assets/companies/weprevent.webp" alt="WePrevent"></div>
-      <div class="logo-box comp"><img src="assets/companies/binc.png" alt="Binc Partners"></div>
-      <div class="logo-box comp"><img src="assets/companies/bta-google.jpg" alt="Българска телеграфна агенция"></div>
-      <div class="logo-box comp"><img src="assets/companies/regiocom.png" alt="regiocom"></div>
-      <div class="logo-box comp"><img src="assets/companies/ubb.png" alt="ОББ"></div>
-      <div class="logo-box comp"><img src="assets/companies/imoteka.png" alt="Имотека"></div>
-      <div class="logo-box comp"><img src="assets/companies/bdo.webp" alt="BDO"></div>
-      <div class="logo-box comp"><img src="assets/companies/alpha-consult.webp" alt="Alpha Consult Bulgaria"></div>
-      <div class="logo-box comp"><img src="assets/companies/dtm.svg" alt="Dynamic Talent Management"></div>
-      <div class="logo-box comp"><img src="assets/companies/newcareer.png" alt="New Career"></div>
-      <div class="logo-box comp"><img src="assets/companies/latecoere.webp" alt="Latecoere"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/sportal.svg" alt="Sportal.bg"></div>
-      <div class="logo-box comp"><img src="assets/companies/cteam.png" alt="CTeam"></div>
-      <div class="logo-box comp"><img src="assets/companies/lidl.svg" alt="Lidl"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/btl.png" alt="BTL"></div>
-      <div class="logo-box comp"><img src="assets/companies/liebherr.svg" alt="Liebherr"></div>
-      <div class="logo-box comp"><img src="assets/companies/vivacredit.png" alt="Viva Credit"></div>
-      <div class="logo-box comp"><img src="assets/companies/address.jpg" alt="Адрес недвижими имоти"></div>
-      <div class="logo-box comp"><img src="assets/companies/primoplus.svg" alt="Primo+"></div>
-      <div class="logo-box comp"><img src="assets/companies/neoperl.png" alt="Neoperl"></div>
-      <div class="logo-box comp"><img src="assets/companies/actioncoach.png" alt="ActionCOACH"></div>
-      <div class="logo-box comp"><img src="assets/companies/deadoors.png" alt="DeaDoors"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/payslip.svg" alt="Payslip"></div>
-      <div class="logo-box comp"><img src="assets/companies/pleggi.svg" alt="Pleggi"></div>
-      <div class="logo-box comp"><img src="assets/companies/technopolis.jpg" alt="Technopolis"></div>
-      <div class="logo-box comp"><img src="assets/companies/praktiker.svg" alt="Praktiker"></div>
-      <div class="logo-box comp"><img src="assets/companies/lev-ins.svg" alt="Лев Инс"></div>
-      <div class="logo-box comp"><img src="assets/companies/dairyday.png" alt="Dairy Day"></div>
-      <div class="logo-box comp"><img src="assets/companies/activtrades.webp" alt="ActivTrades"></div>
-      <div class="logo-box comp"><img src="assets/companies/yps.png" alt="Your People Solution"></div>
-      <div class="logo-box comp"><img src="assets/companies/holcim.jpg" alt="Holcim"></div>
-      <div class="logo-box comp"><img src="assets/companies/fantastico.svg" alt="Фантастико"></div>
-      <div class="logo-box comp"><img src="assets/companies/telus.jpg" alt="TELUS Digital"></div>
-      <div class="logo-box comp"><img src="assets/companies/enikom.png" alt="ЕНИКОМ М"></div>
-      <div class="logo-box comp"><img src="assets/companies/vivacom.svg" alt="Vivacom"></div>
-      <div class="logo-box comp"><img src="assets/companies/baker-tilly.svg" alt="Baker Tilly Bulgaria"></div>
-      <div class="logo-box comp"><img src="assets/companies/dm.png" alt="dm"></div>
-      <div class="logo-box comp"><img src="assets/companies/naos.png" alt="NAOS"></div>
-      <div class="logo-box comp"><img src="assets/companies/za-nashite-detsa.svg" alt="Фондация „За Нашите Деца“"></div>
-      <div class="logo-box comp"><img src="assets/companies/taxistars.svg" alt="TaxiStars"></div>
-      <div class="logo-box comp"><img src="assets/companies/generali.jpg" alt="Generali"></div>
-      <div class="logo-box comp"><img src="assets/companies/billa.png" alt="Billa"></div>
-      <div class="logo-box comp"><img src="assets/companies/aroma.svg" alt="Арома"></div>
-      <div class="logo-box comp"><img src="assets/companies/timac-agro.svg" alt="Timac Agro"></div>
-      <div class="logo-box comp"><img src="assets/companies/samex.png" alt="Самекс"></div>
-      <div class="logo-box comp"><img src="assets/companies/siemens.svg" alt="Siemens"></div>
-      <div class="logo-box comp"><img src="assets/companies/overgas.svg" alt="Овергаз"></div>
-      <div class="logo-box comp"><img src="assets/companies/emag.webp" alt="eMAG"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/marketstar.png" alt="MarketStar"></div>
-      <div class="logo-box comp"><img src="assets/companies/gopet.webp" alt="Gopet Trans"></div>
-      <div class="logo-box comp"><img src="assets/companies/hrs.svg" alt="HRS"></div>
-      <div class="logo-box comp comp--dark"><img src="assets/companies/pontica.svg" alt="Pontica Solutions"></div>
-      <div class="logo-box comp"><img src="assets/companies/witte.svg" alt="Witte Automotive"></div>
-      <div class="logo-box comp"><img src="assets/companies/econt.png" alt="Еконт"></div>
-      <div class="logo-box comp"><img src="assets/companies/prestige.png" alt="Престиж"></div>
-      <div class="logo-box comp"><img src="assets/companies/ikea.svg" alt="IKEA"></div>
-      <div class="logo-box comp"><img src="assets/companies/grifid.png" alt="Хотел Грифит"></div>
-      <div class="logo-box comp"><img src="assets/companies/manpower.svg" alt="Manpower"></div>
-      <div class="logo-box comp"><img src="assets/companies/lufthansa-technik-sofia.svg" alt="Lufthansa Technik Sofia"></div>
+      <div class="logo-box comp">Лого 1</div><div class="logo-box comp">Лого 2</div><div class="logo-box comp">Лого 3</div><div class="logo-box comp">Лого 4</div>
+      <div class="logo-box comp">Лого 5</div><div class="logo-box comp">Лого 6</div><div class="logo-box comp">Лого 7</div><div class="logo-box comp">Лого 8</div>
     </div>
   </div>
 </section>
@@ -987,7 +826,7 @@ fbq('track','PageView');
 <section class="bg-light" id="faq">
   <div class="container faq-layout">
     <div>
-      <div class="eyebrow"><span class="rule"></span><span>Въпроси</span></div>
+      <div class="eyebrow"><span class="rule"></span><span>06 / Въпроси</span></div>
       <h2 class="display" style="font-size:clamp(1.8rem,3.6vw,2.5rem);color:var(--navy-950);">Преди да<br>се включиш.</h2>
       <p style="margin-top:18px;max-width:300px;color:var(--navy-500);font-weight:500;font-size:14px;">Не намери отговор на въпроса си? Пиши ни през секция „Контакти“ по-долу.</p>
     </div>
@@ -1098,37 +937,6 @@ fbq('track','PageView');
   var applyForm = document.getElementById('applyForm');
   var formSuccess = document.getElementById('formSuccess');
   var formError = document.getElementById('formError');
-  var universitySelect = document.getElementById('fUni');
-  var otherUniversityInput = document.getElementById('fUniOther');
-  var studentUniversityField = document.getElementById('studentUniversityField');
-  var studentSpecialtyField = document.getElementById('studentSpecialtyField');
-  var organizationField = document.getElementById('organizationField');
-  var organizationInput = document.getElementById('fOrganization');
-  var roleInputs = document.querySelectorAll('input[name="applicantRole"]');
-  function updateRoleFields(){
-    var role = document.querySelector('input[name="applicantRole"]:checked').value;
-    var isStudent = role === 'student';
-    studentUniversityField.hidden = !isStudent;
-    studentSpecialtyField.hidden = !isStudent;
-    organizationField.hidden = isStudent;
-    universitySelect.required = isStudent && universitySelect.value !== 'Друг';
-    otherUniversityInput.required = isStudent && universitySelect.value === 'Друг';
-    document.getElementById('fSpec').required = isStudent;
-    organizationInput.required = !isStudent;
-  }
-  roleInputs.forEach(function(input){ input.addEventListener('change', updateRoleFields); });
-  if(universitySelect){
-    universitySelect.addEventListener('change', function(){
-      var isOther = universitySelect.value === 'Друг';
-      universitySelect.required = !isOther;
-      universitySelect.hidden = isOther;
-      otherUniversityInput.required = isOther;
-      otherUniversityInput.hidden = !isOther;
-      if(!isOther) otherUniversityInput.value = '';
-      updateRoleFields();
-    });
-  }
-  updateRoleFields();
   if(applyForm){
     applyForm.addEventListener('submit', function(e){
       e.preventDefault();
@@ -1137,20 +945,14 @@ fbq('track','PageView');
       var originalLabel = submitBtn.textContent;
       submitBtn.disabled = true;
       submitBtn.textContent = 'Изпращане…';
-      var applicantRole = document.querySelector('input[name="applicantRole"]:checked').value;
-      var isStudentApplicant = applicantRole === 'student';
-      var organization = organizationInput.value.trim();
 
       var payload = {
-        role: applicantRole,
         firstName: document.getElementById('fName').value.trim(),
         lastName: document.getElementById('fLast').value.trim(),
-        organization: organization,
-        university: isStudentApplicant ? (universitySelect.value === 'Друг' ? otherUniversityInput.value.trim() : universitySelect.value) : organization,
-        specialty: isStudentApplicant ? document.getElementById('fSpec').value.trim() : (applicantRole === 'company' ? 'Представител на компания' : 'Представител на университет'),
+        university: document.getElementById('fUni').value.trim(),
+        specialty: document.getElementById('fSpec').value.trim(),
         phone: document.getElementById('fPhone').value.trim(),
-        email: document.getElementById('fEmail').value.trim(),
-        gdprConsent: document.getElementById('fGdpr').checked
+        email: document.getElementById('fEmail').value.trim()
       };
 
       fetch(SITE_CONFIG.apiBaseUrl + '/api/apply', {
