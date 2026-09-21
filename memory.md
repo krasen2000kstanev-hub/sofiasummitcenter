@@ -1,6 +1,14 @@
 # Sofia Summit Center — памет на проекта
 
-Актуализирано: 8 септември 2026 г.
+Актуализирано: 21 септември 2026 г.
+
+## HR:Rush Google login и mission workflow — 21 септември 2026 г.
+
+- Добавен е auth-first flow в `events/hr-rushforpractice/misii/`: Google вход през AWS Cognito Hosted UI с Authorization Code + PKCE, студентски team-code join, профил на екипа и изход от профила.
+- Добавен е HR:Rush backend в `backend/src/hrr-auth.js`, `backend/src/hrr.js` и migration `backend/migrations/0011_hrr_identity_and_missions.sql` за студенти, ментори, отбори, мисии, доказателства, одобрения и известия.
+- Менторите се разрешават през `hrr_mentor_allowlist`; техният панел показва изпълненията на екипите и позволява approve/reject. Cognito и production D1 migration още трябва да се конфигурират преди live включване.
+- Backend-ът вече има и студентски `GET /api/hrr/notifications` и `GET /api/hrr/history`, така че известията и одобрените точки могат да се зареждат от D1 вместо от presentation data.
+- Публичните Cognito стойности са оставени в `events/hr-rushforpractice/misii/auth-config.js`, а Worker настройките са placeholders в `backend/wrangler.toml`; няма добавени secrets в Git.
 
 ## HR:Rush for Practice Mission Control — 21 септември 2026 г.
 

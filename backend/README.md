@@ -21,6 +21,31 @@
 - `GET /api/admin/orders` — Basic Auth
 - `GET /api/admin/export.csv` — Basic Auth
 
+## HR:Rush identity and missions
+
+The HR:Rush dashboard uses a Cognito app client with Google as an external identity provider. Create a public app client with Authorization Code + PKCE, then set the public values in `events/hr-rushforpractice/misii/auth-config.js` and the Worker values `HRR_COGNITO_ISSUER`, `HRR_COGNITO_CLIENT_ID` and `HRR_COGNITO_DOMAIN` in the deployment environment. The redirect URI is the missions page URL.
+
+Apply `migrations/0011_hrr_identity_and_missions.sql` before enabling the HR:Rush API. Add the first mentor/admin email directly to `hrr_mentor_allowlist`, create teams with SHA-256 join-code hashes, and create or import missions after the first mentor login. The HR:Rush API routes are under `/api/hrr/`; students can join teams, submit evidence, read their notifications and points history, while mentors can review every submission for their missions.
+
+HR:Rush routes: `GET /me`, `GET /team`, `GET /missions`, `POST /teams/join`, `POST /missions/:id/submissions`, `GET /notifications`, `GET /history`, `GET /mentor/submissions`, `POST /mentor/submissions/:id/review`, `GET /mentor/notifications`, and `POST /mentor/missions`.
+
+Deployment order:
+
+```powershell
+npx wrangler d1 execute sofiasummit-events --remote --file=migrations/0011_hrr_identity_and_missions.sql --config=wrangler.toml
+npx wrangler deploy --config=wrangler.toml
+```
+
+Before the first login, add at least one mentor directly in D1 (the first admin cannot be created through the API without an existing admin):
+
+```sql
+INSERT INTO hrr_mentor_allowlist (email, role, active, created_at)
+VALUES ('mentor@example.com', 'mentor', 1, datetime('now'))
+ON CONFLICT(email) DO UPDATE SET role='mentor', active=1;
+```
+
+Do not put Cognito client secrets in Git. This flow uses a public app client with PKCE; the Worker only needs the issuer, client ID and hosted domain variables.
+
 Worker-ът не приема и не съхранява картови данни. Формата създава временна поръчка за 30 минути, а потвърденият DSK статус я превръща в платена регистрация и изпраща отделен PDF билет на всеки участник. PDF-ът използва вградения `assets/arial.ttf` за коректна кирилица и следва одобрения Canva-inspired визуален стил, без QR код. Автоматичното изпращане е идемпотентно; повторно изпращане се извършва само чрез изрично действие в админ панела.
 
 ## Безопасно тестване

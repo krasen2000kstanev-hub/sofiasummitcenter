@@ -2,6 +2,7 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import arialFont from '../assets/arial.ttf';
+import { handleHrr } from './hrr.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
@@ -303,6 +304,8 @@ export default {
       if (request.method === 'OPTIONS') return new Response(null, { headers });
       const url = new URL(request.url);
       try {
+      const hrrResponse = await handleHrr(request, env, url);
+      if (hrrResponse) return new Response(hrrResponse.body, { status: hrrResponse.status, headers: { ...Object.fromEntries(hrrResponse.headers), ...headers } });
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
       if (request.method === 'GET' && url.pathname.startsWith('/api/events/')) {
         const slug = decodeURIComponent(url.pathname.split('/').pop());
