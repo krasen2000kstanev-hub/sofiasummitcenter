@@ -69,7 +69,7 @@ a:hover{color:#0a94a3;}a:focus-visible{outline:2px solid var(--accent);outline-o
 
 ### Ambient Background
 ```css
-.ambient-bokeh{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9;}
+.ambient-bokeh{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.62;}
 ```
 
 ## 5. Layout Principles
@@ -98,7 +98,7 @@ a:hover{color:#0a94a3;}a:focus-visible{outline:2px solid var(--accent);outline-o
 
 **Dependencies:** none; use Canvas 2D.
 
-The background renders a full-viewport color wash plus a small number of soft moving circles, pauses when the document is hidden, and falls back to a static gradient on mobile.
+The background renders only soft moving color circles behind the page content, pauses when the document is hidden, and remains unobtrusive instead of tinting the entire screen.
 
 ```css
 @keyframes ambientFade{from{opacity:0}to{opacity:1}}
@@ -131,7 +131,7 @@ No scroll-linked background work, cursor tracking, pinning or scroll hijacking.
 
 | Breakpoint | Behavior |
 |------------|----------|
-| Desktop >900px | 8–10 slow lights, opacity .9 |
+| Desktop >900px | 8–10 slow lights, opacity .62 |
 | Tablet 641–900px | 5–6 lights, reduced opacity |
 | Mobile <640px | static gradient or disabled canvas |
 
