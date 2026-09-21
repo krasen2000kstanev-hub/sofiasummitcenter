@@ -1389,7 +1389,7 @@ fbq('track','PageView');
       if(counter) counter.textContent = String(active + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
     }
     function move(step){ active = (active + step + cards.length) % cards.length; render(); }
-    function restart(){ clearInterval(timer); timer = setInterval(function(){ move(1); }, 4200); }
+    function restart(){ clearInterval(timer); timer = setInterval(function(){ move(1); }, 2200); }
     prev.addEventListener('click', function(){ move(-1); restart(); });
     next.addEventListener('click', function(){ move(1); restart(); });
     render();
