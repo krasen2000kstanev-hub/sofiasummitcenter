@@ -300,9 +300,9 @@ function ticketPage(order, attendee, event) {
 export default {
   async fetch(request, env, ctx) {
     const headers = cors(request);
-    if (request.method === 'OPTIONS') return new Response(null, { headers });
-    const url = new URL(request.url);
-    try {
+      if (request.method === 'OPTIONS') return new Response(null, { headers });
+      const url = new URL(request.url);
+      try {
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
       if (request.method === 'GET' && url.pathname.startsWith('/api/events/')) {
         const slug = decodeURIComponent(url.pathname.split('/').pop());
