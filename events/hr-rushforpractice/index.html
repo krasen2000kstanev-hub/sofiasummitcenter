@@ -324,6 +324,8 @@
   .role-option:has(input:checked){border-color:var(--cyan);background:rgba(18,201,219,.08);box-shadow:0 0 0 2px rgba(18,201,219,.12);}
   @media(max-width:700px){.role-picker{grid-template-columns:1fr;}}
   .form-actions{margin-top:28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .form-section-label{grid-column:1/-1;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--navy-950);text-transform:uppercase;letter-spacing:.08em;padding-top:8px;border-top:1px solid var(--mist-100);}
+  .form-section-label:first-of-type{border-top:0;padding-top:0;}
   .form-note{font-size:12px;color:var(--navy-400);max-width:280px;}
   .form-success{display:none;text-align:center;padding:30px 20px;}
   .form-success.show{display:block;}
@@ -838,13 +840,21 @@ fbq('track','PageView');
             <label class="role-option"><input type="radio" name="applicantRole" value="company" required> Представлявам компания</label>
             <label class="role-option"><input type="radio" name="applicantRole" value="university" required> Представлявам университет</label>
           </div>
+          <div class="form-section-label student-team-field">Студент 1</div>
           <div class="form-field"><label for="fName">Име</label><input id="fName" name="firstName" type="text" placeholder="Иван" required></div>
           <div class="form-field"><label for="fLast">Фамилия</label><input id="fLast" name="lastName" type="text" placeholder="Иванов" required></div>
           <div class="form-field" id="studentUniversityField"><label for="fUni">Университет</label><select id="fUni" name="university" required><option value="" selected disabled>Избери университет</option><option value="Софийски университет „Св. Климент Охридски“">Софийски университет „Св. Климент Охридски“</option><option value="Университет за национално и световно стопанство (УНСС)">Университет за национално и световно стопанство (УНСС)</option><option value="Нов български университет">Нов български университет</option><option value="УЗФ">УЗФ</option><option value="Друг">Друг</option></select><input id="fUniOther" name="otherUniversity" type="text" placeholder="Напиши университет" hidden></div>
           <div class="form-field" id="studentSpecialtyField"><label for="fSpec">Специалност</label><input id="fSpec" name="specialty" type="text" placeholder="Маркетинг" required></div>
+          <div class="form-section-label student-team-field">Студент 2</div>
+          <div class="form-field student-team-field"><label for="fName2">Име</label><input id="fName2" name="secondFirstName" type="text" placeholder="Мария"></div>
+          <div class="form-field student-team-field"><label for="fLast2">Фамилия</label><input id="fLast2" name="secondLastName" type="text" placeholder="Петрова"></div>
+          <div class="form-field student-team-field"><label for="fUni2">Университет</label><select id="fUni2" name="secondUniversity"><option value="" selected disabled>Избери университет</option><option value="Софийски университет „Св. Климент Охридски“">Софийски университет „Св. Климент Охридски“</option><option value="Университет за национално и световно стопанство (УНСС)">Университет за национално и световно стопанство (УНСС)</option><option value="Нов български университет">Нов български университет</option><option value="УЗФ">УЗФ</option><option value="Друг">Друг</option></select><input id="fUniOther2" name="secondOtherUniversity" type="text" placeholder="Напиши университет" hidden></div>
+          <div class="form-field student-team-field"><label for="fSpec2">Специалност</label><input id="fSpec2" name="secondSpecialty" type="text" placeholder="Човешки ресурси"></div>
           <div class="form-field" id="organizationField" hidden><label for="fOrganization">Име на компанията или университета</label><input id="fOrganization" name="organization" type="text" placeholder="Напиши име на организацията"></div>
           <div class="form-field"><label for="fPhone">Телефон</label><input id="fPhone" name="phone" type="tel" placeholder="+359 88 888 8888" required></div>
           <div class="form-field"><label for="fEmail">Имейл</label><input id="fEmail" name="email" type="email" placeholder="ivan@example.com" required></div>
+          <div class="form-field student-team-field"><label for="fPhone2">Телефон</label><input id="fPhone2" name="secondPhone" type="tel" placeholder="+359 88 888 8888"></div>
+          <div class="form-field student-team-field"><label for="fEmail2">Имейл</label><input id="fEmail2" name="secondEmail" type="email" placeholder="maria@example.com"></div>
         </div>
         <div class="gdpr-consent"><input id="fGdpr" name="gdprConsent" type="checkbox" required><label for="fGdpr">Съгласявам се личните ми данни да бъдат събирани и обработвани за целите на кандидатстването и връзката с мен относно инициативата. Запознах се с <a href="../../privacy.html" target="_blank" rel="noopener">Политиката за поверителност</a>.</label></div>
         <div class="form-actions">
@@ -1167,6 +1177,9 @@ fbq('track','PageView');
   var otherUniversityInput = document.getElementById('fUniOther');
   var studentUniversityField = document.getElementById('studentUniversityField');
   var studentSpecialtyField = document.getElementById('studentSpecialtyField');
+  var studentTeamFields = document.querySelectorAll('.student-team-field');
+  var secondUniversitySelect = document.getElementById('fUni2');
+  var secondOtherUniversityInput = document.getElementById('fUniOther2');
   var organizationField = document.getElementById('organizationField');
   var organizationInput = document.getElementById('fOrganization');
   var roleInputs = document.querySelectorAll('input[name="applicantRole"]');
@@ -1175,10 +1188,18 @@ fbq('track','PageView');
     var isStudent = role === 'student';
     studentUniversityField.hidden = !isStudent;
     studentSpecialtyField.hidden = !isStudent;
+    studentTeamFields.forEach(function(field){ field.hidden = !isStudent; });
     organizationField.hidden = isStudent;
     universitySelect.required = isStudent && universitySelect.value !== 'Друг';
     otherUniversityInput.required = isStudent && universitySelect.value === 'Друг';
     document.getElementById('fSpec').required = isStudent;
+    document.getElementById('fName2').required = isStudent;
+    document.getElementById('fLast2').required = isStudent;
+    secondUniversitySelect.required = isStudent && secondUniversitySelect.value !== 'Друг';
+    secondOtherUniversityInput.required = isStudent && secondUniversitySelect.value === 'Друг';
+    document.getElementById('fSpec2').required = isStudent;
+    document.getElementById('fPhone2').required = isStudent;
+    document.getElementById('fEmail2').required = isStudent;
     organizationInput.required = !isStudent;
   }
   roleInputs.forEach(function(input){ input.addEventListener('change', updateRoleFields); });
@@ -1190,6 +1211,16 @@ fbq('track','PageView');
       otherUniversityInput.required = isOther;
       otherUniversityInput.hidden = !isOther;
       if(!isOther) otherUniversityInput.value = '';
+      updateRoleFields();
+    });
+  }
+  if(secondUniversitySelect){
+    secondUniversitySelect.addEventListener('change', function(){
+      var isOther = secondUniversitySelect.value === 'Друг';
+      secondUniversitySelect.required = !isOther;
+      secondOtherUniversityInput.required = isOther;
+      secondOtherUniversityInput.hidden = !isOther;
+      if(!isOther) secondOtherUniversityInput.value = '';
       updateRoleFields();
     });
   }
@@ -1205,16 +1236,32 @@ fbq('track','PageView');
       var applicantRole = document.querySelector('input[name="applicantRole"]:checked').value;
       var isStudentApplicant = applicantRole === 'student';
       var organization = organizationInput.value.trim();
+      var firstUniversity = isStudentApplicant ? (universitySelect.value === 'Друг' ? otherUniversityInput.value.trim() : universitySelect.value) : organization;
+      var secondUniversity = isStudentApplicant ? (secondUniversitySelect.value === 'Друг' ? secondOtherUniversityInput.value.trim() : secondUniversitySelect.value) : '';
 
       var payload = {
         role: applicantRole,
         firstName: document.getElementById('fName').value.trim(),
         lastName: document.getElementById('fLast').value.trim(),
         organization: organization,
-        university: isStudentApplicant ? (universitySelect.value === 'Друг' ? otherUniversityInput.value.trim() : universitySelect.value) : organization,
+        university: firstUniversity,
         specialty: isStudentApplicant ? document.getElementById('fSpec').value.trim() : (applicantRole === 'company' ? 'Представител на компания' : 'Представител на университет'),
         phone: document.getElementById('fPhone').value.trim(),
         email: document.getElementById('fEmail').value.trim(),
+        teamSize: isStudentApplicant ? 2 : 0,
+        teamMembers: isStudentApplicant ? [{
+          fullName: document.getElementById('fName').value.trim() + ' ' + document.getElementById('fLast').value.trim(),
+          university: firstUniversity,
+          specialty: document.getElementById('fSpec').value.trim(),
+          phone: document.getElementById('fPhone').value.trim(),
+          email: document.getElementById('fEmail').value.trim()
+        }, {
+          fullName: document.getElementById('fName2').value.trim() + ' ' + document.getElementById('fLast2').value.trim(),
+          university: secondUniversity,
+          specialty: document.getElementById('fSpec2').value.trim(),
+          phone: document.getElementById('fPhone2').value.trim(),
+          email: document.getElementById('fEmail2').value.trim()
+        }] : [],
         gdprConsent: document.getElementById('fGdpr').checked
       };
 
