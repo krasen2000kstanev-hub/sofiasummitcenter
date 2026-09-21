@@ -300,6 +300,8 @@ function ticketPage(order, attendee, event) {
 export default {
   async fetch(request, env, ctx) {
     const headers = cors(request);
+  async fetch(request, env, ctx) {
+    const headers = cors(request);
       if (request.method === 'OPTIONS') return new Response(null, { headers });
       const url = new URL(request.url);
       try {
@@ -386,3 +388,4 @@ export default {
     }
   }
 };
+
