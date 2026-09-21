@@ -41,13 +41,14 @@ export async function hrrUser(request, env) {
   const email = String(claims.email || claims['cognito:username'] || claims.username || '').trim().toLowerCase();
   if (!email) throw new Error('Token has no email');
   const allowlist = await env.DB.prepare('SELECT role FROM hrr_mentor_allowlist WHERE email=? AND active=1').bind(email).first();
-  const existing = await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=?').bind(claims.sub || claims.username).first();
+  const subject = claims.sub || claims.username;
+  const existing = await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=? LIMIT 1').bind(subject, email).first();
   const role = allowlist?.role || 'student';
   const timestamp = new Date().toISOString();
   if (existing) {
-    await env.DB.prepare('UPDATE hrr_users SET email=?, display_name=?, role=?, updated_at=? WHERE cognito_sub=?').bind(email, claims.name || existing.display_name || email, role, timestamp, claims.sub || claims.username).run();
+    await env.DB.prepare('UPDATE hrr_users SET cognito_sub=?, email=?, display_name=?, role=?, updated_at=? WHERE id=?').bind(subject, email, claims.name || existing.display_name || email, role, timestamp, existing.id).run();
   } else {
-    await env.DB.prepare('INSERT INTO hrr_users (id,cognito_sub,email,display_name,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(`hrr_user_${crypto.randomUUID()}`, claims.sub || claims.username, email, claims.name || email, role, timestamp, timestamp).run();
+    await env.DB.prepare('INSERT INTO hrr_users (id,cognito_sub,email,display_name,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(`hrr_user_${crypto.randomUUID()}`, subject, email, claims.name || email, role, timestamp, timestamp).run();
   }
-  return await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=?').bind(claims.sub || claims.username).first();
+  return await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=?').bind(subject).first();
 }
