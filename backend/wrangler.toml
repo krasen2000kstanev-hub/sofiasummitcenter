@@ -10,6 +10,9 @@ fallthrough = true
 [vars]
 PUBLIC_SITE_URL = "https://sofiasummit.bg"
 EMAIL_FROM = "tickets@sofiasummit.bg"
+HRR_COGNITO_ISSUER = ""
+HRR_COGNITO_CLIENT_ID = ""
+HRR_COGNITO_DOMAIN = ""
 
 [[d1_databases]]
 binding = "DB"
