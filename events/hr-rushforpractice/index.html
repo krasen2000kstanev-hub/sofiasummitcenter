@@ -44,6 +44,8 @@
     font-family:var(--font-body);
     background:#ffffff;
     color:var(--navy-800);
+    position:relative;
+    isolation:isolate;
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
@@ -116,7 +118,8 @@
   @media (prefers-reduced-motion: reduce){.hero-stage{position:static;height:auto;overflow:visible;}}
 
   .hero-cube-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(155deg,#3a4066,#20233b 70%);}
-  .ambient-bokeh{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:.9;mix-blend-mode:normal;}
+  /* The animation is a true page background, never a foreground layer. */
+  .ambient-bokeh{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;opacity:.9;mix-blend-mode:normal;}
   .bg-slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;}
   .bg-slide.active{opacity:1;}
   .bg-slide.slide-0{background:radial-gradient(circle at 75% 30%,rgba(93,110,166,.55),transparent 60%),linear-gradient(155deg,#3a4066,#20233b 70%);}
