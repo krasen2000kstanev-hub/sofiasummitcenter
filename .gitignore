@@ -2,6 +2,8 @@
 *.zip
 *-installer-backup.php
 .upload-temp/
+.upload-temp2/
+.sync/
 .ftpquota
 .htaccess_*_bak
 *.tfplan
