@@ -432,13 +432,18 @@
   .story-person span{font-size:11px;color:var(--navy-500);font-weight:600;}
   .season-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px;}
   .season-photo{position:relative;overflow:hidden;border-radius:16px;background:var(--navy-900);aspect-ratio:4/3;}
-  .season-photo a,.season-photo img{display:block;width:100%;height:100%;}
+  .season-photo > a:first-child,.season-photo > a:first-child img{display:block;width:100%;height:100%;}
   .season-photo img{object-fit:cover;transition:transform .35s ease;}
   .season-photo:hover img{transform:scale(1.04);}
-  .season-photo figcaption{position:absolute;inset:auto 0 0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(24,28,48,.86));color:#fff;font-size:12px;font-weight:800;letter-spacing:.04em;pointer-events:none;}
-  .season-albums{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;}
-  @media(max-width:800px){.season-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}
-  @media(max-width:480px){.season-gallery{grid-template-columns:1fr;}.season-photo{aspect-ratio:16/10;}}
+  .season-photo figcaption{position:absolute;inset:auto 0 0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(24,28,48,.86));color:#fff;font-size:12px;font-weight:800;letter-spacing:.04em;}
+  .season-albums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px;}
+  .season-album-city{padding:18px;border:1px solid var(--navy-200);border-radius:14px;background:var(--white);}
+  .season-album-city h3{margin:0;color:var(--navy-950);font:800 16px var(--font-display);}
+  .season-album-links{display:grid;gap:8px;margin-top:14px;}
+  .season-album-links a{color:var(--navy-700);font-size:13px;font-weight:700;text-decoration:none;}
+  .season-album-links a:hover{text-decoration:underline;text-underline-offset:3px;}
+  @media(max-width:800px){.season-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.season-albums{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  @media(max-width:480px){.season-gallery,.season-albums{grid-template-columns:1fr;}.season-photo{aspect-ratio:16/10;}}
 
   /* ---------- FAQ ---------- */
   .faq-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;}
@@ -1051,30 +1056,31 @@ fbq('track','PageView');
 <section class="bg-tint" id="season-photos">
   <div class="container">
     <div class="eyebrow"><span class="rule" style="background:var(--coral)"></span><span style="color:var(--coral-deep)">Спомени от инициативата</span></div>
-    <h2 class="display section-head">Снимки от сезоните.</h2>
+    <h2 class="display section-head">Снимки от събитията.</h2>
     <p class="section-lede">Моменти от обученията, срещите с компаниите и финалите на HR:Rush for Practice.</p>
     <div class="season-gallery">
-      <figure class="season-photo"><a href="assets/seasons/season-7-nbu.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-nbu.jpg.webp" alt="Участници на събитие в Нов български университет, Сезон 7" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · НБУ</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-01.jpg.webp" alt="Участници и гости на събитие в Пловдив, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · Пловдив</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-01.jpg.webp" alt="Събитие на HR:Rush for Practice в София, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · София</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-02.jpg.webp" alt="Финалисти на Сезон 8 в София" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · София</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-nbu.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-nbu.jpg.webp" alt="Участници на събитие в Нов български университет" loading="lazy" decoding="async"></a><figcaption>НБУ</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-01.jpg.webp" alt="Участници и гости на събитие в Пловдив" loading="lazy" decoding="async"></a><figcaption>Пловдив</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-01.jpg.webp" alt="Събитие на HR:Rush for Practice в София" loading="lazy" decoding="async"></a><figcaption>София</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-02.jpg.webp" alt="Финалисти на събитие в София" loading="lazy" decoding="async"></a><figcaption>София</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/hr-rush-event-01.jpeg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/hr-rush-event-01.jpeg.webp" alt="Участници в HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice · събитие</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/hr-rush-event-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/hr-rush-event-02.jpg.webp" alt="Среща на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice · събитие</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/hr-rush-event-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/hr-rush-event-03.jpg.webp" alt="Среща на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice · събитие</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-7-event-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-01.jpg.webp" alt="Събитие на HR:Rush for Practice, 2023" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · 2023</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-7-event-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-02.jpg.webp" alt="Събитие на HR:Rush for Practice, 2023" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · 2023</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-7-event-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-03.jpg.webp" alt="Награждаване на участници в HR:Rush for Practice, 2023" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · 2023</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-7-event-04.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-04.jpg.webp" alt="Награждаване на участници в HR:Rush for Practice, 2023" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · 2023</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-7-event-05.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-05.jpg.webp" alt="Презентация на HR:Rush for Practice, 2023" loading="lazy" decoding="async"></a><figcaption>Сезон 7 · 2023</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-event-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-event-01.jpg.webp" alt="Награждаване на участници, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · 2024</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-event-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-event-02.jpg.webp" alt="Среща с партньорска компания, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · 2024</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-02.jpg.webp" alt="Награждаване на участници в Пловдив, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · Пловдив</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-03.jpg.webp" alt="Победители и отличени участници в София, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · София</figcaption></figure>
-      <figure class="season-photo"><a href="assets/seasons/season-8-varna-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-varna-01.jpg.webp" alt="Награждаване на участници във Варна, Сезон 8" loading="lazy" decoding="async"></a><figcaption>Сезон 8 · Варна</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-event-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-01.jpg.webp" alt="Събитие на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-event-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-02.jpg.webp" alt="Събитие на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-event-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-03.jpg.webp" alt="Награждаване на участници в HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-event-04.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-04.jpg.webp" alt="Награждаване на участници в HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-7-event-05.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-event-05.jpg.webp" alt="Презентация на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-event-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-event-01.jpg.webp" alt="Награждаване на участници в HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-event-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-event-02.jpg.webp" alt="Среща с партньорска компания на HR:Rush for Practice" loading="lazy" decoding="async"></a><figcaption>HR:Rush for Practice</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-02.jpg.webp" alt="Награждаване на участници в Пловдив" loading="lazy" decoding="async"></a><figcaption>Пловдив</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-sofia-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-03.jpg.webp" alt="Победители и отличени участници в София" loading="lazy" decoding="async"></a><figcaption>София</figcaption></figure>
+      <figure class="season-photo"><a href="assets/seasons/season-8-varna-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-varna-01.jpg.webp" alt="Награждаване на участници във Варна" loading="lazy" decoding="async"></a><figcaption>Варна</figcaption></figure>
     </div>
-    <div class="season-albums" aria-label="Пълни фотоалбуми от събитията">
-      <a class="btn btn-dark btn-sm" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener noreferrer">Разгледай албума от финала на Сезон 8 ↗</a>
-      <a class="btn btn-outline btn-sm" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener noreferrer">Разгледай албума от София ↗</a>
+    <div class="season-albums" aria-label="Още фотоалбуми от събитията">
+      <section class="season-album-city" aria-labelledby="season-albums-varna"><h3 id="season-albums-varna">Варна</h3><div class="season-album-links"><a href="https://krasenstanev.pixieset.com/hrrushforpracticevarna/" target="_blank" rel="noopener noreferrer">Откриващо събитие ↗</a><a href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8final/" target="_blank" rel="noopener noreferrer">Закриващо събитие ↗</a></div></section>
+      <section class="season-album-city" aria-labelledby="season-albums-plovdiv"><h3 id="season-albums-plovdiv">Пловдив</h3><div class="season-album-links"><a href="https://krasenstanev.pixieset.com/hrrushforpracticeplovdiv/" target="_blank" rel="noopener noreferrer">Откриващо събитие ↗</a><a href="https://krasenstanev.pixieset.com/hrrushforpracticeplovdivs8final/" target="_blank" rel="noopener noreferrer">Закриващо събитие ↗</a></div></section>
+      <section class="season-album-city" aria-labelledby="season-albums-sofia"><h3 id="season-albums-sofia">София</h3><div class="season-album-links"><a href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener noreferrer">Откриващо събитие ↗</a><a href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener noreferrer">Закриващо събитие ↗</a></div></section>
     </div>
   </div>
 </section>
@@ -1175,7 +1181,7 @@ fbq('track','PageView');
         <a href="#whom">За студенти</a>
         <a href="#companies">За компании</a>
         <a href="#universities">Университети</a>
-        <a href="#season-photos">Снимки от сезоните</a>
+        <a href="#season-photos">Снимки от събитията</a>
         <a href="#faq">FAQ</a>
       </div>
     </div>
