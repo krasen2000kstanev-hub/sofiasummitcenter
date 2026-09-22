@@ -10,9 +10,9 @@ fallthrough = true
 [vars]
 PUBLIC_SITE_URL = "https://sofiasummit.bg"
 EMAIL_FROM = "tickets@sofiasummit.bg"
-HRR_COGNITO_ISSUER = ""
-HRR_COGNITO_CLIENT_ID = ""
-HRR_COGNITO_DOMAIN = ""
+HRR_COGNITO_ISSUER = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_r8g1DavAk"
+HRR_COGNITO_CLIENT_ID = "6bvki55do8vt4vmp98nhnglhlo"
+HRR_COGNITO_DOMAIN = "https://us-east-1r8g1davak.auth.us-east-1.amazoncognito.com"
 
 [[d1_databases]]
 binding = "DB"
