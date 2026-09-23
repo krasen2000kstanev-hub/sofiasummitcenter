@@ -430,12 +430,28 @@
   .story-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 18%;border-radius:inherit;}
   .story-person strong{display:block;font-size:13px;color:var(--navy-950);}
   .story-person span{font-size:11px;color:var(--navy-500);font-weight:600;}
-  .season-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px;}
+  .photo-carousel{position:relative;margin-top:36px;}
+  .season-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
   .season-photo{position:relative;overflow:hidden;border-radius:16px;background:var(--navy-900);aspect-ratio:4/3;}
   .season-photo > a:first-child,.season-photo > a:first-child img{display:block;width:100%;height:100%;}
   .season-photo img{object-fit:cover;transition:transform .35s ease;}
   .season-photo:hover img{transform:scale(1.04);}
   .season-photo figcaption{position:absolute;inset:auto 0 0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(24,28,48,.86));color:#fff;font-size:12px;font-weight:800;letter-spacing:.04em;}
+  .season-gallery.is-coverflow{position:relative;display:block;height:clamp(340px,42vw,500px);overflow:hidden;perspective:1200px;}
+  .season-gallery.is-coverflow .season-photo{position:absolute;left:50%;top:50%;width:min(720px,70%);height:calc(100% - 36px);margin:0;aspect-ratio:auto;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.5);transition:transform .7s cubic-bezier(.22,.8,.25,1),opacity .5s ease;box-shadow:0 24px 56px rgba(24,28,48,.22);}
+  .season-gallery.is-coverflow .season-photo.photo--active{z-index:5;opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+  .season-gallery.is-coverflow .season-photo.photo--prev,.season-gallery.is-coverflow .season-photo.photo--next{z-index:3;opacity:.86;}
+  .season-gallery.is-coverflow .season-photo.photo--prev{transform:translate(calc(-50% - 35vw),-50%) perspective(1000px) rotateY(58deg) scale(.72);}
+  .season-gallery.is-coverflow .season-photo.photo--next{transform:translate(calc(-50% + 35vw),-50%) perspective(1000px) rotateY(-58deg) scale(.72);}
+  .season-gallery.is-coverflow .season-photo.photo--prev-2,.season-gallery.is-coverflow .season-photo.photo--next-2{z-index:2;opacity:.42;}
+  .season-gallery.is-coverflow .season-photo.photo--prev-2{transform:translate(calc(-50% - 68vw),-50%) perspective(1000px) rotateY(66deg) scale(.5);}
+  .season-gallery.is-coverflow .season-photo.photo--next-2{transform:translate(calc(-50% + 68vw),-50%) perspective(1000px) rotateY(-66deg) scale(.5);}
+  .photo-carousel-controls{display:none;}
+  .photo-carousel.is-ready .photo-carousel-controls{position:absolute;z-index:8;inset:auto 0 10px;display:flex;align-items:center;justify-content:center;gap:14px;}
+  .photo-carousel-controls button{width:44px;height:44px;border:1px solid var(--navy-200);border-radius:50%;background:var(--white);color:var(--navy-950);font-size:20px;cursor:pointer;box-shadow:0 10px 24px -18px rgba(24,28,48,.8);}
+  .photo-carousel-controls button:hover{border-color:var(--cyan);color:var(--cyan-deep);}
+  .photo-carousel-controls button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px;}
+  .photo-carousel-counter{min-width:58px;text-align:center;color:var(--navy-800);font-size:11px;font-weight:800;letter-spacing:.12em;}
   .season-albums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px;}
   .season-album-city{padding:18px;border:1px solid var(--navy-200);border-radius:14px;background:var(--white);}
   .season-album-city h3{margin:0;color:var(--navy-950);font:800 16px var(--font-display);}
@@ -443,7 +459,9 @@
   .season-album-links a{color:var(--navy-700);font-size:13px;font-weight:700;text-decoration:none;}
   .season-album-links a:hover{text-decoration:underline;text-underline-offset:3px;}
   @media(max-width:800px){.season-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.season-albums{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  @media(max-width:639px){.season-gallery.is-coverflow{height:340px;}.season-gallery.is-coverflow .season-photo{width:78%;height:calc(100% - 56px);}.season-gallery.is-coverflow .season-photo.photo--prev{transform:translate(calc(-50% - 42vw),-50%) perspective(850px) rotateY(58deg) scale(.72);}.season-gallery.is-coverflow .season-photo.photo--next{transform:translate(calc(-50% + 42vw),-50%) perspective(850px) rotateY(-58deg) scale(.72);}.season-gallery.is-coverflow .season-photo.photo--prev-2{transform:translate(calc(-50% - 78vw),-50%) perspective(850px) rotateY(66deg) scale(.5);}.season-gallery.is-coverflow .season-photo.photo--next-2{transform:translate(calc(-50% + 78vw),-50%) perspective(850px) rotateY(-66deg) scale(.5);}}
   @media(max-width:480px){.season-gallery,.season-albums{grid-template-columns:1fr;}.season-photo{aspect-ratio:16/10;}}
+  @media(prefers-reduced-motion:reduce){.season-gallery.is-coverflow .season-photo,.season-photo img{transition:none!important;}.season-gallery.is-coverflow .season-photo.photo--prev,.season-gallery.is-coverflow .season-photo.photo--next,.season-gallery.is-coverflow .season-photo.photo--prev-2,.season-gallery.is-coverflow .season-photo.photo--next-2{transform:translate(-50%,-50%) scale(.88);}}
 
   /* ---------- FAQ ---------- */
   .faq-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;}
@@ -1056,8 +1074,9 @@ fbq('track','PageView');
 <section class="bg-tint" id="season-photos">
   <div class="container">
     <div class="eyebrow"><span class="rule" style="background:var(--coral)"></span><span style="color:var(--coral-deep)">Спомени от инициативата</span></div>
-    <h2 class="display section-head">Снимки от събитията.</h2>
+    <h2 class="display section-head" id="season-photo-heading">Снимки от събитията.</h2>
     <p class="section-lede">Моменти от обученията, срещите с компаниите и финалите на HR:Rush for Practice.</p>
+    <div class="photo-carousel" data-photo-carousel role="region" aria-roledescription="карусел" aria-labelledby="season-photo-heading">
     <div class="season-gallery">
       <figure class="season-photo"><a href="assets/seasons/season-7-nbu.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-7-nbu.jpg.webp" alt="Участници на събитие в Нов български университет" loading="lazy" decoding="async"></a><figcaption>НБУ</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-01.jpg.webp" alt="Участници и гости на събитие в Пловдив" loading="lazy" decoding="async"></a><figcaption>Пловдив</figcaption></figure>
@@ -1076,6 +1095,12 @@ fbq('track','PageView');
       <figure class="season-photo"><a href="assets/seasons/season-8-plovdiv-02.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-plovdiv-02.jpg.webp" alt="Награждаване на участници в Пловдив" loading="lazy" decoding="async"></a><figcaption>Пловдив</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/season-8-sofia-03.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-sofia-03.jpg.webp" alt="Победители и отличени участници в София" loading="lazy" decoding="async"></a><figcaption>София</figcaption></figure>
       <figure class="season-photo"><a href="assets/seasons/season-8-varna-01.jpg.webp" target="_blank" rel="noopener noreferrer"><img src="assets/seasons/season-8-varna-01.jpg.webp" alt="Награждаване на участници във Варна" loading="lazy" decoding="async"></a><figcaption>Варна</figcaption></figure>
+    </div>
+    <div class="photo-carousel-controls" aria-label="Управление на снимките">
+      <button type="button" data-photo-prev aria-label="Предишна снимка">‹</button>
+      <span class="photo-carousel-counter" data-photo-counter aria-live="off"></span>
+      <button type="button" data-photo-next aria-label="Следваща снимка">›</button>
+    </div>
     </div>
     <div class="season-albums" aria-label="Още фотоалбуми от събитията">
       <section class="season-album-city" aria-labelledby="season-albums-varna"><h3 id="season-albums-varna">Варна</h3><div class="season-album-links"><a href="https://krasenstanev.pixieset.com/hrrushforpracticevarna/" target="_blank" rel="noopener noreferrer">Откриващо събитие · Сезон 8 ↗</a><a href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8final/" target="_blank" rel="noopener noreferrer">Закриващо събитие · Сезон 8 ↗</a></div></section>
@@ -1603,6 +1628,54 @@ fbq('track','PageView');
     next.addEventListener('click', function(){ move(1); restart(); });
     render();
     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) restart();
+  })();
+
+  // Initiative photos: lightweight auto-playing cover-flow carousel.
+  (function(){
+    var carousel = document.querySelector('[data-photo-carousel]');
+    if(!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var gallery = carousel.querySelector('.season-gallery');
+    var cards = Array.prototype.slice.call(gallery.querySelectorAll('.season-photo'));
+    var prev = carousel.querySelector('[data-photo-prev]');
+    var next = carousel.querySelector('[data-photo-next]');
+    var counter = carousel.querySelector('[data-photo-counter]');
+    if(cards.length < 2 || !prev || !next) return;
+    var active = 0;
+    var timer;
+
+    function render(){
+      var total = cards.length;
+      cards.forEach(function(card, i){
+        card.classList.remove('photo--active','photo--prev','photo--prev-2','photo--next','photo--next-2');
+        var offset = (i - active + total) % total;
+        var visible = offset === 0;
+        if(visible) card.classList.add('photo--active');
+        if(offset === 1) card.classList.add('photo--next');
+        if(offset === 2) card.classList.add('photo--next-2');
+        if(offset === total - 1) card.classList.add('photo--prev');
+        if(offset === total - 2) card.classList.add('photo--prev-2');
+        card.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        card.querySelector('a').tabIndex = visible ? 0 : -1;
+      });
+      counter.textContent = String(active + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+    }
+    function move(step){ active = (active + step + cards.length) % cards.length; render(); }
+    function stop(){ clearInterval(timer); }
+    function start(){
+      stop();
+      if(!document.hidden && !carousel.matches(':hover') && !carousel.contains(document.activeElement)) timer = setInterval(function(){ move(1); }, 1200);
+    }
+    prev.addEventListener('click', function(){ move(-1); start(); });
+    next.addEventListener('click', function(){ move(1); start(); });
+    carousel.addEventListener('mouseenter', stop);
+    carousel.addEventListener('mouseleave', start);
+    carousel.addEventListener('focusin', stop);
+    carousel.addEventListener('focusout', function(event){ if(!carousel.contains(event.relatedTarget)) start(); });
+    document.addEventListener('visibilitychange', start);
+    gallery.classList.add('is-coverflow');
+    carousel.classList.add('is-ready');
+    render();
+    start();
   })();
 </script>
 
