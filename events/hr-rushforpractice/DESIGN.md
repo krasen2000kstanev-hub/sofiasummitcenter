@@ -136,3 +136,10 @@ No scroll-linked background work, cursor tracking, pinning or scroll hijacking.
 | Mobile <640px | static gradient or disabled canvas |
 
 Touch targets stay at least 44px and the page must not gain horizontal overflow.
+
+### Student testimonial deck (local preview)
+- Present one full, readable testimonial at a time, with adjacent cards fanned behind it in HR:RUSH navy/cyan/coral/amber tones.
+- Advance automatically after the active quote's estimated reading time (200 words/minute plus a 4-second buffer; 14-second minimum); allow previous/next controls, side-card activation, and left/right arrow keys.
+- Pause while hovered, keyboard-focused, or the tab is hidden; restart a full reading interval afterward. Reduced-motion preference disables autoplay and card transitions.
+- Keep the card content and participant identity intact; inactive cards are removed from keyboard/screen-reader navigation.
+- On narrow screens reduce the fan and card padding; honor `prefers-reduced-motion` and preserve a normal card grid if JavaScript is unavailable.

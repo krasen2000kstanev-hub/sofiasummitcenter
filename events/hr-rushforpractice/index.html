@@ -432,6 +432,20 @@
   .story-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 18%;border-radius:inherit;}
   .story-person strong{display:block;font-size:13px;color:var(--navy-950);}
   .story-person span{font-size:11px;color:var(--navy-500);font-weight:600;}
+  .story-carousel{position:relative;margin:44px auto 0;max-width:900px;}
+  .story-carousel .story-stack{position:relative;perspective:1400px;min-height:260px;}
+  .story-carousel .story-stack .story-card{position:absolute;inset:0 auto auto 50%;width:min(760px,calc(100% - 120px));opacity:0;pointer-events:none;transform:translateX(-50%) scale(.88);transition:transform .55s cubic-bezier(.22,.8,.25,1),opacity .35s ease,box-shadow .35s ease;box-shadow:0 22px 54px rgba(24,28,48,.16);}
+  .story-carousel .story-card.story--active{z-index:5;opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1);}
+  .story-carousel .story-card.story--prev,.story-carousel .story-card.story--next{z-index:3;opacity:.72;pointer-events:auto;cursor:pointer;}
+  .story-carousel .story-card.story--prev{transform:translate(calc(-50% - 195px),16px) rotate(-7deg) scale(.88);}
+  .story-carousel .story-card.story--next{transform:translate(calc(-50% + 195px),16px) rotate(7deg) scale(.88);}
+  .story-carousel-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:24px;position:relative;z-index:6;}
+  .story-carousel-controls button{width:46px;height:46px;border:1px solid var(--mist-100);border-radius:50%;background:#fff;color:var(--navy-950);font-size:22px;cursor:pointer;box-shadow:0 10px 24px -18px rgba(24,28,48,.8);}
+  .story-carousel-controls button:hover{border-color:var(--cyan);color:var(--cyan-deep);}
+  .story-carousel-controls button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}
+  .story-carousel-counter{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--navy-500);min-width:68px;text-align:center;}
+  @media(max-width:639px){.story-carousel .story-stack .story-card{width:calc(100% - 42px);padding:20px;}.story-carousel .story-card.story--prev{transform:translate(calc(-50% - 76px),14px) rotate(-5deg) scale(.84);}.story-carousel .story-card.story--next{transform:translate(calc(-50% + 76px),14px) rotate(5deg) scale(.84);}.story-carousel .story-stack{min-height:300px;}}
+  @media(prefers-reduced-motion:reduce){.story-carousel .story-card{transition:none!important;}}
   .photo-carousel{position:relative;margin-top:36px;}
   .season-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
   .season-photo{position:relative;overflow:hidden;border-radius:16px;background:var(--navy-900);aspect-ratio:4/3;}
@@ -1067,7 +1081,8 @@ fbq('track','PageView');
     <div class="eyebrow"><span class="rule"></span><span>От участие до кариера</span></div>
     <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Истории на участници.</h2>
     <p class="section-lede">Участници, които превърнаха практическото предизвикателство в реален опит и успех.</p>
-    <div class="cards-grid cols-2 cols-3">
+    <div class="story-carousel" data-story-carousel role="region" aria-roledescription="карусел" aria-label="Истории на участници">
+    <div class="cards-grid cols-2 cols-3 story-stack" data-story-stack>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>„HR: Rush for Practice“ беше невероятно преживяване, което промени погледа ми върху бизнес процесите. Това е формат, който буквално те изкарва от зоната на комфорт, провокира те да бъдеш проактивен и да действаш решително. Взех си не само ценни уроци по HR, но и изградих страхотна мрежа от контакти с доказани професионалисти. Този опит ми доказа, че комбинацията от бърза реакция и адаптивност е ключът към всеки реален успех.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/hristo-demirov.jpg?v=20260922" alt=""></div><div><strong>Христо Демиров</strong><span>УЗФ · Победител от Сезон 7</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR: Rush for Practice ми помогна да развия практически HR умения, да приложа знанията си в реална среда и да погледна по-уверено на професионалното си развитие. Благодарна съм за новите контакти, подкрепата и ценния опит, който ми даде инициативата.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/petya-zlatanova.jpg" alt="Петя Златанова"></div><div><strong>Петя Златанова</strong><span>УНСС · Участничка · Сезон 7</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR: Rush for Practice ми даде възможност да надникна в света на HR и да се докосна до практическата страна на тази сфера. Програмата ми помогна да придобия повече увереност и спокойствие пред камера, което впоследствие ми беше полезно и в други ситуации. Дори след края ѝ ми се е налагало да заставам пред камера и да заснемам рекламни клипове за приятели, а вече подхождам към това много по-уверено и спокойно.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/ivaneta-vlaeva.jpg" alt="Иванета Влаева"></div><div><strong>Иванета Влаева</strong><span>Великотърновски университет · Участничка · Сезон 4</span></div></div></article>
@@ -1083,6 +1098,12 @@ fbq('track','PageView');
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>Много се радвам, че бях част от HR Rush for Practice 3! 💙 За мен това беше ценен опит, а фокусът е урокът, който най-силно ми остава – колко е важно да знаеш къде искаш да насочиш времето, ресурсите, енергията и усилията си. Тръгвам си с ценни контакти, опит в сферата на HR подбора и още повече благодарност за преживяването! 🚀</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/liya-yoveva.jpg" alt="Лия Йовева"></div><div><strong>Лия Йовева</strong><span>УНСС · Участничка · Сезон 3</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR: Rush for Practice успя да превърне знанията ми от университета в нещо реално, динамично и много по-различно от това, което си представях в началото. Вместо просто да наблюдавам как изглежда работата в HR, имах възможност сама да се сблъскам с реални задачи, предизвикателства и ситуации и да видя как решенията ми се отразяват на практика.<br><br>Програмата ми даде възможност да науча много нови неща, да работя по реални казуси и да видя отблизо различни страни на професията. Особено ценни за мен бяха срещите с различни професионалисти и възможността да получаваме насоки и обратна връзка от хора с реален опит.<br><br>Освен знанията и практическия опит, HR: Rush for Practice ми донесе много нови запознанства, интересни моменти и предизвикателства, които ме накараха да изляза от зоната си на комфорт. Радвам се, че имах възможността да бъда част от това преживяване и определено бих го препоръчала на студенти, които искат да се докоснат до реалната страна на HR и да научат неща, които трудно могат да бъдат усвоени само теоретично.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/yoana-avramova.jpg" alt="Йоана Аврамова"></div><div><strong>Йоана Аврамова</strong><span>НБУ · Участничка · Сезон 5</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR: Rush for Practice беше много повече от състезание – беше преживяване, което ми даде знания, увереност, ценни контакти и реален практически опит. Имах възможността да бъда част от два сезона, като вторият завърши по най-хубавия начин – с победа. Благодарна съм за всички предизвикателства, хора и уроци по пътя. Това е опит, който със сигурност ще остане важна част от професионалното ми развитие.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/eva-madzharova.jpg" alt="Ева Маджарова"></div><div><strong>Ева Маджарова</strong><span>УНСС · Победителка в Сезон 6</span></div></div></article>
+    </div>
+    <div class="story-carousel-controls" aria-label="Навигация на историите">
+      <button type="button" data-story-prev aria-label="Предишен отзив">‹</button>
+      <span class="story-carousel-counter" data-story-counter aria-live="polite"></span>
+      <button type="button" data-story-next aria-label="Следващ отзив">›</button>
+    </div>
     </div>
   </div>
 </section>
@@ -1657,6 +1678,66 @@ fbq('track','PageView');
     next.addEventListener('click', function(){ move(1); restart(); });
     render();
     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) restart();
+  })();
+
+  // Student stories: manually navigated fanned deck, adapted to HR:RUSH colors.
+  (function(){
+    var carousel = document.querySelector('[data-story-carousel]');
+    if(!carousel) return;
+    var stack = carousel.querySelector('[data-story-stack]');
+    var cards = Array.prototype.slice.call(stack.querySelectorAll('.story-card'));
+    var prev = carousel.querySelector('[data-story-prev]');
+    var next = carousel.querySelector('[data-story-next]');
+    var counter = carousel.querySelector('[data-story-counter]');
+    if(cards.length < 2 || !prev || !next) return;
+    var active = 0;
+    var timer;
+    var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function readingTime(card){
+      var quote=card.querySelector('blockquote');
+      var words=quote?quote.textContent.trim().split(/\s+/).filter(Boolean).length:0;
+      return Math.max(14000,Math.ceil(words/200*60000+4000));
+    }
+    function stop(){clearTimeout(timer);}
+    function start(){
+      stop();
+      if(reduceMotion||document.hidden||carousel.matches(':hover')||carousel.contains(document.activeElement)) return;
+      timer=setTimeout(function(){move(1);},readingTime(cards[active]));
+    }
+    function render(){
+      cards.forEach(function(card,i){
+        var offset=(i-active+cards.length)%cards.length;
+        card.classList.remove('story--active','story--prev','story--next');
+        if(offset===0) card.classList.add('story--active');
+        else if(offset===1) card.classList.add('story--next');
+        else if(offset===cards.length-1) card.classList.add('story--prev');
+        card.setAttribute('aria-hidden',offset===0?'false':'true');
+      });
+      counter.textContent=String(active+1).padStart(2,'0')+' / '+String(cards.length).padStart(2,'0');
+      requestAnimationFrame(function(){stack.style.height=Math.ceil(cards[active].getBoundingClientRect().height)+'px';});
+      start();
+    }
+    function move(step){active=(active+step+cards.length)%cards.length;render();}
+    prev.addEventListener('click',function(){move(-1);});
+    next.addEventListener('click',function(){move(1);});
+    cards.forEach(function(card){card.addEventListener('click',function(){
+      if(card.classList.contains('story--prev')) move(-1);
+      else if(card.classList.contains('story--next')) move(1);
+    });});
+    carousel.addEventListener('keydown',function(event){
+      if(event.key==='ArrowLeft'){event.preventDefault();move(-1);}
+      if(event.key==='ArrowRight'){event.preventDefault();move(1);}
+    });
+    carousel.addEventListener('mouseenter',stop);
+    carousel.addEventListener('mouseleave',start);
+    carousel.addEventListener('focusin',stop);
+    carousel.addEventListener('focusout',function(event){if(!carousel.contains(event.relatedTarget)) start();});
+    document.addEventListener('visibilitychange',start);
+    window.addEventListener('resize',render);
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(render);
+    cards.forEach(function(card){card.querySelectorAll('img').forEach(function(img){img.addEventListener('load',render,{once:true});});});
+    render();
+    carousel.classList.add('is-ready');
   })();
 
   // Initiative photos: lightweight auto-playing cover-flow carousel.
