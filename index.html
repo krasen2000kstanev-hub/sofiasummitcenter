@@ -1043,6 +1043,10 @@ fbq('track','PageView');
     var manualX = 0;
     var manualY = 0;
     var dragging = false;
+    var pointerDown = false;
+    var dragPointerId = null;
+    var dragStartX = 0;
+    var dragStartY = 0;
     var lastX = 0;
     var lastY = 0;
     function update(){
@@ -1075,14 +1079,22 @@ fbq('track','PageView');
       if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
     }, {passive:true});
     sphere.addEventListener('pointerdown', function(e){
-      dragging = true;
+      pointerDown = true;
+      dragPointerId = e.pointerId;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
       lastX = e.clientX;
       lastY = e.clientY;
-      sphere.classList.add('is-dragging');
-      sphere.setPointerCapture(e.pointerId);
     });
     sphere.addEventListener('pointermove', function(e){
-      if (!dragging) return;
+      if (!pointerDown || e.pointerId !== dragPointerId) return;
+      if (!dragging) {
+        var distance = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+        if (distance < 6) return;
+        dragging = true;
+        sphere.classList.add('is-dragging');
+        sphere.setPointerCapture(e.pointerId);
+      }
       manualX += (e.clientX - lastX) * .72;
       manualY -= (e.clientY - lastY) * .38;
       lastX = e.clientX;
@@ -1090,12 +1102,20 @@ fbq('track','PageView');
       update();
     });
     function stopDragging(e){
+      pointerDown = false;
       dragging = false;
       sphere.classList.remove('is-dragging');
       if (e && sphere.hasPointerCapture(e.pointerId)) sphere.releasePointerCapture(e.pointerId);
+      dragPointerId = null;
     }
     sphere.addEventListener('pointerup', stopDragging);
     sphere.addEventListener('pointercancel', stopDragging);
+    sphere.addEventListener('lostpointercapture', function(){
+      pointerDown = false;
+      dragging = false;
+      sphere.classList.remove('is-dragging');
+      dragPointerId = null;
+    });
     window.addEventListener('resize', update);
     update();
   }());
