@@ -114,7 +114,7 @@
   @media(max-width:899px){.hero-scroll-track{height:auto;}}
   @media (prefers-reduced-motion: reduce){.hero-scroll-track{height:auto;}}
   .hero-stage{position:sticky;top:0;height:100vh;overflow:hidden;}
-  @media(max-width:899px){.hero-stage{position:static;height:auto;overflow:visible;}}
+  @media(max-width:899px){.hero-stage{position:static;height:auto;overflow:visible;display:flex;flex-direction:column;}}
   @media (prefers-reduced-motion: reduce){.hero-stage{position:static;height:auto;overflow:visible;}}
 
   .hero-cube-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(155deg,#3a4066,#20233b 70%);}
@@ -132,10 +132,12 @@
 
   .hero-cube-viewport{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:flex-end;padding-right:7%;perspective:1400px;will-change:transform;}
   @media(max-width:1180px){.hero-cube-viewport{justify-content:center;padding-right:0;opacity:.85;}}
-  @media(max-width:899px){.hero-cube-viewport{display:none;}}
+  @media(max-width:899px){.hero-cube-viewport{position:relative;inset:auto;order:2;z-index:3;width:100%;height:clamp(220px,36vw,290px);flex:0 0 auto;justify-content:center;padding:0;margin:0 auto 28px;display:flex;opacity:1;perspective:1000px;will-change:auto;}}
   @media (prefers-reduced-motion: reduce){.hero-cube-viewport{display:none;}}
+  @media(max-width:899px) and (prefers-reduced-motion: reduce){.hero-cube-viewport{display:flex;}}
   .hero-cube-wrap{position:relative;--cube-size:clamp(230px, 30vw, 400px);width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;will-change:transform;}
   @media(max-width:1180px){.hero-cube-wrap{--cube-size:clamp(190px, 32vw, 320px);}}
+  @media(max-width:899px){.hero-cube-wrap{--cube-size:clamp(180px,32vw,250px);transform:rotateX(0deg) rotateY(0deg);will-change:auto;}}
 
   .cube-face{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,3.4vw,36px);border-radius:20px;background:radial-gradient(130% 150% at 12% -10%,rgba(255,255,255,.14),transparent 55%),linear-gradient(160deg,var(--navy-800),var(--navy-950));border:1px solid rgba(255,255,255,.2);backface-visibility:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 36px 90px -35px rgba(0,0,0,.7),0 0 70px -14px var(--face-glow,rgba(18,201,219,.5));}
   .cube-face.front{transform:translateZ(calc(var(--cube-size) / 2));--face-glow:rgba(18,201,219,.55);}
@@ -156,6 +158,7 @@
   .side-label{position:absolute;left:0;top:50%;transform:translateY(-50%) rotate(-90deg) translateX(-50%);transform-origin:left top;font-size:11px;font-weight:800;letter-spacing:.25em;color:var(--navy-300);display:none;z-index:3;}
   @media(min-width:1180px){.side-label{display:block;left:24px;}}
   .hero-inner{position:relative;z-index:4;padding:64px 0 96px;}
+  @media(max-width:899px){.hero-inner{order:1;padding:44px 0 20px;}}
   .hero-grid{display:grid;grid-template-columns:1fr;gap:0;max-width:640px;}
   .hero-badge span{font-size:12px;font-weight:800;letter-spacing:.18em;color:var(--cyan-soft);text-transform:uppercase;}
   .hero-badge{display:flex;align-items:center;gap:10px;margin-bottom:26px;}
@@ -1448,9 +1451,8 @@ fbq('track','PageView');
   // ---------- Hero "Highlights" cube: scroll-linked 3D rotation ----------
   // Lives inside the hero now, in place of the old static photo. Uses a tall
   // track + a sticky stage, deriving rotation purely from scroll position
-  // (no wheel-hijacking). On screens under 900px, or with reduced motion,
-  // CSS collapses the track back to a normal-height hero and hides the cube
-  // entirely — this code then simply finds no visible track to act on.
+  // (no wheel-hijacking). On screens under 900px, the cube stays in the
+  // normal hero flow and presents its front face without scroll-driven motion.
   (function(){
     var track = document.getElementById('cubeTrack');
     var wrap = document.getElementById('cubeWrap');
@@ -1481,10 +1483,17 @@ fbq('track','PageView');
     var viewport = document.querySelector('.hero-cube-viewport');
     var bgSlides = document.querySelectorAll('.bg-slide');
     var heroBgOverlay = document.getElementById('heroBgOverlay');
+    var mobileHero = window.matchMedia('(max-width: 899px)');
 
     function easeInOutCubic(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
     function update(){
+      if(mobileHero.matches){
+        wrap.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        if(heroInner){heroInner.style.opacity='';heroInner.style.transform='';heroInner.style.pointerEvents='';}
+        if(heroBgOverlay) heroBgOverlay.style.opacity = '';
+        return;
+      }
       var rect = track.getBoundingClientRect();
       var total = rect.height - window.innerHeight;
       var progress = total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 0;
