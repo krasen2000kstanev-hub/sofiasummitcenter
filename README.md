@@ -11,6 +11,7 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 - `assets/` — venue photos, logos and supporting media.
 - `events/` — standalone landing pages for individual events. The first event page is `events/nail-business-restart/index.html` for NAIL BUSINESS RE:START.
 - `events/hr-rushforpractice/misii/` — HR:Rush for Practice Mission Control dashboard with mission cards, filters, team summary, notifications and points history. It reads the 16 missions from `events/hr-rushforpractice/hrr-data.js`.
+- `events/hr-rushforpractice/` — public HR:Rush for Practice page, including participant stories with photos, mentor profiles and an HR feedback section. Current HR feedback section lists Kaufland, Ficosota and Sportal as upcoming contributors; approved quotes are still to be added.
 - `backend/` — Cloudflare Worker + D1 scaffold for event registration, ticket orders, payment webhooks and ticket emails.
 - `admin.html` — lightweight admin view for event operations.
 
