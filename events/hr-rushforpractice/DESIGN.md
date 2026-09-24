@@ -143,3 +143,8 @@ Touch targets stay at least 44px and the page must not gain horizontal overflow.
 - Pause while hovered, keyboard-focused, or the tab is hidden; restart a full reading interval afterward. Reduced-motion preference disables autoplay and card transitions.
 - Keep the card content and participant identity intact; inactive cards are removed from keyboard/screen-reader navigation.
 - On narrow screens reduce the fan and card padding; honor `prefers-reduced-motion` and preserve a normal card grid if JavaScript is unavailable.
+
+### Hero facts cube
+- On screens up to 899px, keep the cube visible beneath the hero copy as a static front-facing card; do not rotate it in response to scrolling.
+- Keep the cube centered, sized for the available viewport, and layered above the dark readability overlay while preserving the existing HR:RUSH palette.
+- On wider screens, retain the existing scroll-driven cube behavior. Respect reduced-motion preferences; the mobile cube remains static and visible.
