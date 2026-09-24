@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 17 септември 2026 г.
+Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 24 септември 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
