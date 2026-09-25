@@ -31,16 +31,16 @@ HR:Rush routes: `GET /me`, `GET /team`, `GET /missions`, `POST /teams/join`, `PO
 
 ## HR:Rush applications
 
-Apply-page submissions are stored in D1 by `POST /api/apply`. Apply migration `migrations/0013_hrr_applications.sql` before enabling the new endpoint. Each accepted application creates three durable outbox jobs: one row write to the private Google Sheet, an organizer notice, and a candidate confirmation. A five-minute Worker cron retries failed deliveries; sheet rows use the D1 application number as their fixed row so retries overwrite the same row rather than append duplicates.
+Apply-page submissions are stored in D1 by `POST /api/apply`. The production Worker is `sofiasummit-events-api` at `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`; the public form points to it. Each accepted application creates three durable outbox jobs: one row write to the private Google Sheet, an organizer notice, and a candidate confirmation. A five-minute Worker cron retries failed deliveries; sheet rows use the D1 application number as their fixed row so retries overwrite the same row rather than append duplicates.
 
-Set these Worker secrets/variables before changing the public form endpoint:
+Production is configured for season 9 and organizer notifications to `krasen2000.k.stanev@gmail.com`:
 
-- Secret `GOOGLE_SERVICE_ACCOUNT_JSON`: service-account JSON key. Share only the target spreadsheet with its `client_email`; Google Sheets file sharing uses the Editor role, scoped to this one file.
+- Secret `GOOGLE_SERVICE_ACCOUNT_JSON`: service-account JSON key. The production secret belongs to the `HR Rush Applications Writer` identity, which has Editor access only to the target spreadsheet.
 - Variable `HRR_APPLICATIONS_SHEET_ID`: ID of the private native Google Sheet with a tab named `Кандидатури` and the header row from the sheet template.
 - Secret `RESEND_API_KEY` and existing `EMAIL_FROM` for candidate and organizer emails.
 - Variable `HRR_APPLICATION_NOTIFICATION_EMAIL` for the organizer notice recipient and `HRR_APPLICATION_SEASON` for the currently open season.
 
-`GET /api/admin/hr-rush/applications?limit=50&offset=0` is protected by the existing admin Basic Auth secrets and includes delivery state. Apply the migration and configure the sheet credential before switching the apply form from the current HR:Rush Worker to this API. Do not test with real candidate data until the production migration, secrets, sheet access, and email sender have been verified.
+`GET /api/admin/hr-rush/applications?limit=50&offset=0` is protected by the existing admin Basic Auth secrets and includes delivery state. Production deployment completed on 25 September 2026. Do not test with real candidate data.
 
 Forward migration:
 
@@ -50,10 +50,10 @@ npx wrangler d1 execute sofiasummit-events --remote --file=migrations/0013_hrr_a
 
 Rollback is an application rollback: point the public form back to the existing HR:Rush Worker and leave the additive D1 tables and any collected rows intact. Do not drop the application tables as part of a rollback.
 
-Deployment order:
+Production deployment commands (completed 25 September 2026):
 
 ```powershell
-npx wrangler d1 execute sofiasummit-events --remote --file=migrations/0011_hrr_identity_and_missions.sql --config=wrangler.toml
+npx wrangler d1 migrations apply sofiasummit-events --remote --config=wrangler.toml
 npx wrangler deploy --config=wrangler.toml
 ```
 

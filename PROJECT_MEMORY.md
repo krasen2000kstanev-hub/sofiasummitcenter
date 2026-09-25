@@ -7,6 +7,16 @@
 - Секцията „Обратна връзка от HR-и“ показва Kaufland, Ficosota и Sportal като компании, от които предстои да бъдат добавени мнения. Не са публикувани непредоставени цитати.
 - Снимките за страницата са в `events/hr-rushforpractice/assets/participants/` и `events/hr-rushforpractice/assets/mentors/`.
 
+## HR:Rush кандидатури, известия и Google Sheet — production, 25 септември 2026 г.
+
+- Публичната форма вече изпраща към `POST /api/apply` на Worker `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`; кодът е deploy-нат в production версия `4ee0acd6-3b79-4aa7-8e51-d616eae5b91e`.
+- Production D1 migration ledger отчита, че няма оставащи миграции. Формата запазва кандидатурите в D1 и създава три устойчиви задачи за синхронизация: Google Sheet, известие до `krasen2000.k.stanev@gmail.com` без данни за кандидата и потвърждение до кандидата.
+- Sheet „HR:Rush — Кандидатури“ (tab „Кандидатури“) остава частен; service identity `hrr-applications-writer@hr-rush-for-practice.iam.gserviceaccount.com` има Editor само за този файл. Ключът е записан като криптиран Cloudflare secret `GOOGLE_SERVICE_ACCOUNT_JSON` и не се пази в репото.
+- Worker настройките включват сезон 9, ID на таблицата, имейл за известия и cron `*/5 * * * *` за повторни опити.
+- Проверки: локалните тестове 4/4 успешни; Wrangler dry-run успешен; production health 200; празна/невалидна кандидатура 400 без запис; admin списък без удостоверяване 401. Заглавният ред на Sheet съвпада с 13-те колони, които Worker попълва.
+- Не е изпратена тестова валидна кандидатура, затова реалното получаване на ред в Sheet и двата имейла не е end-to-end потвърдено. Не са създавани кандидатски тестови записи и не са изпращани фалшиви имейли.
+- Референция: `backend/README.md`; ключът не се commit-ва. При rollback върни формата към стария endpoint, без да изтриваш D1 таблиците или кандидатурите.
+
 ## Career Cafe copy update
 
 На 17 септември 2026 г. `events/career-cafe/index.html` е обновена с одобрения текст за стойностното предложение, програмата и билетите Espresso, Doppio и Lungo+. Видимите тирета в публичния текст са заменени с пунктуация или кратки изречения. Секцията „Кой ще ти помогне“ остава без допълнителни роли до потвърждение на участниците.
