@@ -7,7 +7,7 @@
 - Студентският вход остава `/events/hr-rushforpractice/misii/`; менторският е `/events/hr-rushforpractice/misii/mentor/`. И двата ползват Google, а проверената server-side роля избира отделния интерфейс.
 - Студентският интерфейс съдържа отбор, мисии, изпращане на доказателства, известия и точки. Менторският съдържа създадените за него мисии, известия и преглед на изпълненията. Администраторите виждат всички мисии в менторския портал.
 - Worker API защитава ролите независимо от скритите UI елементи: student-only team/history/submission/notification endpoints и mentor/admin-only review, create mission и mentor notifications. Покрито от `backend/test/hrr-authz.test.mjs`.
-- `npm test` минава; inline JavaScript-ът е синтактично проверен. Промените към момента са локални и не са публикувани.
+- `npm test` минава (5/5); inline JavaScript-ът е синтактично проверен. GitHub Pages и Worker са публикувани на 25.09.2026; live са потвърдени двата login екрана. Git commit `deaa07f`.
 
 ## HR:Rush кандидатури, известия и Google Sheet — 25 септември 2026 г.
 
