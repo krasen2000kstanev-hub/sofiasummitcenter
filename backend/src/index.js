@@ -330,6 +330,7 @@ export default {
       }
       if (url.pathname.startsWith('/api/admin/')) {
         const denied = requireAdmin(request, env); if (denied) return denied;
+        if (request.method === 'GET' && url.pathname === '/api/admin/auth/check') return json({ ok: true }, 200, { ...headers, 'cache-control': 'no-store' });
         if (request.method === 'GET' && url.pathname === '/api/admin/hr-rush/applications') {
           const limit = Math.max(1, Math.min(100, Number(url.searchParams.get('limit') || 50)));
           const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
