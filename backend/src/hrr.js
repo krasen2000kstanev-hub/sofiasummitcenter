@@ -45,7 +45,7 @@ async function joinTeam(request, env) {
 }
 
 async function team(request, env) {
-  const auth = await requireUser(request, env); if (auth.response) return auth.response;
+  const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
   const membership = await env.DB.prepare('SELECT t.* FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 LIMIT 1').bind(auth.user.id).first();
   if (!membership) return json({ team: null, members: [] });
   const members = await env.DB.prepare(`SELECT u.id,u.display_name,u.email,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points ELSE 0 END),0) points
@@ -100,8 +100,8 @@ async function review(request, env, submissionId) {
   return json({ ok: true, status });
 }
 
-async function notifications(request, env) {
-  const auth = await requireUser(request, env); if (auth.response) return auth.response;
+async function notifications(request, env, roles = ['student']) {
+  const auth = await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
   return json({ notifications: rows.results || [] });
 }
@@ -159,7 +159,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/review$/.test(url.pathname)) return review(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
-  if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);

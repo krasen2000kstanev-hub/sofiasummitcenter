@@ -27,7 +27,7 @@ The HR:Rush dashboard uses a Cognito app client with Google as an external ident
 
 Apply `migrations/0011_hrr_identity_and_missions.sql` before enabling the HR:Rush API. Add the first mentor/admin email directly to `hrr_mentor_allowlist`, create teams with SHA-256 join-code hashes, and create or import missions after the first mentor login. The HR:Rush API routes are under `/api/hrr/`; students can join teams, submit evidence, read their notifications and points history, while mentors can review every submission for their missions.
 
-HR:Rush routes: `GET /me`, `GET /team`, `GET /missions`, `POST /teams/join`, `POST /missions/:id/submissions`, `GET /notifications`, `GET /history`, `GET /mentor/submissions`, `POST /mentor/submissions/:id/review`, `GET /mentor/notifications`, and `POST /mentor/missions`.
+HR:Rush uses one Google authentication flow with separate student (`/events/hr-rushforpractice/misii/`) and mentor (`/events/hr-rushforpractice/misii/mentor/`) entry points. The UI routes by the server-verified role; the Worker independently enforces student versus mentor/admin permissions. Student-only routes include `GET /team`, `POST /teams/join`, `POST /missions/:id/submissions`, `GET /notifications`, and `GET /history`. Mentor/admin routes include `GET /mentor/submissions`, `POST /mentor/submissions/:id/review`, `GET /mentor/notifications`, and `POST /mentor/missions`. `GET /missions` returns student-active missions for students and the mentor's own missions (or all for admins) for staff.
 
 ## HR:Rush applications
 

@@ -10,7 +10,7 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 - `styles.css`, `styles-enhancements.css`, `design-overrides.css`, `script.js` — homepage styling and behavior.
 - `assets/` — venue photos, logos and supporting media.
 - `events/` — standalone landing pages for individual events. The first event page is `events/nail-business-restart/index.html` for NAIL BUSINESS RE:START.
-- `events/hr-rushforpractice/misii/` — HR:Rush for Practice Mission Control dashboard with mission cards, filters, team summary, notifications and points history. It reads the 16 missions from `events/hr-rushforpractice/hrr-data.js`.
+- `events/hr-rushforpractice/misii/` — student Mission Control with team, active missions, submissions, notifications and points history. Mentor/admin access uses the separate `/events/hr-rushforpractice/misii/mentor/` entry and its mission, notification and review panel. Google sign-in determines the role; the API enforces role boundaries.
 - `events/hr-rushforpractice/` — public HR:Rush for Practice page, including participant stories with photos, mentor profiles and an HR feedback section. Current HR feedback section lists Kaufland, Ficosota and Sportal as upcoming contributors; approved quotes are still to be added.
 - `backend/` — Cloudflare Worker + D1 scaffold for event registration, ticket orders, payment webhooks and ticket emails.
 - `admin.html` — lightweight admin view for event operations.
@@ -27,7 +27,7 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 
 There is no build step or package installation. Serve the repository with a local web server, or run `preview-server.ps1` and open `http://127.0.0.1:8765/`. A local server is recommended so relative asset paths behave like production.
 
-The HR:Rush missions dashboard is available at `http://127.0.0.1:8765/events/hr-rushforpractice/misii/`. Its visual layout is based on the approved dashboard reference. Personal progress, Team Alpha members and approval history are currently presentation data until profile and verification APIs are connected.
+The HR:Rush student dashboard is available at `http://127.0.0.1:8765/events/hr-rushforpractice/misii/`; mentor entry is at `/events/hr-rushforpractice/misii/mentor/`. Both use Google sign-in and route users to the role-appropriate interface.
 
 The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the main cards, buttons, event-format pills and selected gallery imagery. Hover states add a subtle edge highlight. The rotating gallery sphere keeps its own interaction model so the two effects do not conflict.
 
