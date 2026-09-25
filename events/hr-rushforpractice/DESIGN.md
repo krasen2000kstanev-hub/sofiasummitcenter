@@ -136,3 +136,15 @@ No scroll-linked background work, cursor tracking, pinning or scroll hijacking.
 | Mobile <640px | static gradient or disabled canvas |
 
 Touch targets stay at least 44px and the page must not gain horizontal overflow.
+
+### Student testimonial deck (local preview)
+- Present one full, readable testimonial at a time, with adjacent cards fanned behind it in HR:RUSH navy/cyan/coral/amber tones.
+- Advance automatically after the active quote's estimated reading time (200 words/minute plus a 4-second buffer; 14-second minimum); allow previous/next controls, side-card activation, and left/right arrow keys.
+- Pause while hovered, keyboard-focused, or the tab is hidden; restart a full reading interval afterward. Reduced-motion preference disables autoplay and card transitions.
+- Keep the card content and participant identity intact; inactive cards are removed from keyboard/screen-reader navigation.
+- On narrow screens reduce the fan and card padding; honor `prefers-reduced-motion` and preserve a normal card grid if JavaScript is unavailable.
+
+### Hero facts cube
+- On screens up to 899px, keep the cube visible beneath the hero copy as a static front-facing card; do not rotate it in response to scrolling.
+- Keep the cube centered, sized for the available viewport, and layered above the dark readability overlay while preserving the existing HR:RUSH palette.
+- On wider screens, retain the existing scroll-driven cube behavior. Respect reduced-motion preferences; the mobile cube remains static and visible.
