@@ -10,6 +10,8 @@ fallthrough = true
 [vars]
 PUBLIC_SITE_URL = "https://sofiasummit.bg"
 EMAIL_FROM = "tickets@sofiasummit.bg"
+HRR_APPLICATION_SEASON = "9"
+HRR_APPLICATION_NOTIFICATION_EMAIL = "krasen2000.k.stanev@gmail.com"
 HRR_COGNITO_ISSUER = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_r8g1DavAk"
 HRR_COGNITO_CLIENT_ID = "6bvki55do8vt4vmp98nhnglhlo"
 HRR_COGNITO_DOMAIN = "https://us-east-1r8g1davak.auth.us-east-1.amazoncognito.com"
@@ -18,3 +20,6 @@ HRR_COGNITO_DOMAIN = "https://us-east-1r8g1davak.auth.us-east-1.amazoncognito.co
 binding = "DB"
 database_name = "sofiasummit-events"
 database_id = "59171d68-7a1e-492b-9014-1213ab3ffe5d"
+
+[triggers]
+crons = ["*/5 * * * *"]
