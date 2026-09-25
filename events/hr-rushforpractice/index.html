@@ -132,8 +132,11 @@
 
   .hero-cube-viewport{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:flex-end;padding-right:7%;perspective:1400px;will-change:transform;}
   @media(max-width:1180px){.hero-cube-viewport{justify-content:center;padding-right:0;opacity:.85;}}
-  @media(max-width:899px){.hero-cube-viewport{position:relative;inset:auto;order:2;z-index:3;width:100%;height:clamp(220px,36vw,290px);flex:0 0 auto;justify-content:center;padding:0;margin:0 auto 28px;display:flex;opacity:1;perspective:1000px;will-change:auto;}}
-  @media(max-width:899px){.hero-cube-wrap{transform-style:flat;}.cube-face:not(.front){display:none;}.cube-face.front{transform:none;box-shadow:0 16px 36px -24px rgba(0,0,0,.7);}.cube-face .cf-num{filter:none;}.ambient-bokeh{display:none;}}
+  @media(max-width:899px){.hero-cube-viewport{position:relative;inset:auto;order:2;z-index:3;width:100%;height:clamp(270px,75vw,320px);flex:0 0 auto;justify-content:center;padding:0;margin:0 auto 28px;display:flex;opacity:1;perspective:900px;will-change:auto;}}
+  @media(max-width:899px){.hero-cube-wrap{transform-style:preserve-3d;transition:transform .48s cubic-bezier(.2,.7,.2,1);}.cube-face{box-shadow:0 14px 32px -22px rgba(0,0,0,.65);}.cube-face .cf-num{filter:none;}.ambient-bokeh{display:none;}}
+  .cube-mobile-next{display:none;}
+  @media(max-width:899px){.cube-mobile-next{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:9px;min-height:42px;padding:0 18px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(19,28,49,.92);color:var(--cyan);font:600 .88rem/1 var(--font-body);white-space:nowrap;cursor:pointer;touch-action:manipulation;}.cube-mobile-next span{font-size:1.1rem;line-height:1;}}
+  @media(max-width:899px) and (prefers-reduced-motion: reduce){.hero-cube-wrap{transition:none;}}
   @media (prefers-reduced-motion: reduce){.hero-cube-viewport{display:none;}}
   @media(max-width:899px) and (prefers-reduced-motion: reduce){.hero-cube-viewport{display:flex;}}
   .hero-cube-wrap{position:relative;--cube-size:clamp(230px, 30vw, 400px);width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;will-change:transform;}
@@ -701,6 +704,7 @@ fbq('track','PageView');
           <div class="cube-face left"><span class="cf-eyebrow">05 / 06</span><div class="cf-num" style="color:var(--cyan-deep)">250+</div><div class="cf-label">наети таланти</div><p class="cf-desc">Участници, получили стаж, работа или друга реална възможност.</p></div>
           <div class="cube-face bottom"><span class="cf-eyebrow">06 / 06</span><div class="cf-num" style="color:var(--coral-deep)">73+</div><div class="cf-label">компании партньори</div><p class="cf-desc">Работодатели, включени с реални позиции във всеки сезон.</p></div>
         </div>
+        <button class="cube-mobile-next" type="button" aria-label="Завърти кубчето към следващата страна" aria-controls="cubeWrap">Следващ факт <span aria-hidden="true">↻</span></button>
       </div>
 
       <div class="hero-bg" id="heroBgOverlay"></div>
@@ -1488,7 +1492,16 @@ fbq('track','PageView');
     var bgSlides = document.querySelectorAll('.bg-slide');
     var heroBgOverlay = document.getElementById('heroBgOverlay');
     var mobileHero = window.matchMedia('(max-width: 899px)');
-    if(mobileHero.matches) return;
+    if(mobileHero.matches){
+      var mobileNext = document.querySelector('.cube-mobile-next');
+      var mobileIndex = 1;
+      if(mobileNext) mobileNext.addEventListener('click',function(){
+        mobileIndex = (mobileIndex + 1) % stops.length;
+        var nextFace = stops[mobileIndex];
+        wrap.style.transform = 'rotateX(' + nextFace.rx + 'deg) rotateY(' + nextFace.ry + 'deg)';
+      });
+      return;
+    }
 
     function easeInOutCubic(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
