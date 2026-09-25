@@ -40,7 +40,7 @@ Production is configured for season 9 and organizer notifications to `krasen2000
 - Secret `RESEND_API_KEY` and existing `EMAIL_FROM` for candidate and organizer emails.
 - Variable `HRR_APPLICATION_NOTIFICATION_EMAIL` for the organizer notice recipient and `HRR_APPLICATION_SEASON` for the currently open season.
 
-`GET /api/admin/hr-rush/applications?limit=50&offset=0` is protected by the existing admin Basic Auth secrets and includes delivery state. Production deployment completed on 25 September 2026. Do not test with real candidate data.
+`GET /api/admin/hr-rush/applications?limit=50&offset=0` is protected by the existing admin Basic Auth secrets and includes delivery state. Production deployment completed on 25 September 2026. An end-to-end production check used synthetic student, company, and university applications; all three outbox delivery types were confirmed `sent`. The synthetic D1 records/outbox jobs and their Sheet rows were deleted immediately after verification. Do not test with real candidate data.
 
 Forward migration:
 

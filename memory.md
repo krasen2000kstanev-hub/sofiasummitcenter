@@ -4,12 +4,12 @@
 
 ## HR:Rush кандидатури, известия и Google Sheet — 25 септември 2026 г.
 
-- Локално е реализиран `POST /api/apply` с проверка на съгласие и полета, запис в D1 и три устойчиви outbox задачи: ред в Google Sheet, известие до `krasen2000.k.stanev@gmail.com` без лични данни и потвърждение към кандидата. Worker cron опитва повторно неуспешните доставки.
-- Добавени са migration `backend/migrations/0013_hrr_applications.sql`, защитен администраторски списък и локални тестове. Google Sheet „HR:Rush — Кандидатури“ е създаден в свързания Drive акаунт и остава частен; service account още няма права върху него.
-- Текущата форма продължава да сочи към стария HR:Rush Worker. Не е приложена production D1 миграция, не е деплойнат новият код и не е направена live тестова кандидатура.
-- Преди включване са нужни Worker secret `GOOGLE_SERVICE_ACCOUNT_JSON`, `HRR_APPLICATIONS_SHEET_ID`, проверени `RESEND_API_KEY`/`EMAIL_FROM` и достъп на service account Editor само до целевия Sheet.
-- `.github/workflows/deploy-events-api.yml` е ограничен локално до `main`, за да не стартира production D1 миграция при feature-branch push. Промяната ще важи в GitHub след качването ѝ. Другият Worker workflow също се задейства само от `main`.
-- Не е потвърдено дали production secrets са налични. GitHub достъпът и live endpoint проверката бяха блокирани от мрежовите ограничения на средата.
+- `POST /api/apply` е активен в production: валидира съгласие/полета, записва в D1 и създава три устойчиви outbox задачи за Google Sheet, уведомление до `krasen2000.k.stanev@gmail.com` без данни за кандидата и потвърждение към кандидата. Worker cron опитва повторно неуспешните доставки.
+- Migration `backend/migrations/0013_hrr_applications.sql` е приложена; защитеният администраторски списък и локалните тестове са налични. Google Sheet „HR:Rush — Кандидатури“ е частен, като специалният service account има Editor достъп само до него.
+- Production е конфигуриран с `GOOGLE_SERVICE_ACCOUNT_JSON`, `HRR_APPLICATIONS_SHEET_ID`, Resend и organizer notification адрес; публичната форма сочи към новия Worker.
+- На 25.09.2026 е направен end-to-end тест с по една фиктивна студентска, фирмена и университетска кандидатура. Всички върнаха HTTP 201, а записът в Sheet, уведомлението до организатора и потвърждението до кандидата бяха `sent`. След проверката бяха изтрити трите D1 кандидатури, деветте outbox задачи и стойностите в Sheet редове 2–4; проверено е, че няма останали тестови записи. Health endpoint отговаря `ok: true`.
+- `.github/workflows/deploy-events-api.yml` е ограничен до `main`, за да не стартира production D1 миграция при feature-branch push. Production deployment и GitHub Actions са потвърдени.
+- Production secrets са конфигурирани в Cloudflare; end-to-end live test и финалният health check са завършени успешно.
 - Скриптите за локален тест са в `backend/package.json` (`npm test`). Пази `.wrangler/`, `_hr-rush-current-preview/` и `_hr-rush-publish/` като локални работни данни; не ги включвай в commit.
 
 ## HR:Rush Google login и mission workflow — 21 септември 2026 г.
