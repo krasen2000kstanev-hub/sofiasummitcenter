@@ -84,3 +84,11 @@ tsvetelin@pleggi.com
 
 ## Inquiry API
 The request form posts name, email, phone, space, date, guests and message to POST /inquiries. Confirmed dates are read from GET /availability?space=.... Terraform provisions DynamoDB storage and SES notifications; set inquiry_notify_email in your tfvars before deployment. The form uses window.SOFIA_API_BASE (defaults to the same origin).
+
+## HR:Rush applications — implementation status
+
+The HR:Rush application API is implemented locally in `backend/` and covered by `npm test`: accepted applications are stored in D1 with durable delivery jobs for a private Google Sheet and Resend email notifications. The public form still targets the existing HR:Rush Worker; it has **not** been switched to the new endpoint. The production D1 migration and Worker deployment have **not** been run.
+
+Before enabling the new flow, configure the Google service-account JSON as a Worker secret, grant that service account Editor access to only the target private spreadsheet, set `HRR_APPLICATIONS_SHEET_ID`, verify `RESEND_API_KEY`/`EMAIL_FROM`, and check the D1 migration/deployment plan. The organizer notification is sent to `krasen2000.k.stanev@gmail.com` without candidate personal data. The spreadsheet is private; it is not shared with that inbox. See [`backend/README.md`](backend/README.md) for the exact setup and rollback steps.
+
+**Deployment caution:** the local `.github/workflows/deploy-events-api.yml` now limits automatic deployment to `main`; the restriction takes effect on GitHub only after this workflow change is pushed/merged. The application feature is not live yet.

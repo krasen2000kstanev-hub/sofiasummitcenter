@@ -3,6 +3,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import arialFont from '../assets/arial.ttf';
 import { handleHrr } from './hrr.js';
+import { handleHrrApplications, processHrrApplicationOutbox } from './hrr-applications.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
@@ -22,6 +23,7 @@ const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
 function adminAuth(request, env) {
+  if (!env.ADMIN_USER || !env.ADMIN_PASSWORD) return false;
   const header = request.headers.get('Authorization') || '';
   if (!header.startsWith('Basic ')) return false;
   try {
@@ -301,11 +303,11 @@ function ticketPage(order, attendee, event) {
 export default {
   async fetch(request, env, ctx) {
     const headers = cors(request);
-  async fetch(request, env, ctx) {
-    const headers = cors(request);
       if (request.method === 'OPTIONS') return new Response(null, { headers });
       const url = new URL(request.url);
       try {
+      const applicationResponse = await handleHrrApplications(request, env, ctx, url, headers);
+      if (applicationResponse) return applicationResponse;
       const hrrResponse = await handleHrr(request, env, url);
       if (hrrResponse) return new Response(hrrResponse.body, { status: hrrResponse.status, headers: { ...Object.fromEntries(hrrResponse.headers), ...headers } });
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
@@ -328,6 +330,17 @@ export default {
       }
       if (url.pathname.startsWith('/api/admin/')) {
         const denied = requireAdmin(request, env); if (denied) return denied;
+        if (request.method === 'GET' && url.pathname === '/api/admin/hr-rush/applications') {
+          const limit = Math.max(1, Math.min(100, Number(url.searchParams.get('limit') || 50)));
+          const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
+          if (!Number.isInteger(limit) || !Number.isInteger(offset)) return json({ error: 'Invalid pagination' }, 400, headers);
+          const rows = await env.DB.prepare(`SELECT a.*,
+            (SELECT status FROM hrr_application_outbox WHERE application_id=a.id AND kind='sheet') sheet_sync,
+            (SELECT status FROM hrr_application_outbox WHERE application_id=a.id AND kind='organizer_email') organizer_email_status,
+            (SELECT status FROM hrr_application_outbox WHERE application_id=a.id AND kind='applicant_email') applicant_email_status
+            FROM hrr_applications a ORDER BY a.created_at DESC LIMIT ? OFFSET ?`).bind(limit, offset).all();
+          return json(rows.results || [], 200, { ...headers, 'cache-control': 'no-store' });
+        }
         if (request.method === 'POST' && /^\/api\/admin\/tickets\/[^/]+\/check-in$/.test(url.pathname)) {
           const token = clean(url.pathname.split('/')[4], 100);
           const updated = await env.DB.prepare("UPDATE attendees SET checked_in_at=? WHERE ticket_token=? AND checked_in_at IS NULL AND order_id IN (SELECT id FROM orders WHERE status='paid')").bind(now(), token).run();
@@ -389,6 +402,9 @@ export default {
       console.error(error);
       return json({ error: 'Възникна техническа грешка. Моля, опитайте отново.' }, 500, headers);
     }
+  },
+  async scheduled(_controller, env, ctx) {
+    ctx.waitUntil(processHrrApplicationOutbox(env));
   }
 };
 

@@ -10,6 +10,8 @@ fallthrough = true
 [vars]
 PUBLIC_SITE_URL = "http://localhost:8787"
 EMAIL_FROM = "test@example.com"
+HRR_APPLICATION_SEASON = "9"
+HRR_APPLICATION_NOTIFICATION_EMAIL = "test@example.com"
 
 [[d1_databases]]
 binding = "DB"
