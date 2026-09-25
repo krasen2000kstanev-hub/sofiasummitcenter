@@ -133,6 +133,7 @@
   .hero-cube-viewport{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:flex-end;padding-right:7%;perspective:1400px;will-change:transform;}
   @media(max-width:1180px){.hero-cube-viewport{justify-content:center;padding-right:0;opacity:.85;}}
   @media(max-width:899px){.hero-cube-viewport{position:relative;inset:auto;order:2;z-index:3;width:100%;height:clamp(220px,36vw,290px);flex:0 0 auto;justify-content:center;padding:0;margin:0 auto 28px;display:flex;opacity:1;perspective:1000px;will-change:auto;}}
+  @media(max-width:899px){.hero-cube-wrap{transform-style:flat;}.cube-face:not(.front){display:none;}.cube-face.front{transform:none;box-shadow:0 16px 36px -24px rgba(0,0,0,.7);}.cube-face .cf-num{filter:none;}.ambient-bokeh{display:none;}}
   @media (prefers-reduced-motion: reduce){.hero-cube-viewport{display:none;}}
   @media(max-width:899px) and (prefers-reduced-motion: reduce){.hero-cube-viewport{display:flex;}}
   .hero-cube-wrap{position:relative;--cube-size:clamp(230px, 30vw, 400px);width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;will-change:transform;}
@@ -1487,6 +1488,7 @@ fbq('track','PageView');
     var bgSlides = document.querySelectorAll('.bg-slide');
     var heroBgOverlay = document.getElementById('heroBgOverlay');
     var mobileHero = window.matchMedia('(max-width: 899px)');
+    if(mobileHero.matches) return;
 
     function easeInOutCubic(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
@@ -1571,7 +1573,7 @@ fbq('track','PageView');
   // Lightweight bokeh atmosphere inspired by the reference, using the initiative palette.
   (function(){
     var canvas = document.getElementById('ambientBokeh');
-    if(!canvas) return;
+    if(!canvas || window.matchMedia('(max-width: 899px)').matches) return;
     var ctx = canvas.getContext('2d');
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var hidden = false;
