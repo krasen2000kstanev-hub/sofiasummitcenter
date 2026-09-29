@@ -8,5 +8,5 @@
 .guests h2{animation:guest-title-in .8s cubic-bezier(.22,1,.36,1) both}.guests h2 span{display:inline-block;animation:guest-title-in .8s .12s cubic-bezier(.22,1,.36,1) both}
 @media(max-width:760px){.guests h2{text-align:left}.guest-kicker{justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.guests h2,.guests h2 span{animation:none}}
-.guests h2,.guests h2 span{animation:none;opacity:0;transform:translateY(28px);clip-path:inset(0 0 100%)}.guests.is-visible h2{animation:guest-title-in .8s cubic-bezier(.22,1,.36,1) both}.guests.is-visible h2 span{animation:guest-title-in .8s .16s cubic-bezier(.22,1,.36,1) both}
+.guests h2,.guests h2 span{animation:none;opacity:0;transform:translateX(70px);clip-path:inset(0 0 100%)}.guests.is-visible h2{animation:guest-title-in .95s cubic-bezier(.22,1,.36,1) both}.guests.is-visible h2 span{animation:guest-title-in .95s .22s cubic-bezier(.22,1,.36,1) both;transform:translateX(-70px)}
 @media(prefers-reduced-motion:reduce){.guests h2,.guests h2 span,.guests.is-visible h2,.guests.is-visible h2 span{animation:none;opacity:1;transform:none;clip-path:none}}
