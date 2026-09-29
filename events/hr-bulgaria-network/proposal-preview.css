@@ -30,3 +30,13 @@ body{background:var(--cream);color:var(--ink)}
 .registration-form .button-dark:hover,.registration-form .button-dark:focus-visible{background:var(--coral)}
 .site-footer{background:var(--yellow)}
 @media(max-width:760px){.site-header{position:relative}.hero{padding-top:58px}.stats{margin:0 20px 80px;padding:20px;border-radius:16px}.stats strong{font-size:28px}.guest-track{grid-template-columns:none}.guest-card{padding:10px}.guest-photo{height:360px}.story{padding-top:78px}.moments{padding-top:76px}.register{padding-top:78px}}
+
+/* Keep the yellow only in the logo; use the existing coral accent everywhere else. */
+.brand-mark{color:var(--yellow)}
+.button-primary,.hero-sticker{background:var(--coral)}
+.hero-caption span,.button-dark span,.stats strong{color:var(--coral)}
+.moments .section-label,.story .section-label,.story-card small{color:var(--coral)}
+.site-footer{background:var(--coral)}
+.moments-link{border-color:var(--coral);color:var(--coral)}
+.guest-photo span{color:var(--coral)}
+.gallery-card.image-placeholder:nth-child(2){background-image:linear-gradient(135deg,rgba(27,29,58,.1),rgba(233,111,93,.4)),url('https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80')}
