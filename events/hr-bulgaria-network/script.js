@@ -24,9 +24,19 @@ const storyVideo = story?.querySelector('.story-video');
 const storyCards = [...document.querySelectorAll('[data-story-card]')];
 const hero = document.querySelector('.hero');
 const guestsSection = document.querySelector('.guests');
-if (guestsSection) new IntersectionObserver(([entry]) => {
-  if (entry.isIntersecting) entry.target.classList.add('is-visible');
-}, {threshold: 0.25}).observe(guestsSection);
+const revealGuests = () => {
+  if (!guestsSection) return;
+  const rect = guestsSection.getBoundingClientRect();
+  if (rect.top < innerHeight * .85 && rect.bottom > 0) guestsSection.classList.add('is-visible');
+};
+if (guestsSection) {
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) entry.target.classList.add('is-visible');
+  }, {threshold: 0.25}).observe(guestsSection);
+  revealGuests();
+  window.addEventListener('hashchange', revealGuests);
+  window.addEventListener('scroll', revealGuests, {passive:true});
+}
 const heroPhotos = [
   'assets/hero-01.jpg', 'assets/hero-11.jpg',
   'assets/hero-02.jpg', 'assets/hero-12.jpg',
