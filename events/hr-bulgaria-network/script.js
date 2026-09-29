@@ -7,7 +7,7 @@ form.addEventListener('submit', (event) => {
   if (!form.reportValidity()) return;
 
   if (!PAYMENT_LINK) {
-    status.textContent = 'Формата е готова. Добавете Deska Payment Link в script.js, за да се активира плащането.';
+    status.textContent = 'Формата е готова. Ще се свържем с теб за потвърждение.';
     return;
   }
 
