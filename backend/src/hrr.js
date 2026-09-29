@@ -61,8 +61,8 @@ async function missions(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const rows = auth.user.role === 'mentor' || auth.user.role === 'admin'
-    ? await env.DB.prepare(`SELECT m.*,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND (m.mentor_user_id=? OR ?='admin') GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id, auth.user.id, auth.user.role).all()
-    : await env.DB.prepare(`SELECT m.*,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
+    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND (m.mentor_user_id=? OR ?='admin') GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id, auth.user.id, auth.user.role).all()
+    : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
   return json({ missions: rows.results || [] });
 }
 
@@ -108,8 +108,11 @@ async function notifications(request, env, roles = ['student']) {
 
 async function history(request, env) {
   const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
-  const rows = await env.DB.prepare(`SELECT s.id,s.status,s.review_note,s.created_at,s.reviewed_at,m.title,m.points,m.scope
+  const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
+      m.title,m.description,m.category,m.points,m.scope,m.deadline,m.status mission_status,m.created_at published_at,
+      u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
+    LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
     WHERE s.student_user_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id).all();
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0);
   return json({ history: rows.results || [], approvedPoints: points });
