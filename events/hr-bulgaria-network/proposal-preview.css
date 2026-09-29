@@ -1,0 +1,32 @@
+:root{--ink:#172c35;--cream:#f8f6f0;--yellow:#f5c85b;--coral:#e96f5d;--muted:#708087;--line:#d8e1df;--aqua:#e8f6f7}
+body{background:var(--cream);color:var(--ink)}
+.site-header{position:sticky;top:0;z-index:10;background:rgba(248,246,240,.94);border-bottom:1px solid var(--line)}
+.site-header nav a:hover,.site-header nav a:focus-visible{color:var(--coral)}
+.hero{padding-top:92px}
+.button-primary{background:var(--yellow);box-shadow:5px 5px 0 var(--ink)}
+.button-primary:hover,.button-primary:focus-visible{background:var(--coral);color:#fff;transform:translate(-2px,-2px)}
+.stats{max-width:1176px;margin-bottom:112px;padding:25px 32px;background:var(--ink);border:0;border-radius:20px;color:#fff}
+.stats strong{color:var(--yellow);font-size:34px;white-space:nowrap}
+.stats span{color:#fff}
+.about-grid{gap:18px}
+.about-grid p{padding:20px 22px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.guests{background:var(--aqua)}
+.guest-track{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.guest-card{background:#fff;padding:12px;border-radius:24px;border:1px solid var(--line)}
+.guest-photo{height:420px;border-radius:18px}
+.guest-company{border-color:var(--coral);color:var(--muted)}
+.guest-topic{min-height:34px}
+.story{padding-top:116px}
+.moments{padding-top:112px}
+.moments-link{font-size:15px}
+.register{background:var(--aqua);padding-top:112px}
+.register .section-label{color:var(--coral)}
+.form-card{border:0;border-radius:16px;padding:22px 24px;box-shadow:0 1px 0 rgba(23,44,53,.08)}
+.form-card legend{display:block;background:transparent;padding:0;margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink)}
+.form-card .choice{min-height:28px}
+.form-card .choice+.choice{margin-top:5px}
+.form-card .other-input{margin-top:5px!important}
+.registration-form .button-dark{background:var(--ink);border-radius:999px}
+.registration-form .button-dark:hover,.registration-form .button-dark:focus-visible{background:var(--coral)}
+.site-footer{background:var(--yellow)}
+@media(max-width:760px){.site-header{position:relative}.hero{padding-top:58px}.stats{margin:0 20px 80px;padding:20px;border-radius:16px}.stats strong{font-size:28px}.guest-track{grid-template-columns:none}.guest-card{padding:10px}.guest-photo{height:360px}.story{padding-top:78px}.moments{padding-top:76px}.register{padding-top:78px}}
