@@ -9,6 +9,11 @@
 **Tone**: енергичен и достъпен — NOT хаотичен или неонов.  
 **Feel**: цветни светлинни петна зад сцена преди началото на състезание.
 
+### Student mission journey
+- Keep the approved winding-road checkpoint map as the visual anchor; selecting any checkpoint (including completed missions) reveals a persistent, readable detail panel.
+- Mission details may include description, deadline, mentor and contact, submission/review timestamps, elapsed time, and mentor feedback. Render unavailable values as “not announced” rather than inventing them; local previews must label all sample values as examples.
+- Upcoming mission releases belong in a separate schedule row; show an explicit empty state until an organizer publishes a date.
+
 **Interaction Tier**: L1 — постоянна атмосфера без scroll hijacking  
 **Dependencies**: CSS + Canvas 2D, без външни библиотеки
 
@@ -76,6 +81,7 @@ a:hover{color:#0a94a3;}a:focus-visible{outline:2px solid var(--accent);outline-o
 
 **Container:** max-width 1280px; padding 24px desktop / 18px mobile; narrow text width 720px.  
 **Spacing:** sections 72–112px; component gaps 12–24px; card padding 18–28px.
+For the student journey, use a two-column map/detail layout on wide screens and stack the detail card under the map on narrow screens; place the selectable mission list below both.
 
 ```css
 .container{max-width:1280px;margin:0 auto;padding:0 24px;}
@@ -107,6 +113,7 @@ The background renders only soft moving color circles behind the page content, p
 ```
 
 No scroll-linked background work, cursor tracking, pinning or scroll hijacking.
+Checkpoint selection is keyboard-operable and updates the mission detail panel without navigation; all statuses, including approved and returned missions, use the same detail pattern.
 
 ## 8. Do's and Don'ts
 
@@ -136,6 +143,7 @@ No scroll-linked background work, cursor tracking, pinning or scroll hijacking.
 | Mobile <640px | static gradient or disabled canvas |
 
 Touch targets stay at least 44px and the page must not gain horizontal overflow.
+On tablet/mobile, stack map, detail, and mission list in that order; keep schedule dates and missing-data states explicit.
 
 ### Student testimonial deck (local preview)
 - Present one full, readable testimonial at a time, with adjacent cards fanned behind it in HR:RUSH navy/cyan/coral/amber tones.
