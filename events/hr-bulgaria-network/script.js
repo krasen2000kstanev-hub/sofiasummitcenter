@@ -29,9 +29,8 @@ const heroPhotos = [
   'assets/hero-03.jpg', 'assets/hero-13.jpg',
   'assets/hero-04.jpg', 'assets/hero-14.jpg',
   'assets/hero-05.jpg', 'assets/hero-15.jpg',
-  'assets/hero-06.jpg', 'assets/hero-07.jpg',
-  'assets/hero-08.jpg', 'assets/hero-09.jpg',
-  'assets/hero-10.jpg'
+  'assets/hero-07.jpg', 'assets/hero-08.jpg',
+  'assets/hero-09.jpg', 'assets/hero-10.jpg'
 ];
 if (hero) {
   let heroIndex = 0;
