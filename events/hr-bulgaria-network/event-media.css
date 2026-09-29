@@ -1,4 +1,4 @@
-.event-hero-image{background-image:linear-gradient(135deg,rgba(27,29,58,.12),rgba(27,29,58,.48)),url('event-last-event-stage.jpg');background-size:cover;background-position:center}
+.event-hero-image{background-image:linear-gradient(135deg,rgba(27,29,58,.12),rgba(27,29,58,.48)),url('assets/events/last-event-stage.jpg');background-size:cover;background-position:center}
 .event-hero-image span{background:rgba(27,29,58,.8)}
 .event-photo img,.story-image{width:100%;height:100%;display:block;object-fit:cover}
 .event-photo img{transition:transform .5s ease}
