@@ -58,6 +58,8 @@ async function setup() {
   const env = { DB: makeDb(), HRR_APPLICATION_SEASON: '9' };
   const migration = await readFile(new URL('../migrations/0013_hrr_applications.sql', import.meta.url), 'utf8');
   env.DB.raw.exec(migration);
+  const positionMigration = await readFile(new URL('../migrations/0014_hrr_application_position.sql', import.meta.url), 'utf8');
+  env.DB.raw.exec(positionMigration);
   return env;
 }
 
@@ -88,6 +90,18 @@ test('stores valid submission and its three outbox jobs atomically using configu
   );
 });
 
+test('requires and stores a company representative position', async () => {
+  const env = await setup();
+  const companyApplication = { ...validApplication, role: 'company', organization: 'Пример ООД', university: '', specialty: 'Представител на компания', position: 'HR мениджър' };
+  const missingPosition = await submitHrrApplication(request({ ...companyApplication, position: '' }), env, null);
+  assert.equal(missingPosition.status, 400);
+  assert.equal(env.DB.raw.prepare('SELECT COUNT(*) n FROM hrr_applications').get().n, 0);
+
+  const response = await submitHrrApplication(request(companyApplication), env, null);
+  assert.equal(response.status, 201);
+  assert.equal(env.DB.raw.prepare('SELECT position FROM hrr_applications').get().position, 'HR мениджър');
+});
+
 test('does not leave an application behind if creating its outbox fails', async () => {
   const env = await setup();
   env.DB.raw.exec(`CREATE TRIGGER reject_outbox BEFORE INSERT ON hrr_application_outbox
@@ -109,7 +123,8 @@ test('retries the same fixed Sheet row and keeps organizer email free of candida
   env.HRR_APPLICATION_NOTIFICATION_EMAIL = 'krasen2000.k.stanev@gmail.com';
   env.RESEND_API_KEY = 'test-key';
   env.EMAIL_FROM = 'test@example.com';
-  await submitHrrApplication(request(validApplication), env, null);
+  const companyApplication = { ...validApplication, role: 'company', organization: 'Пример ООД', university: '', specialty: 'Представител на компания', position: 'HR мениджър' };
+  await submitHrrApplication(request(companyApplication), env, null);
 
   const sheetWrites = [];
   const emailPayloads = [];
@@ -142,6 +157,8 @@ test('retries the same fixed Sheet row and keeps organizer email free of candida
   assert.equal(sheetWrites[0].url, sheetWrites[1].url);
   assert.equal(sheetWrites[0].body.values[0][0], 1);
   assert.equal(sheetWrites[0].body.values[0][10], 'candidate@example.com');
+  assert.equal(decodeURIComponent(sheetWrites[0].url).includes(':N'), true);
+  assert.equal(sheetWrites[0].body.values[0][13], 'HR мениджър');
   const organizerEmail = emailPayloads.find((email) => email.to[0] === 'krasen2000.k.stanev@gmail.com');
   assert.ok(organizerEmail);
   assert.equal(JSON.stringify(organizerEmail).includes('candidate@example.com'), false);

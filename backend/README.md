@@ -42,10 +42,12 @@ Production is configured for season 9 and organizer notifications to `krasen2000
 
 `GET /api/admin/hr-rush/applications?limit=50&offset=0` is protected by the existing admin Basic Auth secrets and includes delivery state. Production deployment completed on 25 September 2026. An end-to-end production check used synthetic student, company, and university applications; all three outbox delivery types were confirmed `sent`. The synthetic D1 records/outbox jobs and their Sheet rows were deleted immediately after verification. Do not test with real candidate data.
 
+Company representatives provide a separate position field. It is stored in D1 and written to the new `Позиция` column (N) in the private Sheet.
+
 Forward migration:
 
 ```powershell
-npx wrangler d1 execute sofiasummit-events --remote --file=migrations/0013_hrr_applications.sql --config=wrangler.toml
+npx wrangler d1 execute sofiasummit-events --remote --file=migrations/0014_hrr_application_position.sql --config=wrangler.toml
 ```
 
 Rollback is an application rollback: point the public form back to the existing HR:Rush Worker and leave the additive D1 tables and any collected rows intact. Do not drop the application tables as part of a rollback.
