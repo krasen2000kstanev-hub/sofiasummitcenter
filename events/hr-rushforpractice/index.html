@@ -200,7 +200,7 @@
 
   /* ---------- Stats strip ---------- */
   .stats-strip{background:var(--mist-50);padding-top:56px;}
-  .stats-row{display:grid;grid-template-columns:1.1fr repeat(4,1fr);gap:20px;padding-bottom:44px;border-bottom:1px solid var(--mist-100);}
+  .stats-row{display:grid;grid-template-columns:1.1fr repeat(5,1fr);gap:20px;padding-bottom:44px;border-bottom:1px solid var(--mist-100);}
   @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:560px){.stats-row{grid-template-columns:1fr 1fr;}}
   .stats-row .lead-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-500);align-self:end;line-height:1.5;}
@@ -265,22 +265,6 @@
   .process-item h4{font-family:var(--font-body);font-size:18px;font-weight:800;color:var(--navy-950);}
   .process-item p{font-size:15px;line-height:1.5;color:var(--navy-500);max-width:340px;font-weight:500;}
   .process-item .arrow-circle{border-color:var(--mist-100);color:var(--navy-500);}
-
-  /* ---------- Impact stats (light) ---------- */
-  .impact-wrap{margin-top:56px;}
-  .impact-grid{display:grid;grid-template-columns:repeat(2,1fr);}
-  @media(min-width:800px){.impact-grid{grid-template-columns:repeat(4,1fr);}}
-  .impact-cell{padding:30px 28px 30px 0;border-top:1px solid var(--mist-100);}
-  .impact-cell:nth-child(odd){border-right:1px solid var(--mist-100);}
-  @media(min-width:800px){.impact-cell{border-right:1px solid var(--mist-100) !important;padding:0 28px;}
-    .impact-cell:first-child{padding-left:0;}
-    .impact-cell:last-child{border-right:none !important;}}
-  .impact-cell .num{font-size:2.6rem;font-weight:700;}
-  .impact-cell .lbl{margin-top:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-500);}
-  .impact-cell.c1 .num{color:var(--cyan-deep);}
-  .impact-cell.c2 .num{color:var(--coral-deep);}
-  .impact-cell.c3 .num{color:var(--amber-deep);}
-  .impact-cell.c4 .num{color:var(--steel);}
 
   /* ---------- Season timeline ---------- */
   .season-head{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:end;}
@@ -614,8 +598,6 @@ fbq('track','PageView');
     #how .process-item p{font-size:14px;line-height:1.55;color:var(--navy-200);max-width:none;}
     #how .process-item .arrow-circle{align-self:flex-end;margin-top:20px;border-color:rgba(255,255,255,.22);background:transparent;color:var(--cyan);}
     #how .process-item::after{content:'';display:block;width:34px;height:3px;margin-top:20px;background:var(--cyan);}
-    #how .impact-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}
-    #how .impact-cell{border-right:0!important;text-align:center;padding:20px 0!important;}
     @media(max-width:980px){
       #how .process-list{grid-template-columns:repeat(2,minmax(0,1fr));}
       #how .process-item:nth-child(2),#how .process-item:nth-child(4){transform:none;}
@@ -773,6 +755,7 @@ fbq('track','PageView');
       <div class="stat"><div class="num" data-count="8000" data-suffix="+">0</div><div class="lbl">кандидати</div></div>
       <div class="stat"><div class="num" data-count="900" data-suffix="+">0</div><div class="lbl">интервюта</div></div>
       <div class="stat"><div class="num" data-count="250" data-suffix="+">0</div><div class="lbl">наети</div></div>
+      <div class="stat"><div class="num" data-count="690" data-suffix="+">0</div><div class="lbl">реални позиции</div></div>
     </div>
     <div class="partner-strip">
       <span>Инициатива на <b>Pleggi</b></span>
@@ -855,19 +838,6 @@ fbq('track','PageView');
       <div class="process-item"><span class="idx">02</span><div class="body"><h4>Участваш</h4><p>Включваш се в практически задачи, срещи, обучения и активности.</p></div><span class="arrow-circle">→</span></div>
       <div class="process-item"><span class="idx">03</span><div class="body"><h4>Показваш какво можеш</h4><p>Компаниите виждат реалните ти умения, мотивация и начин на работа.</p></div><span class="arrow-circle">→</span></div>
       <div class="process-item"><span class="idx">04</span><div class="body"><h4>Получаваш възможност</h4><p>Най-добрите участници получават стаж, работа и награден фонд.</p></div><span class="arrow-circle">→</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="bg-light">
-  <div class="container">
-    <div class="eyebrow"><span class="rule"></span><span>Ефектът</span></div>
-    <h2 class="display section-head">Резултати, които се <span style="color:var(--coral-deep)">броят.</span></h2>
-    <p class="section-lede">Зад всяко число има студент, който е натрупал опит, кандидат, който е получил възможност, и компания, която е открила човек с потенциал.</p>
-    <div class="impact-wrap">
-      <div class="impact-grid">
-        <div class="impact-cell c1"><div class="num" data-count="690" data-suffix="+">0</div><div class="lbl">реални позиции</div></div>
-      </div>
     </div>
   </div>
 </section>
