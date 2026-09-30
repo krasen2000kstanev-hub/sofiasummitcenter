@@ -1812,19 +1812,19 @@ fbq('track','PageView');
   // Long copy stays fully visible without JS; supported browsers get a keyboard-friendly toggle.
   (function(){
     function addReadMore(copy){
-      if(copy.scrollHeight<=136) return;
+      if(copy.textContent.trim().split(/\s+/).filter(Boolean).length<=40) return;
       copy.classList.add('read-more-copy');
       copy.classList.add('is-collapsed');
       var button=document.createElement('button');
       button.type='button';
       button.className='mentor-more';
-      button.textContent='Прочети повече';
+      button.textContent='Прочети още';
       button.setAttribute('aria-expanded','false');
       button.addEventListener('click',function(event){
         event.stopPropagation();
         var expanded=button.getAttribute('aria-expanded')==='true';
         button.setAttribute('aria-expanded',String(!expanded));
-        button.textContent=expanded?'Прочети повече':'Прочети по-малко';
+        button.textContent=expanded?'Прочети още':'Прочети по-малко';
         if(expanded) copy.classList.add('is-collapsed');else copy.classList.remove('is-collapsed');
         var card=copy.parentNode;
         if(card.classList&&card.classList.contains('story-card')&&card.classList.contains('story--active')) card.parentNode.style.height=Math.ceil(card.getBoundingClientRect().height)+'px';
