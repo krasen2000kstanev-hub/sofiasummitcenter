@@ -17,6 +17,12 @@ wp-config.php
 backend/.wrangler/
 backend/node_modules/
 
+# Local previews and deployment bundles.
+.wrangler/
+_hr-rush-current-preview/
+_hr-rush-publish/
+career-cafe-deploy/
+
 # Legacy hosting files kept locally but not published.
 wp-admin/
 wp-includes/
@@ -28,3 +34,5 @@ infra/terraform/.terraform-data/
 infra/terraform/*.tfstate
 infra/terraform/*.tfstate.*
 infra/terraform/terraform.tfvars
+infra/terraform/lambda/node_modules/
+infra/terraform/lambda.zip

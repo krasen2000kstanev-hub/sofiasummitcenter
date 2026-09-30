@@ -12,6 +12,7 @@
 ### Student mission journey
 - Keep the approved winding-road checkpoint map as the visual anchor; selecting any checkpoint (including completed missions) reveals a persistent, readable detail panel.
 - Mission details may include description, deadline, mentor and contact, submission/review timestamps, elapsed time, and mentor feedback. Render unavailable values as “not announced” rather than inventing them; local previews must label all sample values as examples.
+- Show a mentor’s public social profiles only when matched to an exact published mentor identity; retain the contact email as a separate channel and omit unverified or generic profile URLs.
 - Upcoming mission releases belong in a separate schedule row; show an explicit empty state until an organizer publishes a date.
 
 **Interaction Tier**: L1 — постоянна атмосфера без scroll hijacking  

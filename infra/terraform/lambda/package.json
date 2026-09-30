@@ -1,0 +1,11 @@
+{
+  "name": "sofiasummit-career-cafe-lambda",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.883.0",
+    "@aws-sdk/client-sesv2": "^3.883.0",
+    "@aws-sdk/lib-dynamodb": "^3.883.0",
+    "qrcode": "^1.5.4"
+  }
+}

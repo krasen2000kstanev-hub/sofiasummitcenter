@@ -1,47 +1,62 @@
 variable "aws_region" {
-  type        = string
-  description = "AWS region for the backend resources."
-  default     = "eu-central-1"
+  type    = string
+  default = "eu-central-1"
 }
 
 variable "project_name" {
-  type        = string
-  description = "Short project name used in resource names."
-  default     = "sofiasummit"
+  type    = string
+  default = "sofiasummit"
 }
 
-variable "site_domain" {
+variable "public_api_url" {
   type        = string
-  description = "Verified domain used by SES."
-  default     = "sofiasummit.bg"
-}
-
-variable "github_pages_origin" {
-  type        = string
-  description = "GitHub Pages hostname used as the CloudFront origin."
-  default     = "krasen2000kstanev-hub.github.io"
-}
-
-variable "api_base_url" {
-  type        = string
-  description = "Public API URL passed to the event pages."
-  default     = "https://api.sofiasummit.bg"
-}
-
-variable "inquiry_notify_email" {
-  type        = string
-  description = "Inbox that receives new website inquiries."
+  description = "The deployed Lambda Function URL, used in QR codes."
   default     = ""
 }
 
-variable "admin_user" {
-  type = string
-  description = "Admin username for inquiry review."
-  default = ""
+variable "frontend_origin" {
+  type    = string
+  default = "https://sofiasummit.bg"
 }
-variable "admin_password" {
-  type = string
+
+variable "email_from" {
+  type        = string
+  description = "Verified SES sender email address or domain."
+  default     = ""
+}
+
+variable "admin_token" {
+  type      = string
   sensitive = true
-  description = "Admin password for inquiry review."
-  default = ""
+  default   = ""
+}
+
+variable "dsk_webhook_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_espresso_url" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_doppio_url" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_lungo_url" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_parking_url" {
+  type      = string
+  sensitive = true
+  default   = ""
 }
