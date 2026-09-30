@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 24 септември 2026 г.
+Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 30 септември 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -94,3 +94,9 @@ Production deployment was completed on 25 September 2026. The D1 migration ledge
 ## HR:Rush student and mentor portals
 
 The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in student's team, teammate, individual points and shared team points. Mission creators use the separate `/events/hr-rushforpractice/misii/mentor/` portal; server-side role checks prevent mentors from reading student-only team/history endpoints, and students cannot access mentor review or notification endpoints. Run `cd backend && npm test` for the role-separation checks.
+
+## HR:Rush page updates — 30 September 2026
+
+- The season process cards are numbered sequentially 01–04.
+- Company and university applications use matching organization labels and include a required position field; the company CTA links to the form and preselects the company role.
+- Removed the decorative circle from the final call-to-action section.

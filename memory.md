@@ -234,3 +234,10 @@ Sofia Summit Center · ул. „8-ми декември“ 13, София · +35
 
 
 - Inquiry form now sends validated fields to POST /inquiries; GET /availability returns confirmed dates. Terraform adds DynamoDB scan permission and SES notification inbox via inquiry_notify_email.
+
+## HR:Rush страница и форма — 30 септември 2026 г.
+
+- Картичките „Как работи“ са последователно номерирани 01–04.
+- За фирми и университети формата показва отделно наименование на организацията и длъжност; длъжността се изпраща през съществуващото `position` поле.
+- CTA за включване на компанията води директно към формата и избира фирмена роля.
+- Премахнат е декоративният кръг от финалната секция.

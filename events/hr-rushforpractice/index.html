@@ -529,7 +529,6 @@
 
   /* ---------- Final CTA ---------- */
   .final-cta{text-align:center;background:var(--navy-950);position:relative;overflow:hidden;}
-  .final-cta::before{content:"";position:absolute;left:8%;top:20%;width:340px;height:340px;border-radius:999px;border:1px solid rgba(255,255,255,.08);}
   .final-cta-inner{position:relative;max-width:640px;margin:0 auto;}
   .final-cta h2{font-size:clamp(2rem,4.6vw,3.2rem);margin-top:16px;}
   .final-cta .grad{background:linear-gradient(90deg,var(--cyan),var(--coral-soft),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent;}
@@ -852,9 +851,9 @@ fbq('track','PageView');
 
     <div class="process-list">
       <div class="process-item"><span class="idx">01</span><div class="body"><h4>Кандидатстваш</h4><p>Попълваш кратката регистрационна форма.</p></div><span class="arrow-circle">→</span></div>
-      <div class="process-item"><span class="idx">03</span><div class="body"><h4>Участваш</h4><p>Включваш се в практически задачи, срещи, обучения и активности.</p></div><span class="arrow-circle">→</span></div>
-      <div class="process-item"><span class="idx">04</span><div class="body"><h4>Показваш какво можеш</h4><p>Компаниите виждат реалните ти умения, мотивация и начин на работа.</p></div><span class="arrow-circle">→</span></div>
-      <div class="process-item"><span class="idx">05</span><div class="body"><h4>Получаваш възможност</h4><p>Най-добрите участници получават стаж, работа и награден фонд.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">02</span><div class="body"><h4>Участваш</h4><p>Включваш се в практически задачи, срещи, обучения и активности.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">03</span><div class="body"><h4>Показваш какво можеш</h4><p>Компаниите виждат реалните ти умения, мотивация и начин на работа.</p></div><span class="arrow-circle">→</span></div>
+      <div class="process-item"><span class="idx">04</span><div class="body"><h4>Получаваш възможност</h4><p>Най-добрите участници получават стаж, работа и награден фонд.</p></div><span class="arrow-circle">→</span></div>
     </div>
   </div>
 </section>
@@ -937,8 +936,8 @@ fbq('track','PageView');
           <div class="form-field student-team-field"><label for="fLast2">Фамилия</label><input id="fLast2" name="secondLastName" type="text" placeholder="Петрова"></div>
           <div class="form-field student-team-field"><label for="fUni2">Университет</label><select id="fUni2" name="secondUniversity"><option value="" selected disabled>Избери университет</option><option value="Софийски университет „Св. Климент Охридски“">Софийски университет „Св. Климент Охридски“</option><option value="Университет за национално и световно стопанство (УНСС)">Университет за национално и световно стопанство (УНСС)</option><option value="Нов български университет">Нов български университет</option><option value="УЗФ">УЗФ</option><option value="Друг">Друг</option></select><input id="fUniOther2" name="secondOtherUniversity" type="text" placeholder="Напиши университет" hidden></div>
           <div class="form-field student-team-field"><label for="fSpec2">Специалност</label><input id="fSpec2" name="secondSpecialty" type="text" placeholder="Човешки ресурси"></div>
-          <div class="form-field" id="organizationField" hidden><label for="fOrganization">Име на компанията или университета</label><input id="fOrganization" name="organization" type="text" placeholder="Напиши име на организацията"></div>
-          <div class="form-field" id="companyPositionField" hidden><label for="fPosition">Твоята позиция в компанията</label><input id="fPosition" name="position" type="text" placeholder="Напр. HR мениджър"></div>
+          <div class="form-field" id="organizationField" hidden><label id="organizationLabel" for="fOrganization">Име на компанията</label><input id="fOrganization" name="organization" type="text" placeholder="Напиши име на компанията"></div>
+          <div class="form-field" id="companyPositionField" hidden><label id="positionLabel" for="fPosition">Длъжност в компанията</label><input id="fPosition" name="position" type="text" placeholder="Напр. HR мениджър"></div>
           <div class="form-field student-team-field"><label for="fPhone2">Телефон – Студент 2</label><input id="fPhone2" name="secondPhone" type="tel" placeholder="+359 88 888 8888"></div>
           <div class="form-field student-team-field"><label for="fEmail2">Имейл – Студент 2</label><input id="fEmail2" name="secondEmail" type="email" placeholder="maria@example.com"></div>
         </div>
@@ -1017,7 +1016,7 @@ fbq('track','PageView');
     <div class="eyebrow"><span class="rule"></span><span>Компании</span></div>
     <div class="company-head">
       <h2 class="display section-head" style="font-size:clamp(1.7rem,3.2vw,2.3rem);">Компании, които застават зад младите таланти.</h2>
-      <button class="btn btn-outline">Искате да включите компанията си? →</button>
+      <a class="btn btn-outline" href="#apply" data-apply-role="company">Искате да включите компанията си? →</a>
     </div>
     <div class="company-carousel" data-company-carousel role="region" aria-label="Лога на компаниите">
     <div class="logo-grid comp">
@@ -1354,8 +1353,10 @@ fbq('track','PageView');
   var secondOtherUniversityInput = document.getElementById('fUniOther2');
   var organizationField = document.getElementById('organizationField');
   var organizationInput = document.getElementById('fOrganization');
+  var organizationLabel = document.getElementById('organizationLabel');
   var companyPositionField = document.getElementById('companyPositionField');
   var companyPositionInput = document.getElementById('fPosition');
+  var positionLabel = document.getElementById('positionLabel');
   var roleInputs = document.querySelectorAll('input[name="applicantRole"]');
   function updateRoleFields(){
     var role = document.querySelector('input[name="applicantRole"]:checked').value;
@@ -1366,8 +1367,12 @@ fbq('track','PageView');
     studentSpecialtyField.hidden = !isStudent;
     studentTeamFields.forEach(function(field){ field.hidden = !isStudent; });
     organizationField.hidden = isStudent;
-    companyPositionField.hidden = !isCompany;
-    companyPositionInput.required = isCompany;
+    companyPositionField.hidden = isStudent;
+    companyPositionInput.required = !isStudent;
+    organizationLabel.textContent = isCompany ? 'Име на компанията' : 'Име на университета';
+    organizationInput.placeholder = isCompany ? 'Напиши име на компанията' : 'Напиши име на университета';
+    positionLabel.textContent = isCompany ? 'Длъжност в компанията' : 'Длъжност в университета';
+    companyPositionInput.placeholder = isCompany ? 'Напр. HR мениджър' : 'Напр. преподавател';
     document.getElementById('fPhoneLabel').textContent = isStudent ? 'Телефон – Студент 1' : 'Телефон';
     document.getElementById('fEmailLabel').textContent = isStudent ? 'Имейл – Студент 1' : 'Имейл';
     universitySelect.required = isStudent && universitySelect.value !== 'Друг';
@@ -1382,6 +1387,12 @@ fbq('track','PageView');
     document.getElementById('fEmail2').required = isStudent;
     organizationInput.required = !isStudent;
   }
+  document.querySelectorAll('a[data-apply-role]').forEach(function(link){
+    link.addEventListener('click', function(){
+      var roleInput = document.querySelector('input[name="applicantRole"][value="' + link.dataset.applyRole + '"]');
+      if(roleInput){ roleInput.checked = true; updateRoleFields(); }
+    });
+  });
   roleInputs.forEach(function(input){ input.addEventListener('change', updateRoleFields); });
   if(universitySelect){
     universitySelect.addEventListener('change', function(){
@@ -1424,7 +1435,7 @@ fbq('track','PageView');
         firstName: document.getElementById('fName').value.trim(),
         lastName: document.getElementById('fLast').value.trim(),
         organization: organization,
-        position: applicantRole === 'company' ? companyPositionInput.value.trim() : '',
+        position: isStudentApplicant ? '' : companyPositionInput.value.trim(),
         university: firstUniversity,
         specialty: isStudentApplicant ? document.getElementById('fSpec').value.trim() : (applicantRole === 'company' ? 'Представител на компания' : 'Представител на университет'),
         phone: document.getElementById('fPhone').value.trim(),
