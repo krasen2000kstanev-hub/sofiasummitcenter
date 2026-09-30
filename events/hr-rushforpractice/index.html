@@ -603,7 +603,7 @@ fbq('track','PageView');
     #how .eyebrow span{color:var(--cyan);}
     #how .section-head .display{color:#fff;}
     #how .section-lede{color:var(--navy-200);max-width:680px;}
-    #how .process-list{margin-top:56px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;border:0;}
+    #how .process-list{margin-top:56px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;border:0;}
     #how .process-item{min-height:310px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:24px 20px;border:1px solid rgba(255,255,255,.14);border-radius:20px;background:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035));transition:transform .2s ease,border-color .2s ease,background .2s ease;}
     #how .process-item:nth-child(2),#how .process-item:nth-child(4){transform:translateY(28px);}
     #how .process-item:hover{transform:translateY(-8px);border-color:var(--cyan);background:linear-gradient(155deg,rgba(18,201,219,.22),rgba(255,255,255,.06));}
@@ -614,6 +614,8 @@ fbq('track','PageView');
     #how .process-item p{font-size:14px;line-height:1.55;color:var(--navy-200);max-width:none;}
     #how .process-item .arrow-circle{align-self:flex-end;margin-top:20px;border-color:rgba(255,255,255,.22);background:transparent;color:var(--cyan);}
     #how .process-item::after{content:'';display:block;width:34px;height:3px;margin-top:20px;background:var(--cyan);}
+    #how .impact-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}
+    #how .impact-cell{border-right:0!important;text-align:center;padding:20px 0!important;}
     @media(max-width:980px){
       #how .process-list{grid-template-columns:repeat(2,minmax(0,1fr));}
       #how .process-item:nth-child(2),#how .process-item:nth-child(4){transform:none;}
@@ -714,12 +716,12 @@ fbq('track','PageView');
            on to the stats bar. -->
       <div class="hero-cube-viewport">
         <div class="hero-cube-wrap" id="cubeWrap">
-          <div class="cube-face top"><span class="cf-eyebrow">01 / 06</span><div class="cf-num" style="color:var(--steel)">8</div><div class="cf-label">сезона зад нас</div><p class="cf-desc">Осем последователни сезона на практическо HR състезание.</p></div>
-          <div class="cube-face front"><span class="cf-eyebrow">02 / 06</span><div class="cf-num" style="color:var(--cyan)">1,130+</div><div class="cf-label">студенти участвали</div><p class="cf-desc">Реални участници, преминали през практическите мисии на инициативата.</p></div>
-          <div class="cube-face right"><span class="cf-eyebrow">03 / 06</span><div class="cf-num" style="color:var(--coral)">8,000+</div><div class="cf-label">кандидати достигнати</div><p class="cf-desc">Студенти и млади професионалисти, включени в кампаниите на сезоните.</p></div>
-          <div class="cube-face back"><span class="cf-eyebrow">04 / 06</span><div class="cf-num" style="color:var(--amber)">900+</div><div class="cf-label">проведени интервюта</div><p class="cf-desc">Реални срещи между участници и партньорски компании.</p></div>
-          <div class="cube-face left"><span class="cf-eyebrow">05 / 06</span><div class="cf-num" style="color:var(--cyan-deep)">250+</div><div class="cf-label">наети таланти</div><p class="cf-desc">Участници, получили стаж, работа или друга реална възможност.</p></div>
-          <div class="cube-face bottom"><span class="cf-eyebrow">06 / 06</span><div class="cf-num" style="color:var(--coral-deep)">73+</div><div class="cf-label">компании партньори</div><p class="cf-desc">Работодатели, включени с реални позиции във всеки сезон.</p></div>
+          <div class="cube-face top"><span class="cf-eyebrow">01 / 06</span><div class="cf-num" style="color:var(--steel)">HR</div><div class="cf-label">практика</div><p class="cf-desc">Работа по задачи от сферата на човешките ресурси.</p></div>
+          <div class="cube-face front"><span class="cf-eyebrow">02 / 06</span><div class="cf-num" style="color:var(--cyan)">CASE</div><div class="cf-label">реални казуси</div><p class="cf-desc">Казуси, подготвени с участието на партньорски компании.</p></div>
+          <div class="cube-face right"><span class="cf-eyebrow">03 / 06</span><div class="cf-num" style="color:var(--coral)">LEARN</div><div class="cf-label">обучения</div><p class="cf-desc">Нови знания и насоки от практици и ментори.</p></div>
+          <div class="cube-face back"><span class="cf-eyebrow">04 / 06</span><div class="cf-num" style="color:var(--amber)">TEAM</div><div class="cf-label">работа в екип</div><p class="cf-desc">Съвместна работа и обмен на идеи с други участници.</p></div>
+          <div class="cube-face left"><span class="cf-eyebrow">05 / 06</span><div class="cf-num" style="color:var(--cyan-deep)">GROW</div><div class="cf-label">менторство</div><p class="cf-desc">Обратна връзка и подкрепа по време на инициативата.</p></div>
+          <div class="cube-face bottom"><span class="cf-eyebrow">06 / 06</span><div class="cf-num" style="color:var(--coral-deep)">START</div><div class="cf-label">кариерен старт</div><p class="cf-desc">Възможности за стаж и работа след участието.</p></div>
         </div>
         <button class="cube-mobile-next" type="button" aria-label="Завърти кубчето към следващата страна" aria-controls="cubeWrap">Следващ факт <span aria-hidden="true">↻</span></button>
       </div>
@@ -865,9 +867,6 @@ fbq('track','PageView');
     <div class="impact-wrap">
       <div class="impact-grid">
         <div class="impact-cell c1"><div class="num" data-count="690" data-suffix="+">0</div><div class="lbl">реални позиции</div></div>
-        <div class="impact-cell c2"><div class="num" data-count="8000" data-suffix="+">0</div><div class="lbl">намерени кандидати</div></div>
-        <div class="impact-cell c3"><div class="num" data-count="900" data-suffix="+">0</div><div class="lbl">проведени интервюта</div></div>
-        <div class="impact-cell c4"><div class="num" data-count="250" data-suffix="+">0</div><div class="lbl">наети таланти</div></div>
       </div>
     </div>
   </div>
@@ -1525,7 +1524,7 @@ fbq('track','PageView');
       { rx: 0, ry: -270 },   // left
       { rx: -90, ry: -360 }  // bottom
     ];
-    var names = ['8 сезона зад нас', '1,130+ студенти', '8,000+ кандидати', '900+ интервюта', '250+ наети таланти', '73+ компании'];
+    var names = ['Практика в HR', 'Реални казуси', 'Обучения', 'Работа в екип', 'Менторство', 'Кариерен старт'];
     var pctEl = document.getElementById('cubePct');
     var barFill = document.getElementById('cubeBarFill');
     var sceneEl = document.getElementById('cubeScene');

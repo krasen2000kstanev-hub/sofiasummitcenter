@@ -196,6 +196,13 @@ fbq('track','PageView');
   .brand-word{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.88rem;line-height:1.1;}
   .brand-word b{display:block;color:var(--gold);font-weight:800;}
   .navlinks{display:flex;flex:1;justify-content:center;gap:11px;list-style:none;margin:0;padding:0;font-size:.78rem;font-weight:500;min-width:0;}
+  .navlinks .nav-more{position:relative;list-style:none;}
+  .navlinks .nav-more summary{cursor:pointer;list-style:none;color:var(--ink-soft);white-space:nowrap;padding-bottom:4px;}
+  .navlinks .nav-more summary::-webkit-details-marker{display:none;}
+  .navlinks .nav-more summary::after{content:'⌄';margin-left:5px;}
+  .nav-more-links{position:absolute;top:100%;right:0;z-index:20;display:grid;gap:12px;min-width:180px;margin:8px 0 0;padding:16px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .nav-more-links a{display:block;}
+  @media (max-width:1450px){.navlinks .nav-more{width:100%;}.navlinks .nav-more summary{display:block;padding:16px 24px;font-size:.95rem;color:var(--ink)!important;}.nav-more-links{position:static;box-shadow:none;margin:0 18px 12px;padding:8px 16px;background:var(--accent-tint);}.nav-more-links a{padding:10px 8px!important;}}
   .navlinks a{text-decoration:none;color:var(--ink-soft);border-bottom:2px solid transparent;padding-bottom:4px;transition:color .15s, border-color .15s;white-space:nowrap;}
   .navlinks a:hover{color:var(--ink);border-color:var(--gold);}
   .nav-cta{display:flex;align-items:center;gap:14px;flex-shrink:0;}
@@ -460,7 +467,7 @@ fbq('track','PageView');
   "@context": "https://schema.org",
   "@type": "EventVenue",
   "name": "Sofia Summit Center",
-  "description": "Съвременен конгресен център с просторни зали за събития, зала за срещи и подкаст студио в Студентски град, София.",
+  "description": "Конферентна зала, зала за срещи и подкаст студио под наем в Студентски град, София, с оборудване за събития и livestream.",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "ул. „8-ми декември“ 13",
@@ -483,20 +490,13 @@ fbq('track','PageView');
     <div class="menu-control"><button class="navtoggle" id="navtoggle" aria-label="Отвори меню" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span><span class="menu-text">Меню</span></button></div>
     <ul class="navlinks" id="navlinks">
       <li><a href="#spaces">Пространства</a></li>
-      <li><a href="#services">Оборудване</a></li>
       <li><a href="#events">Събития</a></li>
-      <li><a href="#featured-events">Предстоящи</a></li>
-      <li><a href="#reviews">Ревюта</a></li>
-      <li><a href="#gallery">Галерия</a></li>
-      <li><a href="#podcasts">Подкасти</a></li>
-      <li><a href="#productions">Продукции</a></li>
-      <li><a href="#initiatives">Инициативи</a></li>
       <li><a href="#creative-services">Услуги</a></li>
       <li><a href="#about">За нас</a></li>
-      <li><a href="#faq">Въпроси</a></li>
-      <li><a href="#request">Запитване</a></li>
-      <li><a href="#partners">Партньори</a></li>
       <li><a href="#contact">Контакти</a></li>
+      <li class="nav-more"><details><summary>Още</summary><ul class="nav-more-links">
+        <li><a href="#services">Оборудване</a></li><li><a href="#featured-events">Предстоящи събития</a></li><li><a href="#reviews">Ревюта</a></li><li><a href="#gallery">Галерия</a></li><li><a href="#podcasts">Подкасти</a></li><li><a href="#productions">Продукции</a></li><li><a href="#initiatives">Инициативи</a></li><li><a href="#faq">Въпроси</a></li><li><a href="#request">Запитване</a></li><li><a href="#partners">Партньори</a></li>
+      </ul></details></li>
     </ul>
     <div class="nav-cta">
       <a class="nav-phone" href="tel:+359894202086">+359894202086</a>
@@ -516,7 +516,7 @@ fbq('track','PageView');
           <p class="lede">Съвременен конгресен център с просторна зала за събития, зала за срещи и подкаст студио ,  на тихо място до големия парк в Студентски град.</p>
           <div class="hero-ctas">
             <a href="#spaces" class="btn btn-primary">Разгледай пространствата</a>
-            <a href="#request" class="btn btn-ghost">Провери свободна дата</a>
+            <a href="#request" class="btn btn-ghost">Запитай за свободна дата</a>
           </div>
         </div>
         <div class="hero-photo">
@@ -536,7 +536,7 @@ fbq('track','PageView');
       <div class="sechead">
         <p class="eyebrow">Пространства</p>
         <h2>Изберете средата, която ви подхожда.</h2>
-        <p>Две пространства с точен капацитет, реално оборудване и собствен процес на резервация.</p>
+        <p>Две зали и подкаст студио с ясен капацитет, оборудване и лесно запитване.</p>
       </div>
 
       <div class="spaces-grid">
@@ -551,7 +551,7 @@ fbq('track','PageView');
             <li><b>Размери:</b> 16.5 м широчина, 10 м дължина, 3.10 м височина</li>
             <li><b>Включено:</b> конферентна катедра с 4 микрофона, трибуна, 3 работни помещения за групова работа</li>
           </ul>
-          <a href="#request" class="btn btn-line">Провери свободна дата →</a>
+          <a href="#request" class="btn btn-line">Запитай за свободна дата →</a>
         </article>
 
         <article class="space-card">
@@ -563,7 +563,7 @@ fbq('track','PageView');
             <li><b>Капацитет:</b> 15 седящи места + зона за неформален разговор</li>
             <li><b>Включено:</b> мултимедия, камера и микрофони за видеоконферентна връзка</li>
           </ul>
-          <a href="#request" class="btn btn-line">Провери свободна дата →</a>
+          <a href="#request" class="btn btn-line">Запитай за свободна дата →</a>
         </article>
 
         <article class="space-card">
@@ -623,7 +623,6 @@ fbq('track','PageView');
       </div>
       <div class="event-tags">
         <span>Конференции</span>
-        <span>Обучения</span>
         <span>Обучения и семинари</span>
         <span>Представяне на продукти</span>
         <span>Подкаст заснемане</span>
@@ -667,10 +666,10 @@ fbq('track','PageView');
           <div class="gallery-orbit-sphere" id="gallery-orbit-sphere">
             <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrsreshha/" target="_blank" rel="noopener" aria-label="Отвори албума HR Среща"><img src="assets/event-photos/hr-sreshta-01.jpg" alt="HR Среща"><span>HR Среща ↗</span></a>
             <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/snimki/" target="_blank" rel="noopener" aria-label="Отвори албума Misia100"><img src="assets/event-photos/misia100-01.jpg" alt="Misia100"><span>Misia100 ↗</span></a>
-            <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener" aria-label="Отвори албума HR Rush for Practice Sofia S8 Final"><img src="assets/event-photos/hr-rush-practice-01.jpg" alt="HR Rush for Practice Sofia S8 Final"><span>HR Rush for Practice ↗</span></a>
+            <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticevarnas8finalcopy/" target="_blank" rel="noopener noreferrer" aria-label="Отвори албума HR Rush for Practice — Варна, финал на сезон 8"><img src="assets/event-photos/hr-rush-practice-01.jpg" alt="HR Rush for Practice — Варна, финал на сезон 8"><span>Варна · финал на сезон 8 ↗</span></a>
             <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/beyou/" target="_blank" rel="noopener" aria-label="Отвори албума Be You"><img src="assets/event-photos/be-you-01.jpg" alt="Be You"><span>Be You ↗</span></a>
             <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/sreshtamejdubisnesaimladite/" target="_blank" rel="noopener" aria-label="Отвори албума Среща между бизнеса и младите 5.0"><img src="assets/event-photos/biznes-i-mladite-01.jpg" alt="Среща между бизнеса и младите 5.0"><span>Бизнесът и младите 5.0 ↗</span></a>
-            <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener" aria-label="Отвори албума HR Rush for Practice Sofia"><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt="HR Rush for Practice Sofia"><span>HR Rush for Practice ↗</span></a>
+            <a class="gallery-orbit-card" href="https://krasenstanev.pixieset.com/hrrushforpracticesofia/" target="_blank" rel="noopener noreferrer" aria-label="Отвори албума HR Rush for Practice — София"><img src="assets/event-photos/hr-rush-sofia-01.jpg" alt="HR Rush for Practice — София"><span>София · HR:Rush for Practice ↗</span></a>
           </div>
           <svg class="gallery-orbit-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0,56 Q25,34 50,50 T100,42" stroke="rgba(36,82,184,.14)" stroke-width=".25" fill="none"/><path d="M18,0 L82,100" stroke="rgba(36,82,184,.08)" stroke-width=".25" fill="none"/></svg>
         </div>
@@ -735,9 +734,9 @@ fbq('track','PageView');
           <p class="eyebrow">За нас</p>
           <h2>Вашият адрес за добри срещи.</h2>
            <p>Sofia Summit Center е съвременен конферентен център в Студентски град, София, създаден за конференции, обучения, срещи и специализирани формати.</p>
-           <p>Разполагаме с функционална конферентна зала и отделно оборудвано подкаст студио. Всяко пространство има собствена техника и озвучение, съобразени с неговото предназначение и конкретния формат на събитието.</p>
-           <p>За удобство на гостите е осигурена възможност за паркиране. В сградата има рецепция и фоайе, където посетителите могат спокойно да изчакат преди началото на срещата или събитието.</p>
-           <p>Съчетаваме удобна локация, спокойна атмосфера и професионална среда, в която срещите, идеите и работата могат да се развиват ефективно.</p>
+           <p>Предлагаме конферентна зала, зала за срещи и подкаст студио за събития, работни срещи и специализирани формати.</p>
+           <p>За удобство на гостите има възможност за паркиране, рецепция и фоайе за изчакване.</p>
+           <p>Създаваме спокойна и професионална среда за срещи, идеи и ефективна работа.</p>
           <ul class="perk-list">
              <li><b>Локация:</b> Студентски град, София, в близост до парк</li>
              <li><b>Удобства:</b> Възможност за паркиране, рецепция и фоайе за изчакване</li>
@@ -780,7 +779,7 @@ fbq('track','PageView');
       </details>
       <details class="faq-item" name="faq">
         <summary class="faq-q">Разполагате ли с техника за запис и стрийминг?<span class="plus">+</span></summary>
-         <div class="faq-a">Да, голямата зала разполага с три управляеми таванни камери и озвучение за цялостно покритие на събитието. Подкаст студиото има отделна система от три камери и различно озвучение, съобразени с интервюта, разговори и подкаст формати.</div>
+        <div class="faq-a">Да. Двете пространства имат отделни системи за заснемане и озвучение, съобразени с формата. Вижте оборудването в секциите <a href="#spaces">„Пространства“</a> и <a href="#services">„Оборудване“</a>.</div>
       </details>
        <details class="faq-item" name="faq">
          <summary class="faq-q">Има ли офис помещения извън конферентната зала?<span class="plus">+</span></summary>
@@ -788,7 +787,7 @@ fbq('track','PageView');
       </details>
       <details class="faq-item" name="faq">
         <summary class="faq-q">Каква е разликата между залата за срещи и подкаст студиото?<span class="plus">+</span></summary>
-         <div class="faq-a">Конферентната зала е с 15 седящи места и е подходяща за преговори, обучения, бордови срещи и видеоконферентни разговори. Подкаст студиото разполага със собствена, напълно самостоятелна техника ,  отделни камери, озвучение и оборудване за запис на подкаст епизоди, видео интервюта и панели.</div>
+         <div class="faq-a">Залата за срещи е с 15 седящи места и е подходяща за преговори, обучения и видеоконферентни разговори. Подкаст студиото е самостоятелно оборудвано за записи, интервюта и панели. Вижте подробностите в секция <a href="#spaces">„Пространства“</a>.</div>
       </details>
       <details class="faq-item" name="faq">
         <summary class="faq-q">Как да резервирам дата?<span class="plus">+</span></summary>
