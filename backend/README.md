@@ -31,9 +31,9 @@ HR:Rush uses one Google authentication flow with separate student (`/events/hr-r
 
 ## HR:Rush applications
 
-Apply-page submissions are stored in D1 by `POST /api/apply`. The production Worker is `sofiasummit-events-api` at `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`; the public form points to it. Each accepted application creates three durable outbox jobs: one row write to the private Google Sheet, an organizer notice, and a candidate confirmation. A five-minute Worker cron retries failed deliveries; sheet rows use the D1 application number as their fixed row so retries overwrite the same row rather than append duplicates.
+Apply-page submissions are stored in D1 by `POST /api/apply`. The production Worker is `sofiasummit-events-api` at `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`; the public form points to it. Each accepted application creates three durable outbox jobs: one row write to the private Google Sheet, an organizer notice, and a candidate confirmation. The organizer email is sent only after its Sheet row is written and contains the submitted fields in a table plus a direct Sheet link. A five-minute Worker cron retries failed deliveries; sheet rows use the D1 application number as their fixed row so retries overwrite the same row rather than append duplicates.
 
-Production is configured for season 9 and organizer notifications to `krasen2000.k.stanev@gmail.com`:
+Production is configured for season 9 and organizer notifications to `tsvetelin@pleggi.com`:
 
 - Secret `GOOGLE_SERVICE_ACCOUNT_JSON`: service-account JSON key. The production secret belongs to the `HR Rush Applications Writer` identity, which has Editor access only to the target spreadsheet.
 - Variable `HRR_APPLICATIONS_SHEET_ID`: ID of the private native Google Sheet with a tab named `Кандидатури` and the header row from the sheet template.
