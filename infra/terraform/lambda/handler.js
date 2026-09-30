@@ -10,9 +10,9 @@ const EVENT_ID = 'career-cafe';
 const ORIGIN = process.env.FRONTEND_ORIGIN || 'https://sofiasummit.bg';
 
 const TICKETS = Object.freeze({
-  espresso: { name: 'Espresso', priceCents: 1200, paymentUrl: process.env.DSK_ESPRESSO_URL || '' },
-  doppio: { name: 'Doppio', priceCents: 2400, paymentUrl: process.env.DSK_DOPPIO_URL || '' },
-  lungo: { name: 'Lungo+', priceCents: 3600, paymentUrl: process.env.DSK_LUNGO_URL || '' }
+  espresso: { name: 'Espresso', priceCents: 1200, paymentUrl: process.env.DSK_ESPRESSO_URL || '', parkingPaymentUrl: process.env.DSK_ESPRESSO_PARKING_URL || '' },
+  doppio: { name: 'Doppio', priceCents: 2400, paymentUrl: process.env.DSK_DOPPIO_URL || '', parkingPaymentUrl: process.env.DSK_DOPPIO_PARKING_URL || '' },
+  lungo: { name: 'Lungo+', priceCents: 3600, paymentUrl: process.env.DSK_LUNGO_URL || '', parkingPaymentUrl: process.env.DSK_LUNGO_PARKING_URL || '' }
 });
 const PARKING_CENTS = 500;
 const DISCOUNT_CENTS = 600;
@@ -87,8 +87,8 @@ async function createRegistration(event) {
   return response(201, {
     ok: true, orderId, amountCents: item.amountCents, currency: item.currency,
     discountCents: item.discountCents, parkingCents: item.parkingCents,
-    paymentUrl: calculated.ticket.paymentUrl || null,
-    parkingPaymentUrl: calculated.parking ? (process.env.DSK_PARKING_URL || null) : null,
+    paymentUrl: (calculated.parking ? calculated.ticket.parkingPaymentUrl : calculated.ticket.paymentUrl) || null,
+    parkingPaymentUrl: null,
     message: 'Регистрацията е записана. Продължете към плащане.'
   });
 }

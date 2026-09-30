@@ -90,7 +90,9 @@ resource "aws_lambda_function" "registration" {
       DSK_ESPRESSO_URL   = var.dsk_espresso_url
       DSK_DOPPIO_URL     = var.dsk_doppio_url
       DSK_LUNGO_URL      = var.dsk_lungo_url
-      DSK_PARKING_URL    = var.dsk_parking_url
+      DSK_ESPRESSO_PARKING_URL = var.dsk_espresso_parking_url
+      DSK_DOPPIO_PARKING_URL   = var.dsk_doppio_parking_url
+      DSK_LUNGO_PARKING_URL    = var.dsk_lungo_parking_url
     }
   }
 }
