@@ -55,7 +55,19 @@ variable "dsk_lungo_url" {
   default   = ""
 }
 
-variable "dsk_parking_url" {
+variable "dsk_espresso_parking_url" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_doppio_parking_url" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "dsk_lungo_parking_url" {
   type      = string
   sensitive = true
   default   = ""
