@@ -1,5 +1,15 @@
-aws_region           = "eu-central-1"
-project_name         = "sofiasummit"
-site_domain          = "sofiasummit.bg"
-github_pages_origin  = "krasen2000kstanev-hub.github.io"
-api_base_url         = "https://api.sofiasummit.bg"
+aws_region      = "eu-central-1"
+project_name    = "sofiasummit"
+frontend_origin = "https://sofiasummit.bg"
+email_from      = "tickets@sofiasummit.bg"
+
+# Fill after the first apply, then apply again so QR links use the real URL.
+public_api_url = "https://REPLACE.lambda-url.eu-central-1.on.aws/"
+
+# Keep the real values only in local terraform.tfvars or CI secrets.
+admin_token        = "replace-with-long-random-token"
+dsk_webhook_secret = ""
+dsk_espresso_url   = ""
+dsk_doppio_url     = ""
+dsk_lungo_url      = ""
+dsk_parking_url    = ""

@@ -1,12 +1,17 @@
 output "api_url" {
-  value       = aws_apigatewayv2_stage.default.invoke_url
-  description = "Temporary API Gateway URL. Add a custom domain later."
+  value       = aws_apigatewayv2_api.career_cafe.api_endpoint
+  description = "Public API Gateway HTTP API endpoint for the career cafe API."
+}
+
+output "lambda_url" {
+  value       = aws_lambda_function_url.registration.function_url
+  description = "Legacy Lambda Function URL; API Gateway is the public endpoint."
 }
 
 output "dynamodb_table" {
-  value = aws_dynamodb_table.events.name
+  value = aws_dynamodb_table.registrations.name
 }
 
 output "ses_identity" {
-  value = aws_sesv2_email_identity.site_domain.email_identity
+  value = var.email_from
 }

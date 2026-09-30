@@ -445,6 +445,28 @@ fbq('track','PageView');
   .ticket.featured .ticket-cta{background:var(--gold); color:#241a10;}
   .ticket.featured .ticket-cta:hover{background:transparent; color:var(--gold);}
   .tickets-note{margin-top:26px; text-align:center; color:var(--muted); font-size:0.85rem; font-style:italic;}
+  .registration-form{margin-top:42px; padding:34px; border:1px solid var(--line-gold); border-radius:var(--radius-m); background:var(--charcoal-2);}
+  .registration-form h3{font-family:"Playfair Display",serif; font-size:1.8rem; margin:0 0 8px;}
+  .registration-form > p{color:var(--muted); margin:0 0 24px;}
+  .form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px;}
+  .form-field{display:flex; flex-direction:column; gap:7px;}
+  .form-field.full{grid-column:1/-1;}
+  .form-field label,.form-label{font-size:0.8rem; font-weight:700; color:var(--white);}
+  .form-field input,.form-field textarea{width:100%; padding:13px 14px; border:1px solid var(--line-soft); border-radius:2px; background:var(--charcoal); color:var(--white); font:inherit;}
+  .form-field textarea{resize:vertical; min-height:110px;}
+  .form-field input:focus,.form-field textarea:focus{outline:2px solid var(--gold); outline-offset:2px;}
+  .ticket-choice-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;}
+  .ticket-choice{display:flex; align-items:center; gap:10px; padding:13px; border:1px solid var(--line-soft); border-radius:2px; cursor:pointer; color:var(--white);}
+  .ticket-choice:has(input:checked){border-color:var(--gold); background:rgba(185,122,63,.12);}
+  .ticket-choice input{accent-color:var(--gold);}
+  .parking-option{display:flex; align-items:center; gap:10px; margin-top:20px; color:var(--white);}
+  .parking-option input{accent-color:var(--gold);}
+  .registration-submit{margin-top:24px; border:1px solid var(--gold); background:var(--gold); color:#241a10; padding:14px 22px; border-radius:2px; font:inherit; font-weight:700; cursor:pointer;}
+  .registration-submit:hover{background:var(--gold-light);}
+  .discount-note{display:none; margin-top:14px; color:var(--gold-light); font-size:0.9rem;}
+  .registration-result{margin-top:20px; padding:16px; border:1px solid var(--line-gold); color:var(--white);}
+  .registration-result a{color:var(--gold-light); font-weight:700;}
+  @media (max-width:700px){.form-grid,.ticket-choice-grid{grid-template-columns:1fr;}.form-field.full{grid-column:auto;}.registration-form{padding:24px 18px;}}
 
   /* ============ VENUE FACTS ============ */
   .venue-facts{display:flex; flex-direction:column; gap:20px; margin-top:26px;}
@@ -816,44 +838,80 @@ fbq('track','PageView');
       <div class="ticket-grid reveal">
         <div class="ticket">
           <div class="ticket-name">Espresso</div>
-          <div class="ticket-price"><span class="num">6</span><span class="cur">€</span></div>
+          <div class="ticket-price"><span class="num">12</span><span class="cur">€</span></div>
           <hr>
           <ul>
-            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Вход за целия ден</li>
+            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Вход за цялото събитие</li>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Кафе и лека закуска</li>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Всички лекции и работилници</li>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Свободен нетуъркинг</li>
           </ul>
-          <a class="ticket-cta" href="#">Поръчай Espresso</a>
+          <a class="ticket-cta" href="#registration" data-ticket="Espresso">Избери Espresso</a>
         </div>
 
         <div class="ticket featured">
           <span class="ticket-badge">Най-поръчван</span>
           <div class="ticket-name">Doppio</div>
-          <div class="ticket-price"><span class="num">11</span><span class="cur">€</span></div>
+          <div class="ticket-price"><span class="num">24</span><span class="cur">€</span></div>
           <hr>
           <ul>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Всичко от Espresso</li>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Запазен слот за CV/LinkedIn преглед</li>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Приоритетен ред за срещи</li>
-            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Достъп до видеозаписите от събитието</li>
+            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Ранен вход, 30 мин. преди началото</li>
           </ul>
-          <a class="ticket-cta" href="#">Поръчай Doppio</a>
+          <a class="ticket-cta" href="#registration" data-ticket="Doppio">Избери Doppio</a>
         </div>
 
         <div class="ticket">
           <div class="ticket-name">Lungo+</div>
-          <div class="ticket-price"><span class="num">18</span><span class="cur">€</span></div>
+          <div class="ticket-price"><span class="num">36</span><span class="cur">€</span></div>
           <hr>
           <ul>
             <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Всичко от Doppio</li>
-            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 20 мин. лична сесия с коуч</li>
-            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Ранен вход, 30 мин. преди началото</li>
+            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 20 мин. лична сесия с консултант/коуч</li>
+            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Достъп до Mastermind събитието</li>
+            <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Достъп до видеозаписите от събитието</li>
           </ul>
-          <a class="ticket-cta" href="#">Поръчай Lungo+</a>
+          <a class="ticket-cta" href="#registration" data-ticket="Lungo+">Избери Lungo+</a>
         </div>
       </div>
-      <p class="tickets-note">Цените са примерни за макета и подлежат на потвърждение преди пускането на билетите в продажба.</p>
+      <form class="registration-form" id="registration" data-api-url="https://3r3kwcz4he.execute-api.eu-central-1.amazonaws.com" novalidate>
+        <h3>Запиши се за Кариерно кафе</h3>
+        <p>Попълни данните си и избери желания билет.</p>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="registration-name">Имена</label>
+            <input id="registration-name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="form-field">
+            <label for="registration-email">Имейл</label>
+            <input id="registration-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="form-field full">
+            <label for="registration-position">Бивша позиция</label>
+            <input id="registration-position" name="formerPosition" type="text" required>
+          </div>
+          <div class="form-field full">
+            <label for="registration-need">От какво имам нужда / защо съм на това събитие?</label>
+            <textarea id="registration-need" name="need" rows="4" maxlength="500" placeholder="Например: търся нова работа, искам да се запозная с работодатели или имам нужда от кариерен съвет." required></textarea>
+          </div>
+          <div class="form-field full">
+            <span class="form-label">Избери билет</span>
+            <div class="ticket-choice-grid">
+              <label class="ticket-choice"><input type="radio" name="ticket" value="espresso" data-ticket-name="Espresso" data-price="12" required> Espresso — 12 €</label>
+              <label class="ticket-choice"><input type="radio" name="ticket" value="doppio" data-ticket-name="Doppio" data-price="24"> Doppio — 24 €</label>
+              <label class="ticket-choice"><input type="radio" name="ticket" value="lungo" data-ticket-name="Lungo+" data-price="36"> Lungo+ — 36 €</label>
+            </div>
+          </div>
+        </div>
+        <label class="parking-option"><input type="checkbox" name="parking" value="true" id="parking-option"> Да, желая да заявя паркинг (+5 €)</label>
+        <label class="parking-option"><input type="checkbox" name="agreeTerms" value="true" id="registration-consent" required> Съгласявам се с обработката на данните според <a href="../../privacy.html" target="_blank" rel="noopener">политиката за поверителност</a>.</label>
+        <p class="discount-note" id="discount-note">Имате отстъпка от 6 € за избрания билет.</p>
+        <button class="registration-submit" type="submit">Изпрати записване →</button>
+        <div class="registration-result" id="registration-result" hidden aria-live="polite"></div>
+      </form>
+      <p class="tickets-note">След изпращане ще получите линк за плащане на избрания билет и отделен линк за паркинг, ако сте го заявили.</p>
       </div>
     </div>
   </section>
@@ -1408,6 +1466,64 @@ fbq('track','PageView');
       if(e.key === 'Enter' || e.key === ' ' || e.keyCode === 13 || e.keyCode === 32){
         e.preventDefault();
         scrollToTop();
+      }
+    });
+  })();
+
+  (function(){
+    var form = document.getElementById('registration');
+    var nameInput = document.getElementById('registration-name');
+    var discountNote = document.getElementById('discount-note');
+    var parkingOption = document.getElementById('parking-option');
+    var ticketInputs = document.querySelectorAll('input[name="ticket"]');
+    var resultBox = document.getElementById('registration-result');
+    var submitButton = form ? form.querySelector('button[type="submit"]') : null;
+
+    function updatePrice(){
+      if(discountNote) discountNote.style.display = 'none';
+    }
+    if(nameInput) nameInput.addEventListener('input', updatePrice);
+    if(parkingOption) parkingOption.addEventListener('change', updatePrice);
+    for(var j = 0; j < ticketInputs.length; j++) ticketInputs[j].addEventListener('change', updatePrice);
+
+    var choices = document.querySelectorAll('[data-ticket]');
+    for(var i = 0; i < choices.length; i++){
+      choices[i].addEventListener('click', function(){
+        var ticketName = this.getAttribute('data-ticket').toLowerCase();
+        var input = document.querySelector('input[name="ticket"][data-ticket-name="' + (ticketName === 'lungo+' ? 'Lungo+' : ticketName.charAt(0).toUpperCase() + ticketName.slice(1)) + '"]');
+        if(input){ input.checked = true; input.dispatchEvent(new Event('change')); }
+      });
+    }
+
+    if(form) form.addEventListener('submit', async function(event){
+      event.preventDefault();
+      if(!form.checkValidity()) { form.reportValidity(); return; }
+      var apiUrl = form.getAttribute('data-api-url') || window.CAREER_CAFE_API_URL || '';
+      if(!apiUrl){ resultBox.hidden = false; resultBox.textContent = 'Формата все още не е свързана с backend API.'; return; }
+      var selected = document.querySelector('input[name="ticket"]:checked');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Изпращане…';
+      resultBox.hidden = true;
+      try {
+        var response = await fetch(apiUrl.replace(/\/$/, '') + '/registrations', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({
+          name: nameInput.value, email: document.getElementById('registration-email').value,
+          formerPosition: document.getElementById('registration-position').value,
+          need: document.getElementById('registration-need').value,
+          ticket: selected.value, parking: parkingOption.checked,
+          agreeTerms: document.getElementById('registration-consent').checked
+        }) });
+        var data = await response.json();
+        resultBox.hidden = false;
+        if(!response.ok) { resultBox.textContent = data.error || 'Регистрацията не беше приета.'; return; }
+        resultBox.textContent = 'Регистрацията е записана. Регистрационен номер: ' + data.orderId + '. Крайна сума: ' + (Number(data.amountCents) / 100).toFixed(2) + ' €. ';
+        if(data.paymentUrl){ var ticketLink = document.createElement('a'); ticketLink.href = data.paymentUrl; ticketLink.target = '_blank'; ticketLink.rel = 'noopener'; ticketLink.textContent = 'Плати билета'; resultBox.appendChild(ticketLink); }
+        if(data.parkingPaymentUrl){ resultBox.appendChild(document.createTextNode(' ')); var parkingLink = document.createElement('a'); parkingLink.href = data.parkingPaymentUrl; parkingLink.target = '_blank'; parkingLink.rel = 'noopener'; parkingLink.textContent = 'Плати паркинга'; resultBox.appendChild(parkingLink); }
+      } catch(error) {
+        resultBox.hidden = false;
+        resultBox.textContent = 'Възникна грешка при изпращането. Опитайте отново.';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Изпрати записване →';
       }
     });
   })();
