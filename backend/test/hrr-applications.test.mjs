@@ -120,7 +120,7 @@ test('retries the same Sheet row before emailing the organizer application detai
   const pemBody = btoa(String.fromCharCode(...der));
   env.GOOGLE_SERVICE_ACCOUNT_JSON = JSON.stringify({ client_email: 'worker@example.iam.gserviceaccount.com', private_key: `-----BEGIN PRIVATE KEY-----\n${pemBody}\n-----END PRIVATE KEY-----` });
   env.HRR_APPLICATIONS_SHEET_ID = 'sheet-test-id';
-  env.HRR_APPLICATION_NOTIFICATION_EMAIL = 'tsvetelin@pleggi.com';
+  env.HRR_APPLICATION_NOTIFICATION_EMAIL = 'tsvetelin@pleggi.com,Yoanna.p.mihova@gmail.com';
   env.RESEND_API_KEY = 'test-key';
   env.EMAIL_FROM = 'test@example.com';
   const companyApplication = { ...validApplication, role: 'company', organization: '<Пример> ООД', university: '', specialty: '', position: 'HR мениджър' };
@@ -158,8 +158,9 @@ test('retries the same Sheet row before emailing the organizer application detai
   assert.equal(sheetWrites[0].body.values[0][10], 'candidate@example.com');
   assert.equal(decodeURIComponent(sheetWrites[0].url).includes(':N'), true);
   assert.equal(sheetWrites[0].body.values[0][13], 'HR мениджър');
-  const organizerEmail = emailPayloads.find((email) => email.to[0] === 'tsvetelin@pleggi.com');
+  const organizerEmail = emailPayloads.find((email) => email.to.includes('tsvetelin@pleggi.com'));
   assert.ok(organizerEmail);
+  assert.deepEqual(organizerEmail.to, ['tsvetelin@pleggi.com', 'Yoanna.p.mihova@gmail.com']);
   assert.match(organizerEmail.html, /candidate@example\.com/);
   assert.match(organizerEmail.html, /&lt;Пример&gt; ООД/);
   assert.match(organizerEmail.html, /HR мениджър/);
