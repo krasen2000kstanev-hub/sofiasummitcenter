@@ -7,6 +7,7 @@
 .story-media{background:#1b1d3a}
 .story-video{display:none}
 .replace-note{display:none}
-.moments-link{display:inline-flex;margin-top:4px;border-bottom:1px solid var(--yellow);color:var(--yellow);font-size:14px;font-weight:700;text-decoration:none}
+.moments-links{display:flex;flex-wrap:wrap;gap:18px;margin-top:4px}
+.moments-link{display:inline-flex;border-bottom:1px solid var(--yellow);color:var(--yellow);font-size:14px;font-weight:700;text-decoration:none}
 .moments-link:hover,.moments-link:focus-visible{color:#fff;border-color:#fff}
 @media(max-width:760px){.register-copy:after{margin-top:20px}.event-photo img{transition:none}}
