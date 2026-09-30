@@ -7,7 +7,6 @@
 .story-media{background:#1b1d3a}
 .story-video{display:none}
 .replace-note{display:none}
-.register-copy:after{content:'25 септември 2026  ·  Sofia Summit Center  ·  Плащане през Deska';display:block;margin-top:26px;color:var(--ink);font-size:13px;font-weight:700;line-height:1.5}
 .moments-link{display:inline-flex;margin-top:4px;border-bottom:1px solid var(--yellow);color:var(--yellow);font-size:14px;font-weight:700;text-decoration:none}
 .moments-link:hover,.moments-link:focus-visible{color:#fff;border-color:#fff}
 @media(max-width:760px){.register-copy:after{margin-top:20px}.event-photo img{transition:none}}
