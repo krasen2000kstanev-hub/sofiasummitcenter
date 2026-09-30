@@ -131,8 +131,17 @@ async function sendApplicationEmail(env, kind, application) {
   const organizer = kind === 'organizer_email';
   const recipient = organizer ? env.HRR_APPLICATION_NOTIFICATION_EMAIL : application.email;
   if (!recipient) throw new Error('Email recipient is not configured');
+  const sheetUrl = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(env.HRR_APPLICATIONS_SHEET_ID || '')}/edit`;
+  const details = [
+    ['№ кандидатура', application.application_no], ['Дата', application.created_at], ['Сезон', application.season],
+    ['Тип', { student: 'Студент', company: 'Представител на компания', university: 'Представител на университет' }[application.role] || application.role],
+    ['Име', `${application.first_name} ${application.last_name}`], ['Компания', application.organization],
+    ['Длъжност', application.position], ['Университет', application.university], ['Специалност', application.specialty],
+    ['Телефон', application.phone], ['Имейл', application.email],
+    ['Съгласие за лични данни', application.gdpr_consent ? 'Да' : 'Не'], ['Статус', application.status]
+  ];
   const message = organizer
-    ? '<p>Получена е нова кандидатура за HR:Rush for Practice. Отворете защитения администраторски списък, за да я прегледате.</p>'
+    ? `<p>Получена е нова кандидатура за HR:Rush for Practice.</p><p><a href="${html(sheetUrl)}">Отвори таблицата с кандидатурите</a></p><table style="border-collapse:collapse;width:100%;max-width:640px">${details.map(([label, value]) => `<tr><th style="padding:8px 12px;border:1px solid #ddd;text-align:left;background:#f4f6f8">${html(label)}</th><td style="padding:8px 12px;border:1px solid #ddd">${html(value || '—')}</td></tr>`).join('')}</table>`
     : `<p>Здравейте, ${html(application.first_name)}!</p><p>Получихме кандидатурата Ви за HR:Rush for Practice, сезон ${Number(application.season)}. Ще се свържем с Вас при следващи стъпки.</p>`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -154,6 +163,11 @@ async function deliver(env, outbox, application) {
     await writeApplicationToSheet(env, application);
     return null;
   }
+  if (outbox.kind === 'organizer_email') {
+    const sheet = await env.DB.prepare("SELECT status FROM hrr_application_outbox WHERE application_id=? AND kind='sheet'")
+      .bind(application.id).first();
+    if (sheet?.status !== 'sent') throw new Error('Google Sheet sync is not complete');
+  }
   return sendApplicationEmail(env, outbox.kind, application);
 }
 
@@ -163,7 +177,7 @@ export async function processHrrApplicationOutbox(env, maxItems = 30) {
   const staleBefore = new Date(Date.now() - 5 * 60 * 1000).toISOString();
   const due = await env.DB.prepare(`SELECT id FROM hrr_application_outbox
     WHERE (status='pending' AND available_at<=?) OR (status='processing' AND locked_at<?)
-    ORDER BY created_at LIMIT ?`).bind(timestamp, staleBefore, maxItems).all();
+    ORDER BY created_at, CASE kind WHEN 'sheet' THEN 0 WHEN 'organizer_email' THEN 1 ELSE 2 END LIMIT ?`).bind(timestamp, staleBefore, maxItems).all();
   for (const item of due.results || []) {
     const claimedAt = now();
     const claim = await env.DB.prepare(`UPDATE hrr_application_outbox
