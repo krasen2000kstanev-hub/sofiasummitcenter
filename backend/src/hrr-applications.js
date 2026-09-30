@@ -129,8 +129,10 @@ async function writeApplicationToSheet(env, application) {
 async function sendApplicationEmail(env, kind, application) {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new Error('Email service is not configured');
   const organizer = kind === 'organizer_email';
-  const recipient = organizer ? env.HRR_APPLICATION_NOTIFICATION_EMAIL : application.email;
-  if (!recipient) throw new Error('Email recipient is not configured');
+  const recipients = organizer
+    ? String(env.HRR_APPLICATION_NOTIFICATION_EMAIL || '').split(',').map((email) => email.trim()).filter(Boolean)
+    : [application.email];
+  if (!recipients.length) throw new Error('Email recipient is not configured');
   const sheetUrl = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(env.HRR_APPLICATIONS_SHEET_ID || '')}/edit`;
   const details = [
     ['№ кандидатура', application.application_no], ['Дата', application.created_at], ['Сезон', application.season],
@@ -148,7 +150,7 @@ async function sendApplicationEmail(env, kind, application) {
     headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
     body: JSON.stringify({
       from: env.EMAIL_FROM,
-      to: [recipient],
+      to: recipients,
       subject: organizer ? 'Нова кандидатура — HR:Rush for Practice' : 'Потвърждение на кандидатурата — HR:Rush for Practice',
       html: message
     })
