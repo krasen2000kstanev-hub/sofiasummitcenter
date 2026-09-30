@@ -332,7 +332,7 @@
   .role-picker{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:4px;}
   .role-option{position:relative;display:flex;align-items:center;gap:10px;padding:14px 16px;border:1px solid var(--mist-100);border-radius:14px;background:var(--mist-50);color:var(--navy-950);font-size:13px;font-weight:700;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;}
   .role-option input{width:16px;height:16px;margin:0;accent-color:var(--cyan-deep);}
-  .role-option:has(input:checked){border-color:var(--cyan);background:rgba(18,201,219,.08);box-shadow:0 0 0 2px rgba(18,201,219,.12);}
+  .role-option.is-selected{border-color:var(--cyan);background:rgba(18,201,219,.08);box-shadow:0 0 0 2px rgba(18,201,219,.12);}
   @media(max-width:700px){.role-picker{grid-template-columns:1fr;}}
   .form-actions{margin-top:28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
   .form-section-label{grid-column:1/-1;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--navy-950);text-transform:uppercase;letter-spacing:.08em;padding-top:8px;border-top:1px solid var(--mist-100);}
@@ -367,9 +367,10 @@
   .mentor-body h4{font-family:var(--font-body);color:var(--navy-950);font-size:15px;font-weight:800;}
   .mentor-body .role{margin-top:3px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--cyan-deep);}
   .mentor-body p{margin-top:12px;font-size:13px;color:var(--navy-500);font-weight:500;}
-  .mentor-copy.is-collapsed{max-height:8.5em;overflow:hidden;}
-  .mentor-more{margin-top:8px;padding:4px 0;border:0;background:none;color:var(--cyan-deep);font:700 12px var(--font-body);cursor:pointer;}
-  .mentor-more:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:3px;}
+  .read-more-copy.is-collapsed{max-height:8.5em;overflow:hidden;}
+  blockquote.read-more-copy.is-collapsed{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;}
+  .mentor-more{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;padding:8px 0;border:0;background:none;color:var(--cyan-deep);font:700 12px var(--font-body);cursor:pointer;}
+  .mentor-more:focus{outline:2px solid var(--cyan);outline-offset:3px;border-radius:3px;}
   .mentor-body .social-links{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:14px;}
   .mentor-body .social-links a{font-size:12px;font-weight:800;color:var(--navy-600);}
   .mentor-body .social-links a:hover{color:var(--cyan-deep);}
@@ -420,24 +421,27 @@
   .logo-box.comp.comp--dark{background:linear-gradient(145deg,var(--navy-950),#303a68);border-color:rgba(255,255,255,.12);}
   @media(max-width:639px){.logo-box.comp{height:96px;padding:14px 18px;}.logo-box.comp img{max-height:48px;}}
   .company-carousel{position:relative;margin-top:44px;}
-  .company-carousel .logo-grid.comp{position:relative;display:block;height:470px;margin-top:0;overflow:hidden;perspective:1200px;}
-  .company-carousel .logo-grid.comp .logo-box{position:absolute;left:50%;top:50%;width:min(230px,30vw);margin:0;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.72) rotate(0deg);transition:transform .55s cubic-bezier(.22,.8,.25,1),opacity .35s ease,filter .35s ease;}
-  .company-carousel .logo-grid.comp .logo-box.company-logo--active{opacity:1;z-index:5;pointer-events:auto;transform:translate(-50%,-50%) scale(1.08) rotate(0deg);}
-  .company-carousel .logo-grid.comp .logo-box.company-logo--prev{opacity:.78;z-index:3;transform:translate(calc(-50% - 245px),calc(-50% - 92px)) rotate(-13deg);}
-  .company-carousel .logo-grid.comp .logo-box.company-logo--prev-2{opacity:.48;z-index:2;transform:translate(calc(-50% - 390px),calc(-50% - 166px)) rotate(-23deg) scale(.82);}
-  .company-carousel .logo-grid.comp .logo-box.company-logo--next{opacity:.78;z-index:3;transform:translate(calc(-50% + 245px),calc(-50% + 92px)) rotate(13deg);}
-  .company-carousel .logo-grid.comp .logo-box.company-logo--next-2{opacity:.48;z-index:2;transform:translate(calc(-50% + 390px),calc(-50% + 166px)) rotate(23deg) scale(.82);}
-  .company-carousel-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:-8px;position:relative;z-index:6;}
+  .company-carousel .logo-grid.comp{margin-top:0;}
+  .company-carousel.is-ready .logo-grid.comp{position:relative;display:block;height:470px;overflow:hidden;perspective:1200px;}
+  .company-carousel.is-ready .logo-grid.comp .logo-box{position:absolute;left:50%;top:50%;width:min(230px,30vw);margin:0;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.72) rotate(0deg);transition:transform .55s cubic-bezier(.22,.8,.25,1),opacity .35s ease,filter .35s ease;}
+  .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--active{opacity:1;z-index:5;pointer-events:auto;transform:translate(-50%,-50%) scale(1.08) rotate(0deg);}
+  .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--prev{opacity:.78;z-index:3;transform:translate(calc(-50% - 245px),calc(-50% - 92px)) rotate(-13deg);}
+  .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--prev-2{opacity:.48;z-index:2;transform:translate(calc(-50% - 390px),calc(-50% - 166px)) rotate(-23deg) scale(.82);}
+  .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--next{opacity:.78;z-index:3;transform:translate(calc(-50% + 245px),calc(-50% + 92px)) rotate(13deg);}
+  .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--next-2{opacity:.48;z-index:2;transform:translate(calc(-50% + 390px),calc(-50% + 166px)) rotate(23deg) scale(.82);}
+  .company-carousel-controls{display:none;align-items:center;justify-content:center;gap:14px;margin-top:-8px;position:relative;z-index:6;}
+  .company-carousel.is-ready .company-carousel-controls{display:flex;}
   .company-carousel-controls button{width:42px;height:42px;border:1px solid var(--mist-100);border-radius:50%;background:#fff;color:var(--navy-950);font-size:20px;cursor:pointer;box-shadow:0 10px 24px -18px rgba(24,28,48,.8);}
   .company-carousel-controls button:hover{border-color:var(--cyan);color:var(--cyan-deep);}
   .company-carousel-counter{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--navy-400);min-width:58px;text-align:center;}
+  @media(prefers-reduced-motion:reduce){.company-carousel .logo-box{transition:none!important;}}
   @media(max-width:639px){
-    .company-carousel .logo-grid.comp{height:390px;}
-    .company-carousel .logo-grid.comp .logo-box{width:min(220px,64vw);}
-    .company-carousel .logo-grid.comp .logo-box.company-logo--prev{transform:translate(calc(-50% - 122px),calc(-50% - 60px)) rotate(-12deg) scale(.78);}
-    .company-carousel .logo-grid.comp .logo-box.company-logo--prev-2{transform:translate(calc(-50% - 190px),calc(-50% - 118px)) rotate(-20deg) scale(.58);}
-    .company-carousel .logo-grid.comp .logo-box.company-logo--next{transform:translate(calc(-50% + 122px),calc(-50% + 60px)) rotate(12deg) scale(.78);}
-    .company-carousel .logo-grid.comp .logo-box.company-logo--next-2{transform:translate(calc(-50% + 190px),calc(-50% + 118px)) rotate(20deg) scale(.58);}
+    .company-carousel.is-ready .logo-grid.comp{height:390px;}
+    .company-carousel.is-ready .logo-grid.comp .logo-box{width:min(220px,64vw);}
+    .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--prev{transform:translate(calc(-50% - 122px),calc(-50% - 60px)) rotate(-12deg) scale(.78);}
+    .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--prev-2{transform:translate(calc(-50% - 190px),calc(-50% - 118px)) rotate(-20deg) scale(.58);}
+    .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--next{transform:translate(calc(-50% + 122px),calc(-50% + 60px)) rotate(12deg) scale(.78);}
+    .company-carousel.is-ready .logo-grid.comp .logo-box.company-logo--next-2{transform:translate(calc(-50% + 190px),calc(-50% + 118px)) rotate(20deg) scale(.58);}
   }
 
   .company-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;}
@@ -451,18 +455,21 @@
   .story-person strong{display:block;font-size:13px;color:var(--navy-950);}
   .story-person span{font-size:11px;color:var(--navy-500);font-weight:600;}
   .story-carousel{position:relative;margin:44px auto 0;max-width:900px;}
-  .story-carousel .story-stack{position:relative;perspective:1400px;min-height:260px;}
-  .story-carousel .story-stack .story-card{position:absolute;inset:0 auto auto 50%;width:min(760px,calc(100% - 120px));opacity:0;pointer-events:none;transform:translateX(-50%) scale(.88);transition:transform .55s cubic-bezier(.22,.8,.25,1),opacity .35s ease,box-shadow .35s ease;box-shadow:0 22px 54px rgba(24,28,48,.16);}
-  .story-carousel .story-card.story--active{z-index:5;opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1);}
-  .story-carousel .story-card.story--prev,.story-carousel .story-card.story--next{z-index:3;opacity:.72;pointer-events:auto;cursor:pointer;}
-  .story-carousel .story-card.story--prev{transform:translate(calc(-50% - 195px),16px) rotate(-7deg) scale(.88);}
-  .story-carousel .story-card.story--next{transform:translate(calc(-50% + 195px),16px) rotate(7deg) scale(.88);}
-  .story-carousel-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:24px;position:relative;z-index:6;}
+  .story-carousel .story-stack{position:relative;min-height:0;}
+  .story-carousel .story-stack .story-card{margin:0 0 16px;}
+  .story-carousel.is-ready .story-stack{perspective:1400px;min-height:260px;}
+  .story-carousel.is-ready .story-stack .story-card{position:absolute;inset:0 auto auto 50%;width:min(760px,calc(100% - 120px));margin:0;opacity:0;pointer-events:none;transform:translateX(-50%) scale(.88);transition:transform .55s cubic-bezier(.22,.8,.25,1),opacity .35s ease,box-shadow .35s ease;box-shadow:0 22px 54px rgba(24,28,48,.16);}
+  .story-carousel.is-ready .story-card.story--active{z-index:5;opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1);}
+  .story-carousel.is-ready .story-card.story--prev,.story-carousel.is-ready .story-card.story--next{z-index:3;opacity:.72;pointer-events:auto;cursor:pointer;}
+  .story-carousel.is-ready .story-card.story--prev{transform:translate(calc(-50% - 195px),16px) rotate(-7deg) scale(.88);}
+  .story-carousel.is-ready .story-card.story--next{transform:translate(calc(-50% + 195px),16px) rotate(7deg) scale(.88);}
+  .story-carousel-controls{display:none;align-items:center;justify-content:center;gap:14px;margin-top:24px;position:relative;z-index:6;}
+  .story-carousel.is-ready .story-carousel-controls{display:flex;}
   .story-carousel-controls button{width:46px;height:46px;border:1px solid var(--mist-100);border-radius:50%;background:#fff;color:var(--navy-950);font-size:22px;cursor:pointer;box-shadow:0 10px 24px -18px rgba(24,28,48,.8);}
   .story-carousel-controls button:hover{border-color:var(--cyan);color:var(--cyan-deep);}
   .story-carousel-controls button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}
   .story-carousel-counter{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--navy-500);min-width:68px;text-align:center;}
-  @media(max-width:639px){.story-carousel .story-stack .story-card{width:calc(100% - 42px);padding:20px;}.story-carousel .story-card.story--prev{transform:translate(calc(-50% - 76px),14px) rotate(-5deg) scale(.84);}.story-carousel .story-card.story--next{transform:translate(calc(-50% + 76px),14px) rotate(5deg) scale(.84);}.story-carousel .story-stack{min-height:300px;}}
+  @media(max-width:639px){.story-carousel.is-ready .story-stack .story-card{width:calc(100% - 42px);padding:20px;}.story-carousel.is-ready .story-card.story--prev{transform:translate(calc(-50% - 76px),14px) rotate(-5deg) scale(.84);}.story-carousel.is-ready .story-card.story--next{transform:translate(calc(-50% + 76px),14px) rotate(5deg) scale(.84);}.story-carousel.is-ready .story-stack{min-height:300px;}}
   @media(prefers-reduced-motion:reduce){.story-carousel .story-card{transition:none!important;}}
   .photo-carousel{position:relative;margin-top:36px;}
   .season-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
@@ -621,7 +628,7 @@ fbq('track','PageView');
     @media(prefers-reduced-motion:reduce){#how .process-item,#how .process-item:nth-child(2),#how .process-item:nth-child(4){transition:none;transform:none;}#how .process-item:hover{transform:none;}}
   </style>
   <style id="season-9-preview-overrides">
-    section:has(.season-head){background:radial-gradient(circle at 8% 50%,rgba(18,201,219,.12),transparent 30%),var(--mist-50);}
+    .season-highlight{background:radial-gradient(circle at 8% 50%,rgba(18,201,219,.12),transparent 30%),var(--mist-50);}
     .season-head{grid-template-columns:220px 1fr;gap:52px;align-items:center;min-height:280px;}
     .season-head>div:first-child{padding:24px 20px 28px;border-radius:24px;background:rgba(18,201,219,.12);border:1px solid rgba(18,201,219,.28);box-shadow:0 20px 50px -35px rgba(10,148,163,.8);}
     .season-num-label{font-size:16px;letter-spacing:.18em;color:var(--cyan-deep);}
@@ -868,7 +875,7 @@ fbq('track','PageView');
   </div>
 </section>
 
-<section class="bg-tint">
+<section class="bg-tint season-highlight">
   <div class="container">
     <div class="season-head">
       <div>
@@ -1130,6 +1137,7 @@ fbq('track','PageView');
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR:Rush for Practice беше едно преживяване, което никога няма да забравя. През този макар и кратък период усъвършенствах уменията си за адаптация и комуникация. Многократно излязох от зоната си на комфорт и осъществих множество контакти, които ще ми бъдат полезни и занапред. Научих се да боравя правилно с изкуствения интелект. Но най-важното е, че след това събитие пред мен се разкри нова възможност за професионално развитие.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/valentin-slavchev.jpg" alt="Валентин Славчев" loading="lazy"></div><div><strong>Валентин Славчев</strong><span>Икономически университет – Варна · Участник · Сезон 6</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>Моят път ми показа, че всичко е възможно, когато се вслушаш в себе си, действаш проактивно и останеш верен на ценностите си, защото една смела крачка днес може да промени посоката на всичко, което предстои.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/valentin-kazandzhiev.jpg" alt="Валентин Казанджиев" loading="lazy"></div><div><strong>Валентин Казанджиев</strong><span>УНСС · Участник · Сезон 5</span></div></div></article>
       <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>HR: Rush for Practice е предизвикателство, което те изправя не само срещу конкурентни отбори, но и срещу собствената ти мотивация. Инициативата е направена така, че сам да се амбицираш и да покажеш умения, за които не си подозирал, че притежаваш, и които да използваш в правилните ситуации. Именно това мотивира желанието ми да достигна най-висок резултат в моя сезон.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/konstantin-sarafski.jpg" alt="Константин Сарафски" loading="lazy"></div><div><strong>Константин Сарафски</strong><span>НБУ · Победител в Сезон 2</span></div></div></article>
+      <article class="story-card"><span style="color:var(--cyan-deep);font-size:22px;font-weight:800;">”</span><blockquote>„HR: Rush for Practice“ успя да ми даде поглед над различни етапи от селектирането на таланти. Имах възможността да говоря пред по-голяма аудитория за дадена позиция в конкретен отдел и успях да създам много нови контакти — както от бизнеса, така и с колеги от чужди университети, превърнали се впоследствие в ценни приятелства.</blockquote><div class="story-person"><div class="story-avatar"><img src="assets/participants/simeon-simeonov.jpg" alt="Симеон Симеонов" loading="lazy"></div><div><strong>Симеон Симеонов</strong><span>УНСС · Участник · Сезон 5</span></div></div></article>
     </div>
     <div class="story-carousel-controls" aria-label="Навигация на историите">
       <button type="button" data-story-prev aria-label="Предишен отзив">‹</button>
@@ -1348,6 +1356,7 @@ fbq('track','PageView');
   var roleInputs = document.querySelectorAll('input[name="applicantRole"]');
   function updateRoleFields(){
     var role = document.querySelector('input[name="applicantRole"]:checked').value;
+    roleInputs.forEach(function(input){if(input.parentNode.classList){if(input.checked) input.parentNode.classList.add('is-selected');else input.parentNode.classList.remove('is-selected');}});
     var isStudent = role === 'student';
     studentUniversityField.hidden = !isStudent;
     studentSpecialtyField.hidden = !isStudent;
@@ -1690,12 +1699,14 @@ fbq('track','PageView');
     }
     requestAnimationFrame(tick);
   }
-  var observer = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){ animateCounter(entry.target); observer.unobserve(entry.target); }
-    });
-  }, { threshold: 0.4 });
-  counters.forEach(function(c){ observer.observe(c); });
+  if('IntersectionObserver' in window){
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ animateCounter(entry.target); observer.unobserve(entry.target); }
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(function(c){ observer.observe(c); });
+  }else counters.forEach(animateCounter);
 
   // Company logos: lightweight diagonal carousel inspired by the reference.
   (function(){
@@ -1707,6 +1718,8 @@ fbq('track','PageView');
     var counter = carousel.querySelector('[data-company-counter]');
     var active = 0;
     var timer;
+    var hovering = false;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function render(){
       var total = cards.length;
@@ -1722,11 +1735,17 @@ fbq('track','PageView');
       if(counter) counter.textContent = String(active + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
     }
     function move(step){ active = (active + step + cards.length) % cards.length; render(); }
-    function restart(){ clearInterval(timer); timer = setInterval(function(){ move(1); }, 1200); }
+    function restart(){ clearInterval(timer); if(!reduceMotion&&!document.hidden&&!hovering&&!carousel.contains(document.activeElement)) timer = setInterval(function(){ move(1); }, 5000); }
     prev.addEventListener('click', function(){ move(-1); restart(); });
     next.addEventListener('click', function(){ move(1); restart(); });
     render();
-    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) restart();
+    carousel.classList.add('is-ready');
+    carousel.addEventListener('mouseenter',function(){hovering=true;clearInterval(timer);});
+    carousel.addEventListener('mouseleave',function(){hovering=false;restart();});
+    carousel.addEventListener('focusin',function(){clearInterval(timer);});
+    carousel.addEventListener('focusout',function(event){if(!carousel.contains(event.relatedTarget)) restart();});
+    document.addEventListener('visibilitychange',restart);
+    restart();
   })();
 
   // Student stories: manually navigated fanned deck, adapted to HR:RUSH colors.
@@ -1741,6 +1760,7 @@ fbq('track','PageView');
     if(cards.length < 2 || !prev || !next) return;
     var active = 0;
     var timer;
+    var hovering = false;
     var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function readingTime(card){
       var quote=card.querySelector('blockquote');
@@ -1750,7 +1770,7 @@ fbq('track','PageView');
     function stop(){clearTimeout(timer);}
     function start(){
       stop();
-      if(reduceMotion||document.hidden||carousel.matches(':hover')||carousel.contains(document.activeElement)) return;
+      if(reduceMotion||document.hidden||hovering||carousel.contains(document.activeElement)) return;
       timer=setTimeout(function(){move(1);},readingTime(cards[active]));
     }
     function render(){
@@ -1777,8 +1797,8 @@ fbq('track','PageView');
       if(event.key==='ArrowLeft'){event.preventDefault();move(-1);}
       if(event.key==='ArrowRight'){event.preventDefault();move(1);}
     });
-    carousel.addEventListener('mouseenter',stop);
-    carousel.addEventListener('mouseleave',start);
+    carousel.addEventListener('mouseenter',function(){hovering=true;stop();});
+    carousel.addEventListener('mouseleave',function(){hovering=false;start();});
     carousel.addEventListener('focusin',stop);
     carousel.addEventListener('focusout',function(event){if(!carousel.contains(event.relatedTarget)) start();});
     document.addEventListener('visibilitychange',start);
@@ -1789,30 +1809,38 @@ fbq('track','PageView');
     carousel.classList.add('is-ready');
   })();
 
-  // Keep mentor cards even: only long biographies get a native-sized disclosure control.
+  // Long copy stays fully visible without JS; supported browsers get a keyboard-friendly toggle.
   (function(){
-    document.querySelectorAll('.mentor-body').forEach(function(body){
-      var paragraphs=Array.prototype.slice.call(body.querySelectorAll(':scope > p'));
-      if(!paragraphs.length) return;
-      var copy=document.createElement('div');
-      copy.className='mentor-copy';
-      body.insertBefore(copy,paragraphs[0]);
-      paragraphs.forEach(function(paragraph){copy.appendChild(paragraph);});
+    function addReadMore(copy){
       if(copy.scrollHeight<=136) return;
+      copy.classList.add('read-more-copy');
       copy.classList.add('is-collapsed');
       var button=document.createElement('button');
       button.type='button';
       button.className='mentor-more';
-      button.textContent='Прочети още';
+      button.textContent='Прочети повече';
       button.setAttribute('aria-expanded','false');
-      button.addEventListener('click',function(){
+      button.addEventListener('click',function(event){
+        event.stopPropagation();
         var expanded=button.getAttribute('aria-expanded')==='true';
         button.setAttribute('aria-expanded',String(!expanded));
-        button.textContent=expanded?'Прочети още':'Скрий';
-        copy.classList.toggle('is-collapsed',expanded);
+        button.textContent=expanded?'Прочети повече':'Прочети по-малко';
+        if(expanded) copy.classList.add('is-collapsed');else copy.classList.remove('is-collapsed');
+        var card=copy.parentNode;
+        if(card.classList&&card.classList.contains('story-card')&&card.classList.contains('story--active')) card.parentNode.style.height=Math.ceil(card.getBoundingClientRect().height)+'px';
       });
-      copy.after(button);
+      copy.parentNode.insertBefore(button,copy.nextSibling);
+    }
+    document.querySelectorAll('.mentor-body').forEach(function(body){
+      var paragraphs=Array.prototype.filter.call(body.children,function(child){return child.tagName==='P';});
+      if(!paragraphs.length) return;
+      var copy=document.createElement('div');
+      copy.className='read-more-copy';
+      body.insertBefore(copy,paragraphs[0]);
+      paragraphs.forEach(function(paragraph){copy.appendChild(paragraph);});
+      addReadMore(copy);
     });
+    document.querySelectorAll('.story-card blockquote,.hr-quote-card blockquote').forEach(addReadMore);
   })();
 
   // Initiative photos: lightweight auto-playing cover-flow carousel.
@@ -1827,6 +1855,7 @@ fbq('track','PageView');
     if(cards.length < 2 || !prev || !next) return;
     var active = 0;
     var timer;
+    var hovering = false;
 
     function render(){
       var total = cards.length;
@@ -1848,12 +1877,12 @@ fbq('track','PageView');
     function stop(){ clearInterval(timer); }
     function start(){
       stop();
-      if(!document.hidden && !carousel.matches(':hover') && !carousel.contains(document.activeElement)) timer = setInterval(function(){ move(1); }, 1200);
+      if(!document.hidden && !hovering && !carousel.contains(document.activeElement)) timer = setInterval(function(){ move(1); }, 1200);
     }
     prev.addEventListener('click', function(){ move(-1); start(); });
     next.addEventListener('click', function(){ move(1); start(); });
-    carousel.addEventListener('mouseenter', stop);
-    carousel.addEventListener('mouseleave', start);
+    carousel.addEventListener('mouseenter', function(){ hovering = true; stop(); });
+    carousel.addEventListener('mouseleave', function(){ hovering = false; start(); });
     carousel.addEventListener('focusin', stop);
     carousel.addEventListener('focusout', function(event){ if(!carousel.contains(event.relatedTarget)) start(); });
     document.addEventListener('visibilitychange', start);
