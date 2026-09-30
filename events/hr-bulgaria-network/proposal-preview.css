@@ -1,0 +1,59 @@
+:root{--ink:#172c35;--cream:#f8f6f0;--yellow:#f5c85b;--coral:#e96f5d;--muted:#708087;--line:#d8e1df;--aqua:#e8f6f7}
+body{background:var(--cream);color:var(--ink)}
+.site-header{position:sticky;top:0;z-index:10;background:rgba(248,246,240,.94);border-bottom:1px solid var(--line)}
+.site-header nav a:hover,.site-header nav a:focus-visible{color:var(--coral)}
+.hero{padding-top:92px}
+.button-primary{background:var(--yellow);box-shadow:5px 5px 0 var(--ink)}
+.button-primary:hover,.button-primary:focus-visible{background:var(--coral);color:#fff;transform:translate(-2px,-2px)}
+.stats{max-width:1176px;margin-bottom:112px;padding:25px 32px;background:var(--ink);border:0;border-radius:20px;color:#fff}
+.stats strong{color:var(--yellow);font-size:34px;white-space:nowrap}
+.stats span{color:#fff}
+.about-grid{gap:18px}
+.about-grid p{padding:20px 22px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.guests{background:var(--aqua)}
+.guest-track{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.guest-card{background:#fff;padding:12px;border-radius:24px;border:1px solid var(--line)}
+.guest-photo{height:420px;border-radius:18px}
+.guest-company{border-color:var(--coral);color:var(--muted)}
+.guest-topic{min-height:34px}
+.story{padding-top:116px}
+.moments{padding-top:112px}
+.moments-link{font-size:15px}
+.register{background:var(--aqua);padding-top:112px}
+.register .section-label{color:var(--coral)}
+.form-card{border:0;border-radius:16px;padding:22px 24px;box-shadow:0 1px 0 rgba(23,44,53,.08)}
+.form-card legend{display:block;background:transparent;padding:0;margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink)}
+.form-card .choice{min-height:28px}
+.form-card .choice+.choice{margin-top:5px}
+.form-card .other-input{margin-top:5px!important}
+.registration-form .button-dark{background:var(--ink);border-radius:999px}
+.registration-form .button-dark:hover,.registration-form .button-dark:focus-visible{background:var(--coral)}
+.site-footer{background:var(--yellow)}
+@media(max-width:760px){.site-header{position:relative}.hero{padding-top:58px}.stats{margin:0 20px 80px;padding:20px;border-radius:16px}.stats strong{font-size:28px}.guest-track{grid-template-columns:none}.guest-card{padding:10px}.guest-photo{height:360px}.story{padding-top:78px}.moments{padding-top:76px}.register{padding-top:78px}}
+
+/* Keep the yellow only in the logo; use the existing coral accent everywhere else. */
+.brand-mark{color:var(--yellow)}
+.button-primary,.hero-sticker{background:var(--coral)}
+.hero-caption span,.button-dark span,.stats strong{color:var(--coral)}
+.moments .section-label,.story .section-label,.story-card small{color:var(--coral)}
+.site-footer{background:var(--coral)}
+.moments-link{border-color:var(--coral);color:var(--coral)}
+.guest-photo span{color:var(--coral)}
+.gallery-card.image-placeholder:nth-child(2){background-image:linear-gradient(135deg,rgba(27,29,58,.1),rgba(233,111,93,.4)),url('https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80')}
+.back-to-top{position:fixed;right:24px;bottom:24px;z-index:20;width:56px;height:56px;display:grid;place-items:center;background:var(--coral);color:var(--ink);border:1px solid var(--ink);border-radius:50%;font-size:32px;line-height:1;text-decoration:none;box-shadow:0 3px 0 var(--ink);transition:transform .2s ease,background .2s ease}
+.back-to-top:hover,.back-to-top:focus-visible{background:var(--ink);color:#fff;transform:translateY(-4px);outline:none}
+@media(max-width:760px){.back-to-top{right:18px;bottom:18px;width:50px;height:50px;font-size:28px}}
+
+/* Conversion pass: clearer event context, one calm registration panel, stronger proof. */
+.event-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 22px;color:var(--ink);font-size:13px}.event-meta span{color:var(--muted)}.event-meta span:not(:last-child)::after{content:'·';margin-left:18px;color:var(--coral)}
+.hero-note{margin-top:4px}.register-benefits{margin:30px 0 0;padding:0;list-style:none;display:grid;gap:12px;color:var(--ink);font-size:15px}.register-benefits li{display:flex;align-items:flex-start;gap:10px}.register-benefits li::before{content:'↗';color:var(--coral);font-weight:700}
+.registration-form{background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px 28px;gap:0;box-shadow:0 14px 34px rgba(23,44,53,.06)}.registration-form .form-card{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:18px 0 20px;background:transparent;box-shadow:none}.registration-form .form-card:first-child{padding-top:2px}.registration-form .form-card:last-of-type{padding-bottom:22px}.registration-form .consent{padding:20px 0 8px}.registration-form .button-dark{margin-top:14px}.payment-note{margin:10px 4px 0;color:var(--muted);font-size:12px;line-height:1.4}.registration-form .choice input{width:16px;height:16px}.site-header{transition:box-shadow .2s ease}.site-header:focus-within{box-shadow:0 2px 0 rgba(23,44,53,.08)}
+.gallery{grid-template-columns:1.5fr .8fr .8fr}.gallery-card{border-radius:22px}.gallery-tall{border-radius:70px 0 0 0}.gallery-small{border-radius:0 0 70px 0}
+@media(max-width:760px){.site-header{position:sticky;top:0}.event-meta{display:grid;gap:5px;margin-bottom:18px}.event-meta span:not(:last-child)::after{display:none}.registration-form{padding:18px 16px;border-radius:18px}.register-benefits{margin-top:24px}.gallery-card{border-radius:18px}.gallery-tall,.gallery-small{border-radius:18px}}
+
+/* Local preview only: use original event photos as a rotating full hero backdrop. */
+.hero{position:relative;max-width:none;min-height:calc(100vh - 86px);overflow:hidden;display:flex;align-items:center;background-image:linear-gradient(90deg,rgba(23,44,53,.94) 0%,rgba(23,44,53,.78) 42%,rgba(23,44,53,.34) 100%),var(--hero-photo);background-size:cover;background-position:center;color:#fff;padding-left:max(32px,calc((100vw - 1176px)/2));padding-right:max(32px,calc((100vw - 1176px)/2))}
+.hero::after{content:'';position:absolute;inset:auto 0 0;height:28%;background:linear-gradient(transparent,rgba(23,44,53,.55));pointer-events:none}
+.hero-copy{position:relative;z-index:1;max-width:620px;padding:0;background:transparent}.hero h1{color:#fff}.hero .hero-text,.hero .hero-note{color:rgba(255,255,255,.88)}.hero .event-meta{color:#fff}.hero .event-meta span{color:rgba(255,255,255,.78)}.hero .eyebrow{color:#fff}
+.hero-visual{display:none}
+@media(max-width:760px){.hero{min-height:calc(100svh - 76px);background-position:center top;padding-left:20px;padding-right:20px}.hero-copy{padding:0;background:transparent}}
