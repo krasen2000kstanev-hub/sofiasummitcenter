@@ -110,7 +110,7 @@ test('does not leave an application behind if creating its outbox fails', async 
   assert.equal(env.DB.raw.prepare('SELECT COUNT(*) n FROM hrr_applications').get().n, 0);
 });
 
-test('retries the same fixed Sheet row and keeps organizer email free of candidate details', async () => {
+test('retries the same Sheet row before emailing the organizer application details and Sheet link', async () => {
   const env = await setup();
   const privateKey = await crypto.subtle.generateKey({
     name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048,
@@ -120,10 +120,10 @@ test('retries the same fixed Sheet row and keeps organizer email free of candida
   const pemBody = btoa(String.fromCharCode(...der));
   env.GOOGLE_SERVICE_ACCOUNT_JSON = JSON.stringify({ client_email: 'worker@example.iam.gserviceaccount.com', private_key: `-----BEGIN PRIVATE KEY-----\n${pemBody}\n-----END PRIVATE KEY-----` });
   env.HRR_APPLICATIONS_SHEET_ID = 'sheet-test-id';
-  env.HRR_APPLICATION_NOTIFICATION_EMAIL = 'krasen2000.k.stanev@gmail.com';
+  env.HRR_APPLICATION_NOTIFICATION_EMAIL = 'tsvetelin@pleggi.com';
   env.RESEND_API_KEY = 'test-key';
   env.EMAIL_FROM = 'test@example.com';
-  const companyApplication = { ...validApplication, role: 'company', organization: 'Пример ООД', university: '', specialty: 'Представител на компания', position: 'HR мениджър' };
+  const companyApplication = { ...validApplication, role: 'company', organization: '<Пример> ООД', university: '', specialty: '', position: 'HR мениджър' };
   await submitHrrApplication(request(companyApplication), env, null);
 
   const sheetWrites = [];
@@ -149,8 +149,7 @@ test('retries the same fixed Sheet row and keeps organizer email free of candida
   await processHrrApplicationOutbox(env);
   const failed = env.DB.raw.prepare("SELECT status FROM hrr_application_outbox WHERE kind='sheet'").get();
   assert.equal(failed.status, 'pending');
-  env.DB.raw.prepare("UPDATE hrr_application_outbox SET available_at=? WHERE kind='sheet'").run(new Date().toISOString());
-  await processHrrApplicationOutbox(env);
+  env.DB.raw.prepare("UPDATE hrr_application_outbox SET available_at=? WHERE status='pending'").run(new Date().toISOString());
   await processHrrApplicationOutbox(env);
 
   assert.equal(sheetWrites.length, 2);
@@ -159,9 +158,11 @@ test('retries the same fixed Sheet row and keeps organizer email free of candida
   assert.equal(sheetWrites[0].body.values[0][10], 'candidate@example.com');
   assert.equal(decodeURIComponent(sheetWrites[0].url).includes(':N'), true);
   assert.equal(sheetWrites[0].body.values[0][13], 'HR мениджър');
-  const organizerEmail = emailPayloads.find((email) => email.to[0] === 'krasen2000.k.stanev@gmail.com');
+  const organizerEmail = emailPayloads.find((email) => email.to[0] === 'tsvetelin@pleggi.com');
   assert.ok(organizerEmail);
-  assert.equal(JSON.stringify(organizerEmail).includes('candidate@example.com'), false);
-  assert.equal(JSON.stringify(organizerEmail).includes('Тест'), false);
+  assert.match(organizerEmail.html, /candidate@example\.com/);
+  assert.match(organizerEmail.html, /&lt;Пример&gt; ООД/);
+  assert.match(organizerEmail.html, /HR мениджър/);
+  assert.match(organizerEmail.html, /https:\/\/docs\.google\.com\/spreadsheets\/d\/sheet-test-id\/edit/);
   assert.equal(env.DB.raw.prepare("SELECT status FROM hrr_application_outbox WHERE kind='sheet'").get().status, 'sent');
 });
