@@ -13,6 +13,7 @@ function validate(body) {
   const firstName = clean(body.firstName, 100);
   const lastName = clean(body.lastName, 100);
   const organization = clean(body.organization, 180);
+  const position = clean(body.position, 180);
   const university = clean(body.university, 180);
   const specialty = clean(body.specialty, 180);
   const phone = clean(body.phone, 50);
@@ -22,8 +23,9 @@ function validate(body) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Въведете валиден имейл адрес.';
   if (role === 'student' && (!university || !specialty)) return 'За студентска кандидатура са нужни университет и специалност.';
   if (role !== 'student' && !organization) return 'Въведете организацията, която представлявате.';
+  if (role === 'company' && !position) return 'Въведете позицията си в компанията.';
   if (body.gdprConsent !== true) return 'Необходимо е съгласие за обработване на личните данни.';
-  return { role, firstName, lastName, organization, university, specialty, phone, email };
+  return { role, firstName, lastName, organization, position, university, specialty, phone, email };
 }
 
 export async function submitHrrApplication(request, env, ctx, headers = {}) {
@@ -39,9 +41,9 @@ export async function submitHrrApplication(request, env, ctx, headers = {}) {
   const createdAt = now();
   const applicationId = makeId();
   await env.DB.batch([env.DB.prepare(`INSERT INTO hrr_applications
-    (id,season,role,first_name,last_name,organization,university,specialty,phone,email,gdpr_consent,consent_at,created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,1,?,?)`)
-    .bind(applicationId, configuredSeason, values.role, values.firstName, values.lastName, values.organization,
+    (id,season,role,first_name,last_name,organization,position,university,specialty,phone,email,gdpr_consent,consent_at,created_at)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,1,?,?)`)
+    .bind(applicationId, configuredSeason, values.role, values.firstName, values.lastName, values.organization, values.position,
       values.university, values.specialty, values.phone, values.email, createdAt, createdAt),
     ...['sheet', 'organizer_email', 'applicant_email'].map((kind) => env.DB.prepare(`INSERT INTO hrr_application_outbox
       (id,application_id,kind,status,attempts,available_at,created_at) VALUES (?,?,?,'pending',0,?,?)`)
@@ -108,12 +110,12 @@ async function writeApplicationToSheet(env, application) {
     });
     if (!extend.ok) throw new Error(`Google Sheets row extension failed (${extend.status})`);
   }
-  const range = `'Кандидатури'!A${rowNumber}:M${rowNumber}`;
+  const range = `'Кандидатури'!A${rowNumber}:N${rowNumber}`;
   const values = [[
     application.application_no, application.created_at, application.season,
     application.role, application.first_name, application.last_name,
     application.organization, application.university, application.specialty,
-    application.phone, application.email, 'Да', application.status
+    application.phone, application.email, 'Да', application.status, application.position
   ]];
   const endpoint = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`;
   const response = await fetch(endpoint, {
