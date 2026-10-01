@@ -1,0 +1,20 @@
+{
+  "title": "HR Bulgaria Network",
+  "date": "25 септември 2026",
+  "time": "Ще бъде публикувано на сайта",
+  "venue": "Sofia Summit Center",
+  "address": "ул. „8-ми декември“ 13, София",
+  "url": "https://sofiasummit.bg/events/hr-bulgaria-network/",
+  "speakers": [
+    {
+      "name": "Бойко Проданов",
+      "company": "ActionCOACH",
+      "topic": "Война за таланти? Или как да не губите най-добрите кандидати?"
+    },
+    {
+      "name": "Радослава Кроснева",
+      "company": "Co-Partner",
+      "topic": "Какво ще отличава търсения HR професионалист през следващите години?"
+    }
+  ]
+}
