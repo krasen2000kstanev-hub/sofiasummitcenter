@@ -15,6 +15,7 @@ form.addEventListener('submit', async (event) => {
   status.textContent = 'Записваме данните…';
   const data = Object.fromEntries(new FormData(form).entries());
   data.expectations = [...form.querySelectorAll('input[name="expectations"]:checked')].map((input) => input.value);
+  data.expectationsOther = data.expectations_other || '';
   data.consent = form.elements.consent.checked;
   try {
     const response = await fetch(`${API_BASE}/registrations`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(data)});
@@ -27,8 +28,10 @@ form.addEventListener('submit', async (event) => {
 });
 
 const guestTrack = document.querySelector('.guest-track');
-document.querySelector('.carousel-prev')?.addEventListener('click', () => guestTrack.scrollBy({left: -320, behavior: 'smooth'}));
-document.querySelector('.carousel-next')?.addEventListener('click', () => guestTrack.scrollBy({left: 320, behavior: 'smooth'}));
+if (guestTrack) {
+  document.querySelector('.carousel-prev')?.addEventListener('click', () => guestTrack.scrollBy({left: -320, behavior: 'smooth'}));
+  document.querySelector('.carousel-next')?.addEventListener('click', () => guestTrack.scrollBy({left: 320, behavior: 'smooth'}));
+}
 
 const story = document.querySelector('[data-story]');
 const storyVideo = story?.querySelector('.story-video');
