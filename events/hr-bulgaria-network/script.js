@@ -1,18 +1,29 @@
-const PAYMENT_LINK = '';
+const API_BASE = window.HR_API_BASE || '';
+const PAYMENT_LINK = 'https://epg.dskbank.bg/sc/YqwigIbIWMnGQnRP';
 const form = document.querySelector('#registration-form');
 const status = document.querySelector('.form-status');
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!form.reportValidity()) return;
 
-  if (!PAYMENT_LINK) {
+  if (!API_BASE) {
     status.textContent = 'Формата е готова. Ще се свържем с теб за потвърждение.';
     return;
   }
 
-  const params = new URLSearchParams(new FormData(form));
-  window.location.href = `${PAYMENT_LINK}?name=${encodeURIComponent(params.get('name'))}&email=${encodeURIComponent(params.get('email'))}`;
+  status.textContent = 'Записваме данните…';
+  const data = Object.fromEntries(new FormData(form).entries());
+  data.expectations = [...form.querySelectorAll('input[name="expectations"]:checked')].map((input) => input.value);
+  data.consent = form.elements.consent.checked;
+  try {
+    const response = await fetch(`${API_BASE}/registrations`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(data)});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.errors ? Object.values(result.errors)[0] : 'registration_failed');
+    window.location.href = result.paymentUrl || PAYMENT_LINK;
+  } catch (error) {
+    status.textContent = error.message === 'Failed to fetch' ? 'Временно няма връзка със сървъра. Опитай отново.' : error.message;
+  }
 });
 
 const guestTrack = document.querySelector('.guest-track');

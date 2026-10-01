@@ -1,0 +1,12 @@
+{
+  "name": "hr-bulgaria-network-backend",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test/validation.test.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.900.0",
+    "@aws-sdk/client-sesv2": "^3.900.0"
+  }
+}
