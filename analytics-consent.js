@@ -45,6 +45,43 @@
     }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     window.fbq('init', PIXEL_ID);
     window.fbq('track', 'PageView');
+
+    document.addEventListener('click', function (event) {
+      var target = event.target.closest('a[href], [data-story-prev], [data-story-next], .story-card.story--prev, .story-card.story--next');
+      if (!target) return;
+
+      var name, params = {};
+      if (target.matches('[data-story-prev], [data-story-next], .story-card.story--prev, .story-card.story--next')) {
+        name = 'student_feedback_click';
+      } else if (target.closest('.social-row[aria-label="Последвайте HR:Rush for Practice"]')) {
+        name = 'social_profile_click';
+        params.platform = target.getAttribute('aria-label') || target.title || 'unknown';
+      } else if (target.getAttribute('href') === '#apply') {
+        name = 'registration_click';
+      } else if (target.getAttribute('href') === '#mentors') {
+        name = 'mentor_click';
+      } else if (target.getAttribute('href') === '#student-feedback') {
+        name = 'student_feedback_click';
+      } else if (target.getAttribute('href') === '#hr-feedback') {
+        name = 'hr_feedback_click';
+      }
+
+      if (name) {
+        window.gtag('event', name, params);
+        window.fbq('trackCustom', name, params);
+      }
+    });
+
+    var hrFeedback = document.querySelector('[aria-labelledby="hr-feedback-heading"]');
+    if (hrFeedback && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, observer) {
+        if (entries.some(function (entry) { return entry.isIntersecting; })) {
+          window.gtag('event', 'hr_feedback_view');
+          window.fbq('trackCustom', 'hr_feedback_view');
+          observer.disconnect();
+        }
+      }, { threshold: 0.25 }).observe(hrFeedback);
+    }
   }
 
   function makeBanner() {
