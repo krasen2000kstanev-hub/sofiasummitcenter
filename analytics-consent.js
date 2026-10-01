@@ -8,8 +8,12 @@
   function readConsent() {
     try {
       var current = JSON.parse(localStorage.getItem(KEY) || 'null');
-      var legacy = JSON.parse(localStorage.getItem('nailrestart_cookie_consent') || 'null');
-      return current || legacy;
+      if (current) return current;
+      // The nail-event page has its own older banner; keep its consent local to that page.
+      if (document.getElementById('cookieBanner')) {
+        return JSON.parse(localStorage.getItem('nailrestart_cookie_consent') || 'null');
+      }
+      return null;
     } catch (_) { return null; }
   }
 
@@ -48,10 +52,16 @@
     if (banner) return banner;
     banner = document.createElement('div');
     banner.id = 'cookieBanner';
+    banner.className = 'sofia-cookie-banner';
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Настройки за бисквитки');
-    banner.innerHTML = '<div style="max-width:1100px;margin:auto;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap"><p style="margin:0;line-height:1.5">Използваме технически необходими бисквитки. Аналитичните бисквитки на Google Analytics и Meta Pixel се включват само с твое съгласие. <a href="/privacy.html" target="_blank" rel="noopener">Повече информация</a>.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" data-cookie="reject">Само необходимите</button><button type="button" data-cookie="accept">Приемам</button></div></div>';
-    banner.style.cssText = 'position:fixed;z-index:99999;left:16px;right:16px;bottom:16px;padding:16px 20px;background:#fff;color:#171717;border:1px solid #ddd;border-radius:12px;box-shadow:0 8px 30px #0002;font:14px/1.4 system-ui,sans-serif';
+    banner.innerHTML = '<div class="sofia-cookie-banner-inner"><p>Използваме технически необходими бисквитки. Аналитичните бисквитки на Google Analytics и Meta Pixel се включват само с твое съгласие. <a href="/privacy.html" target="_blank" rel="noopener">Повече информация</a>.</p><div class="sofia-cookie-banner-actions"><button type="button" data-cookie="reject">Само необходимите</button><button type="button" data-cookie="accept">Приемам</button></div></div>';
+    if (!document.getElementById('sofia-cookie-banner-styles')) {
+      var style = document.createElement('style');
+      style.id = 'sofia-cookie-banner-styles';
+      style.textContent = '.sofia-cookie-banner{position:fixed;z-index:99999;left:16px;right:16px;bottom:16px;padding:16px 20px;background:#fff;color:#171717;border:1px solid #ddd;border-radius:12px;box-shadow:0 8px 30px #0002;font:14px/1.4 system-ui,sans-serif}.sofia-cookie-banner-inner{max-width:1100px;margin:auto;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}.sofia-cookie-banner p{margin:0;line-height:1.5}.sofia-cookie-banner a{color:#123b86}.sofia-cookie-banner-actions{display:flex;gap:8px;flex-wrap:wrap}.sofia-cookie-banner button{min-height:42px;padding:10px 14px;border:1px solid #123b86;border-radius:6px;background:#fff;color:#123b86;font:inherit;cursor:pointer}.sofia-cookie-banner button[data-cookie="accept"]{background:#123b86;color:#fff}@media(max-width:600px){.sofia-cookie-banner{left:10px;right:10px;bottom:10px;padding:14px 12px}.sofia-cookie-banner-inner{display:block}.sofia-cookie-banner p{font-size:13px;margin-bottom:12px}.sofia-cookie-banner-actions{display:grid;grid-template-columns:1fr 1fr}.sofia-cookie-banner button{width:100%;min-height:44px}.sofia-cookie-banner button[data-cookie="accept"]{grid-column:1/-1;grid-row:1}.sofia-cookie-banner button[data-cookie="reject"]{grid-column:1/-1;grid-row:2}}';
+      document.head.appendChild(style);
+    }
     document.body.appendChild(banner);
     banner.querySelector('[data-cookie="accept"]').onclick = function () { saveConsent(true); banner.remove(); };
     banner.querySelector('[data-cookie="reject"]').onclick = function () { saveConsent(false); banner.remove(); };
