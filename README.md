@@ -83,7 +83,7 @@ tsvetelin@pleggi.com
 
 
 ## Inquiry API
-The request form posts name, email, phone, space, date, guests and message to POST /inquiries. Confirmed dates are read from GET /availability?space=.... Terraform provisions DynamoDB storage and SES notifications; set inquiry_notify_email in your tfvars before deployment. The form uses window.SOFIA_API_BASE (defaults to the same origin).
+The request form posts name, email, phone, space, date, guests and message to POST /inquiries. Confirmed dates are read from GET /availability?space=.... Terraform provisions DynamoDB storage and SES notifications to both addresses in inquiry_notify_emails. The form uses window.SOFIA_API_BASE (defaults to the same origin).
 
 ## HR:Rush applications — production status
 

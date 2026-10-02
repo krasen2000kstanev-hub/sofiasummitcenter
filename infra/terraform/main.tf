@@ -81,15 +81,16 @@ resource "aws_lambda_function" "registration" {
 
   environment {
     variables = {
-      TABLE_NAME         = aws_dynamodb_table.registrations.name
-      PUBLIC_API_URL     = var.public_api_url
-      FRONTEND_ORIGIN    = var.frontend_origin
-      EMAIL_FROM         = var.email_from
-      ADMIN_TOKEN        = var.admin_token
-      DSK_WEBHOOK_SECRET = var.dsk_webhook_secret
-      DSK_ESPRESSO_URL   = var.dsk_espresso_url
-      DSK_DOPPIO_URL     = var.dsk_doppio_url
-      DSK_LUNGO_URL      = var.dsk_lungo_url
+      TABLE_NAME               = aws_dynamodb_table.registrations.name
+      PUBLIC_API_URL           = var.public_api_url
+      FRONTEND_ORIGIN          = var.frontend_origin
+      EMAIL_FROM               = var.email_from
+      INQUIRY_NOTIFY_EMAILS    = join(",", var.inquiry_notify_emails)
+      ADMIN_TOKEN              = var.admin_token
+      DSK_WEBHOOK_SECRET       = var.dsk_webhook_secret
+      DSK_ESPRESSO_URL         = var.dsk_espresso_url
+      DSK_DOPPIO_URL           = var.dsk_doppio_url
+      DSK_LUNGO_URL            = var.dsk_lungo_url
       DSK_ESPRESSO_PARKING_URL = var.dsk_espresso_parking_url
       DSK_DOPPIO_PARKING_URL   = var.dsk_doppio_parking_url
       DSK_LUNGO_PARKING_URL    = var.dsk_lungo_parking_url

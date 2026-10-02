@@ -7,6 +7,7 @@ Minimal AWS backend for the Career Cafe form, DSK payments, paid ticket emails a
 - Lambda + Function URL: JSON API and DSK webhook.
 - DynamoDB: registrations and `CONFIG#career-cafe` discount-name list.
 - SES: paid-ticket email with an inline QR PNG.
+- New venue inquiries are emailed to both addresses in `inquiry_notify_emails`.
 - IAM and CloudWatch Logs: least-privilege access and diagnostics.
 
 ## Build and deploy

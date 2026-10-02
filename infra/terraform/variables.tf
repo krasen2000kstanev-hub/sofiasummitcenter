@@ -25,6 +25,12 @@ variable "email_from" {
   default     = ""
 }
 
+variable "inquiry_notify_emails" {
+  type        = list(string)
+  description = "Recipients for new venue inquiries."
+  default     = ["tsvetelin@pleggi.com", "krasen.k.stanev@gmail.com"]
+}
+
 variable "admin_token" {
   type      = string
   sensitive = true
