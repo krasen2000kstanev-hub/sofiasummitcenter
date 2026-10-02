@@ -457,7 +457,8 @@
   "@context": "https://schema.org",
   "@type": "EventVenue",
   "name": "Sofia Summit Center",
-  "description": "Конферентна зала, зала за срещи и подкаст студио под наем в Студентски град, София, с оборудване за събития и livestream.",
+  "description": "Конферентна зала до 150 гости, зала за срещи и подкаст студио под наем в Студентски град, София, с оборудване за събития и livestream.",
+  "maximumAttendeeCapacity": 150,
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "ул. „8-ми декември“ 13",
@@ -502,8 +503,8 @@
       <div class="hero-grid">
         <div>
           <p class="eyebrow">Студентски град · София</p>
-          <h1>Място за срещи, идеи и движение.</h1>
-          <p class="lede">Съвременен конгресен център с просторна зала за събития, зала за срещи и подкаст студио ,  на тихо място до големия парк в Студентски град.</p>
+          <h1>Конферентна зала до 150 гости в София.</h1>
+          <p class="lede">Съвременен конгресен център с трансформируема зала, зала за срещи и подкаст студио, на тихо място до големия парк в Студентски град.</p>
           <div class="hero-ctas">
             <a href="#spaces" class="btn btn-primary">Разгледай пространствата</a>
             <a href="#request" class="btn btn-ghost">Запитай за свободна дата</a>
@@ -537,7 +538,7 @@
           <h3>Зала за събития</h3>
           <p>Правоъгълна зала със сцена, която се трансформира според формàта на събитието ви ,  от конференция до фирмено парти.</p>
           <ul class="space-meta">
-            <li><b>Капацитет:</b> театър 200 · класна стая 100 · коктейл до 150 · банкет до 120</li>
+            <li><b>Капацитет:</b> до 150 гости · класна стая 100 · банкет до 120</li>
             <li><b>Размери:</b> 16.5 м широчина, 10 м дължина, 3.10 м височина</li>
             <li><b>Включено:</b> конферентна катедра с 4 микрофона, трибуна, 3 работни помещения за групова работа</li>
           </ul>
@@ -889,6 +890,23 @@
 
 </main>
 
+<script>
+  document.title = 'Sofia Summit Center | Конферентна зала до 150 гости в София';
+  var homepageDescription = document.querySelector('meta[name="description"]');
+  if (homepageDescription) homepageDescription.content = 'Конферентна зала до 150 гости, зала за срещи и подкаст студио под наем в Студентски град, София, с оборудване за събития и livestream.';
+  var ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.content = document.title;
+  var ogDescription = document.querySelector('meta[property="og:description"]');
+  if (ogDescription) ogDescription.content = 'Конферентна зала до 150 гости в Студентски град, София.';
+  var twitterDescription = document.querySelector('meta[name="twitter:description"]');
+  if (twitterDescription) twitterDescription.content = 'Конферентна зала до 150 гости в Студентски град, София.';
+  [['og:image:width','260'],['og:image:height','216']].forEach(function(pair){
+    var meta = document.querySelector('meta[property="' + pair[0] + '"]');
+    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('property', pair[0]); document.head.appendChild(meta); }
+    meta.content = pair[1];
+  });
+</script>
+
 <button class="back-to-top" id="back-to-top" type="button" aria-label="Върни се в началото" title="Върни се в началото">↑</button>
 
 <footer>
@@ -1196,14 +1214,14 @@
   main#top > #creative-services{order:3}
   main#top > #featured-events{order:4}
   main#top > #gallery{order:5}
-  main#top > #podcasts{order:6}
-  main#top > #productions{order:7}
-  main#top > #initiatives{order:8}
-  main#top > #about{order:9}
-  main#top > #faq{order:10}
-  main#top > #request{order:11}
-  main#top > #partners{order:12}
-  main#top > #contact{order:13}
+  main#top > #about{order:6}
+  main#top > #faq{order:7}
+  main#top > #request{order:8}
+  main#top > #partners{order:9}
+  main#top > #contact{order:10}
+  main#top > #podcasts{order:11}
+  main#top > #productions{order:12}
+  main#top > #initiatives{order:13}
   html,body{overflow-x:hidden}
 </style>
 <style id="mobile-ux-overrides">
