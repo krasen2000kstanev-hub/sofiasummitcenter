@@ -38,6 +38,7 @@ const encodedSubject = (value) => `=?UTF-8?B?${Buffer.from(value, 'utf8').toStri
 const now = () => new Date().toISOString();
 const id = () => `cc_${crypto.randomUUID()}`;
 const randomTicketCode = () => Array.from({ length: 4 }, () => TICKET_CODE_ALPHABET[crypto.randomInt(TICKET_CODE_ALPHABET.length)]).join('');
+const inquiryRecipients = (value = process.env.INQUIRY_NOTIFY_EMAILS) => String(value || '').split(',').map((email) => email.trim().toLowerCase()).filter((email) => /^\S+@\S+\.\S+$/.test(email));
 
 function method(event) { return event.requestContext?.http?.method || event.httpMethod || 'GET'; }
 function path(event) { return event.rawPath || event.path || '/'; }
@@ -199,10 +200,45 @@ async function checkIn(event, token) {
   }
 }
 
+async function createInquiry(event) {
+  let input;
+  try { input = parseBody(event); } catch { return response(400, { error: 'Невалиден JSON.' }); }
+  const inquiry = {
+    name: text(input.name, 120), email: text(input.email, 254).toLowerCase(), phone: text(input.phone, 40),
+    space: text(input.space, 80), requestedDate: text(input.date || input.requested_date, 10), guests: Number(input.guests || 0), message: text(input.message, 2000)
+  };
+  if (!inquiry.name || !/^\S+@\S+\.\S+$/.test(inquiry.email) || !inquiry.phone || !inquiry.space || !/^\d{4}-\d{2}-\d{2}$/.test(inquiry.requestedDate) || !Number.isInteger(inquiry.guests) || inquiry.guests < 1 || inquiry.guests > 150) return response(400, { error: 'Моля, попълнете правилно всички полета.' });
+  const item = { id: `INQUIRY#${crypto.randomUUID()}`, type: 'inquiry', status: 'pending', createdAt: now(), name: inquiry.name, email: inquiry.email, phone: inquiry.phone, space: inquiry.space, requestedDate: inquiry.requestedDate, guests: inquiry.guests, message: inquiry.message };
+  await db.send(new PutCommand({ TableName: TABLE, Item: item, ConditionExpression: 'attribute_not_exists(id)' }));
+  let emailSent = false;
+  const recipients = inquiryRecipients();
+  if (process.env.EMAIL_FROM && recipients.length) try {
+    await ses.send(new SendEmailCommand({
+      FromEmailAddress: process.env.EMAIL_FROM,
+      Destination: { ToAddresses: recipients },
+      Content: { Simple: {
+        Subject: { Data: `Ново запитване — ${inquiry.space}`, Charset: 'UTF-8' },
+        Body: { Text: { Data: `Име: ${inquiry.name}\nИмейл: ${inquiry.email}\nТелефон: ${inquiry.phone}\nПространство: ${inquiry.space}\nДата: ${inquiry.requestedDate}\nГости: ${inquiry.guests}\n\n${inquiry.message}`, Charset: 'UTF-8' } }
+      } }
+    }));
+    emailSent = true;
+  } catch (error) { console.error('Inquiry notification failed', error); }
+  return response(201, { ok: true, inquiry_id: item.id, status: item.status, email_sent: emailSent });
+}
+
+async function availability(event) {
+  const space = text(event.queryStringParameters?.space, 80);
+  if (!space) return response(400, { error: 'Липсва пространство.' });
+  const result = await db.send(new ScanCommand({ TableName: TABLE, FilterExpression: '#type = :type AND #space = :space AND #status = :status', ExpressionAttributeNames: { '#type': 'type', '#space': 'space', '#status': 'status' }, ExpressionAttributeValues: { ':type': 'inquiry', ':space': space, ':status': 'confirmed' }, ProjectionExpression: 'requestedDate' }));
+  return response(200, { space, occupied_dates: (result.Items || []).map((item) => item.requestedDate).filter(Boolean) });
+}
+
 exports.handler = async (event) => {
   if (method(event) === 'OPTIONS') return response(204, {});
   try {
     const route = path(event);
+    if (method(event) === 'GET' && route === '/availability') return availability(event);
+    if (method(event) === 'POST' && route === '/inquiries') return createInquiry(event);
     if (method(event) === 'POST' && route === '/registrations') return createRegistration(event);
     if (method(event) === 'POST' && route === '/payments/dsk/webhook') return dskWebhook(event);
     if (method(event) === 'GET' && route.startsWith('/tickets/')) return ticket(event, decodeURIComponent(route.split('/').pop()));
@@ -216,3 +252,4 @@ exports.handler = async (event) => {
 };
 
 exports.calculatePrice = calculatePrice;
+exports.inquiryRecipients = inquiryRecipients;
