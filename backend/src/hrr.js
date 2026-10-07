@@ -31,6 +31,23 @@ async function me(request, env) {
   return json({ user: auth.user, team });
 }
 
+async function ranking(env) {
+  const season = await currentSeason(env);
+  if (!season) return json({ season: null, teams: [], updatedAt: now() });
+  const rows = await env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
+      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END),0) missions_points,
+      COALESCE(SUM(CASE WHEN a.scope='team' THEN 1 ELSE a.completed_count END),0) missions_completed
+    FROM hrr_teams t
+    LEFT JOIN (
+      SELECT s.team_id,s.mission_id,m.scope,m.points,COUNT(*) completed_count
+      FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
+      WHERE s.status='approved' AND m.season_id=? AND s.team_id IN (SELECT id FROM hrr_teams WHERE season_id=?)
+      GROUP BY s.team_id,s.mission_id,m.scope,m.points
+    ) a ON a.team_id=t.id
+    WHERE t.season_id=? GROUP BY t.id ORDER BY missions_points DESC,t.name ASC`).bind(season.id, season.id, season.id).all();
+  return json({ season: season.slug, teams: (rows.results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })), updatedAt: now() });
+}
+
 async function joinTeam(request, env) {
   const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
   const body = await request.json(); const code = clean(body.code, 80); const season = await currentSeason(env);
@@ -46,14 +63,15 @@ async function joinTeam(request, env) {
 
 async function team(request, env) {
   const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
-  const membership = await env.DB.prepare('SELECT t.* FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 LIMIT 1').bind(auth.user.id).first();
+  const season = await currentSeason(env);
+  const membership = await env.DB.prepare('SELECT t.* FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.season_id=? AND tm.active=1 LIMIT 1').bind(auth.user.id, season?.id || '').first();
   if (!membership) return json({ team: null, members: [] });
-  const members = await env.DB.prepare(`SELECT u.id,u.display_name,u.email,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points ELSE 0 END),0) points
-    FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id LEFT JOIN hrr_submissions s ON s.student_user_id=u.id LEFT JOIN hrr_missions m ON m.id=s.mission_id
-    WHERE tm.team_id=? AND tm.active=1 GROUP BY u.id ORDER BY points DESC`).bind(membership.id).all();
+  const members = await env.DB.prepare(`SELECT u.id,u.display_name,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points ELSE 0 END),0) points
+    FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id LEFT JOIN hrr_submissions s ON s.student_user_id=u.id LEFT JOIN hrr_missions m ON m.id=s.mission_id AND m.season_id=?
+    WHERE tm.team_id=? AND tm.season_id=? AND tm.active=1 GROUP BY u.id ORDER BY points DESC`).bind(season.id, membership.id, season.id).all();
   const teamPoints = await env.DB.prepare(`SELECT COALESCE(SUM(m.points),0) points
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
-    WHERE s.team_id=? AND s.status='approved' AND m.scope='team'`).bind(membership.id).first();
+    WHERE s.team_id=? AND s.status='approved' AND m.scope='team' AND m.season_id=?`).bind(membership.id, season.id).first();
   return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) });
 }
 
@@ -146,6 +164,7 @@ async function addMentor(request, env) {
 
 export async function handleHrr(request, env, url) {
   if (!url.pathname.startsWith('/api/hrr/')) return null;
+  if (request.method === 'GET' && url.pathname === '/api/hrr/ranking') return ranking(env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/auth/token') {
     const body = await request.json();
     const tokenUrl = `${String(env.HRR_COGNITO_DOMAIN || '').replace(/\/$/, '')}/oauth2/token`;
