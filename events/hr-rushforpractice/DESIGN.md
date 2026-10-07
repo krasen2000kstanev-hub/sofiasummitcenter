@@ -11,6 +11,8 @@
 
 ### Student mission journey
 - Keep the approved winding-road checkpoint map as the visual anchor; selecting any checkpoint (including completed missions) reveals a persistent, readable detail panel.
+- Use the route and its selectable mission list as the single mission browser; do not repeat the same missions in a second card grid. Keep the dashboard summary to live progress, the next open mission, approved points, and submissions awaiting review.
+- Derive progress and next-mission content from the authenticated API; never show sample rankings, dates, or percentages as if they were live data. Add a compact status filter to the route list.
 - Mission details may include description, deadline, mentor and contact, submission/review timestamps, elapsed time, and mentor feedback. Render unavailable values as “not announced” rather than inventing them; local previews must label all sample values as examples.
 - Show a mentor’s public social profiles only when matched to an exact published mentor identity; retain the contact email as a separate channel and omit unverified or generic profile URLs.
 - Upcoming mission releases belong in a separate schedule row; show an explicit empty state until an organizer publishes a date.
@@ -82,7 +84,7 @@ a:hover{color:#0a94a3;}a:focus-visible{outline:2px solid var(--accent);outline-o
 
 **Container:** max-width 1280px; padding 24px desktop / 18px mobile; narrow text width 720px.  
 **Spacing:** sections 72–112px; component gaps 12–24px; card padding 18–28px.
-For the student journey, use a two-column map/detail layout on wide screens and stack the detail card under the map on narrow screens; place the selectable mission list below both.
+For the student journey, use a two-column map/detail layout on wide screens, followed by the filter and selectable mission list; stack the detail card below the map on narrow screens.
 
 ```css
 .container{max-width:1280px;margin:0 auto;padding:0 24px;}
