@@ -1875,6 +1875,13 @@
           });
           var result = await response.json();
           if (!response.ok) throw new Error(result.error || ('HTTP ' + response.status));
+          if (result.status === 'paid' && data.promoCode === 'IREN100') {
+            if (note) note.textContent = 'Регистрацията е потвърдена успешно. Не е необходимо плащане.';
+            if (window.refreshSeatAvailability) window.refreshSeatAvailability();
+            form.reset();
+            form.dataset.appliedPromo = '';
+            return;
+          }
           if (!result.paymentUrl) throw new Error('Плащането все още не е конфигурирано.');
           if (note) note.textContent = 'Поръчката е създадена. Пренасочване към плащане…';
           if (window.refreshSeatAvailability) window.refreshSeatAvailability();
