@@ -262,7 +262,14 @@ async function createOrder(request, env) {
   }
   const results = await env.DB.batch(statements);
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
-  const paymentUrl = ticket.dsk_url || null;
+  const promoPayment = promoCode
+    ? await env.DB.prepare(`SELECT ppl.payment_url
+        FROM promo_payment_links ppl
+        JOIN promo_codes p ON p.id = ppl.promo_code_id
+        WHERE p.event_id = ? AND p.code = ? AND ppl.ticket_key = ? AND ppl.attendee_count = ? AND ppl.active = 1`)
+      .bind(event.id, promoCode, ticketKey, count).first()
+    : null;
+  const paymentUrl = promoPayment?.payment_url || (promoCode ? null : ticket.dsk_url) || null;
   await env.DB.prepare('UPDATE orders SET payment_url = ? WHERE id = ?').bind(paymentUrl, orderId).run();
   if (promoCode === 'IREN100') {
     await finalizeOrder(orderId, 'promo:IREN100', env, ctx);
