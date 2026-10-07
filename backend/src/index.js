@@ -262,6 +262,10 @@ async function createOrder(request, env) {
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
   const paymentUrl = ticket.dsk_url || null;
   await env.DB.prepare('UPDATE orders SET payment_url = ? WHERE id = ?').bind(paymentUrl, orderId).run();
+  if (promoCode === 'IREN100') {
+    await finalizeOrder(orderId, 'promo:IREN100', env, ctx);
+    return json({ orderId, status: 'paid', amountCents: 0, currency: ticket.currency, paymentUrl: null, message: 'Регистрацията е потвърдена без плащане.' }, 201, headers);
+  }
   return json({ orderId, status: 'pending_payment', amountCents: amount, currency: ticket.currency, paymentUrl, message: paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, paymentUrl ? 201 : 202, headers);
 }
 
