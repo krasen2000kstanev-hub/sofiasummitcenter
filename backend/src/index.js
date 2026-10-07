@@ -19,6 +19,7 @@ const cors = (request) => ({
 
 const now = () => new Date().toISOString();
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
+const ticketCode = () => crypto.randomUUID().replaceAll('-', '').slice(0, 4).toUpperCase();
 const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
@@ -154,7 +155,8 @@ async function generateTicketPdf(env, order, attendee, event, ticketUrl) {
   centered('РЕГИСТРАЦИЯ ПОТВЪРДЕНА', 685, 17);
   centered(`ИМЕ НА УЧАСТНИКА: ${attendee.full_name}`, 648, 11);
   centered(`ВИД БИЛЕТ: ${event.ticket_name || 'Билет'}`, 626, 11);
-  centered(`НОМЕР НА ПОРЪЧКА: ${order.id}`, 604, 11);
+  centered(`КОД ЗА ПРОВЕРКА: ${attendee.ticket_token}`, 608, 11);
+  centered(`НОМЕР НА ПОРЪЧКА: ${order.id}`, 588, 11);
   centered(`ДАТА: ${new Date(event.starts_at || '').toLocaleDateString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long' })}`, 566, 11);
   centered('ЧАС: 09:00 ч.', 544, 11);
   centered(`МЯСТО: ${event.venue}`, 522, 11);
@@ -181,7 +183,7 @@ async function sendAttendeeTicketEmail(env, order, attendee, event, force = fals
     console.error('[ticket-pdf]', error);
     return { status: 'failed', attendeeId: attendee.id };
   }
-  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете приложения PDF билет на входа.</p>`;
+  const message = `<h1>${html(event.name)}</h1><p>Здравейте, ${html(attendee.full_name)}!</p><p>Регистрацията и плащането са потвърдени.</p><p><strong>Вид билет:</strong> ${html(event.ticket_name || 'Билет')}</p><p><strong>Код за проверка:</strong> <span style="font-family:monospace;font-size:18px;letter-spacing:2px">${html(attendee.ticket_token)}</span></p><p><a href="${html(ticketUrl)}">Отвори онлайн билета</a></p><p>Покажете приложения PDF билет на входа.</p>`;
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: env.EMAIL_FROM, to: [recipient], subject: `Билет за ${event.name}`, html: message, attachments: [{ filename: `ticket-${attendee.ticket_token}.pdf`, content: base64(pdf) }] })
@@ -260,8 +262,19 @@ async function createOrder(request, env) {
   }
   const results = await env.DB.batch(statements);
   if (!results[0].meta?.changes) return json({ error: 'Свободните места за това събитие са изчерпани.' }, 409, headers);
-  const paymentUrl = ticket.dsk_url || null;
+  const promoPayment = promoCode
+    ? await env.DB.prepare(`SELECT ppl.payment_url
+        FROM promo_payment_links ppl
+        JOIN promo_codes p ON p.id = ppl.promo_code_id
+        WHERE p.event_id = ? AND p.code = ? AND ppl.ticket_key = ? AND ppl.attendee_count = ? AND ppl.active = 1`)
+      .bind(event.id, promoCode, ticketKey, count).first()
+    : null;
+  const paymentUrl = promoPayment?.payment_url || (promoCode ? null : ticket.dsk_url) || null;
   await env.DB.prepare('UPDATE orders SET payment_url = ? WHERE id = ?').bind(paymentUrl, orderId).run();
+  if (promoCode === 'IREN100') {
+    await finalizeOrder(orderId, 'promo:IREN100', env, ctx);
+    return json({ orderId, status: 'paid', amountCents: 0, currency: ticket.currency, paymentUrl: null, message: 'Регистрацията е потвърдена без плащане.' }, 201, headers);
+  }
   return json({ orderId, status: 'pending_payment', amountCents: amount, currency: ticket.currency, paymentUrl, message: paymentUrl ? 'Продължете към защитената страница на ДСК.' : 'DSK payment link все още не е конфигуриран.' }, paymentUrl ? 201 : 202, headers);
 }
 
@@ -284,11 +297,11 @@ async function finalizeOrder(orderId, reference, env, ctx) {
   const token = crypto.randomUUID();
   await env.DB.prepare("UPDATE orders SET status='paid', payment_reference=?, ticket_token=COALESCE(ticket_token,?), paid_at=COALESCE(paid_at,?), updated_at=? WHERE id=? AND status='pending_payment'")
     .bind(reference || null, token, now(), now(), orderId).run();
-  const order = await env.DB.prepare('SELECT o.*, e.name event_name, e.starts_at, e.venue, t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
+  const order = await env.DB.prepare('SELECT o.*, e.name event_name, e.starts_at, e.venue, t.name ticket_name, t.ticket_key FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=?').bind(orderId).first();
   if (!order) return false;
   const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
   for (const attendee of attendees.results || []) {
-    if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+    if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(ticketCode(order.ticket_key, attendee.attendee_no), attendee.id).run();
   }
   const ticketRows = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
   ctx.waitUntil(sendTicketEmails(env, order, ticketRows.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }));
@@ -373,11 +386,11 @@ export default {
         }
         if (request.method === 'POST' && /^\/api\/admin\/orders\/[^/]+\/resend-ticket$/.test(url.pathname)) {
           const orderId = url.pathname.split('/')[4];
-          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
+          const order = await env.DB.prepare("SELECT o.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name,t.ticket_key FROM orders o JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE o.id=? AND o.status='paid'").bind(orderId).first();
           if (!order) return json({ error: 'Paid order not found' }, 404, headers);
           const attendees = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
           for (const attendee of attendees.results || []) {
-            if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(crypto.randomUUID(), attendee.id).run();
+            if (!attendee.ticket_token) await env.DB.prepare('UPDATE attendees SET ticket_token=? WHERE id=? AND ticket_token IS NULL').bind(ticketCode(order.ticket_key, attendee.attendee_no), attendee.id).run();
           }
           const refreshed = await env.DB.prepare('SELECT * FROM attendees WHERE order_id=? ORDER BY attendee_no').bind(orderId).all();
           return json(await sendTicketEmails(env, order, refreshed.results || [], { name: order.event_name, starts_at: order.starts_at, venue: order.venue, ticket_name: order.ticket_name }, true), 200, headers);
