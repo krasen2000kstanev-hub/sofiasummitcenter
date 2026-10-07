@@ -212,7 +212,7 @@ async function quotePromo(request, env) {
   if (!promo) return json({ error: 'Невалиден промокод.' }, 400, headers);
   const allowed = JSON.parse(promo.ticket_keys_json || '[]');
   if (allowed.length && !allowed.includes(ticket.ticket_key)) return json({ error: 'Промокодът не важи за избрания билет.' }, 400, headers);
-  const percent = count > 1 ? Number(promo.group_discount_percent || promo.discount_value) : Number(promo.single_discount_percent || promo.discount_value);
+  const percent = code === 'IRINA20' ? 20 : count > 1 ? Number(promo.group_discount_percent || promo.discount_value) : Number(promo.single_discount_percent || promo.discount_value);
   return json({ valid: true, code, discountPercent: percent, amountCents: Math.round(ticket.price_cents * count * (100 - percent) / 100), currency: ticket.currency }, 200, headers);
 }
 
@@ -241,7 +241,8 @@ async function createOrder(request, env) {
     if (!promo) return json({ error: 'Невалиден промокод.' }, 400, headers);
     const allowed = JSON.parse(promo.ticket_keys_json || '[]');
     if (allowed.length && !allowed.includes(ticketKey)) return json({ error: 'Промокодът не важи за избрания билет.' }, 400, headers);
-    amount = promo.discount_type === 'percent' ? Math.round(amount * (100 - promo.discount_value) / 100) : Math.max(0, amount - promo.discount_value * count);
+    const percent = promoCode === 'IRINA20' ? 20 : count > 1 ? Number(promo.group_discount_percent || promo.discount_value) : Number(promo.single_discount_percent || promo.discount_value);
+    amount = promo.discount_type === 'percent' ? Math.round(amount * (100 - percent) / 100) : Math.max(0, amount - promo.discount_value * count);
   }
 
   const orderId = id('order');
