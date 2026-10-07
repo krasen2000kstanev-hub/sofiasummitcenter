@@ -1754,12 +1754,12 @@
     async function refreshQuote(showErrors){
       var people = Math.max(1, Number(countSelect.value || 1));
       var raw = (promoInput.value || '').trim();
-      var code = people > 1 ? '' : raw.toUpperCase(), selected = TICKETS[ticketType.value] || TICKETS.standard;
-      if (!raw && people === 1) {
+      var code = raw.toUpperCase(), selected = TICKETS[ticketType.value] || TICKETS.standard;
+      if (!raw) {
         form.dataset.appliedPromo = '';
         renderAllPrices(0);
         if (showErrors) setNote('', false);
-        return;
+        return true;
       }
       promoBtn.disabled = true;
       try {
@@ -1769,13 +1769,15 @@
         if (people > 1) renderAllPrices(quote.discountPercent);
         else renderPrice(selected, quote.amountCents, quote.discountPercent, quote.unitAmountCents);
         form.dataset.appliedPromo = code;
-        setNote(people > 1 ? 'Групова цена: 25% отстъпка. Промокод не е нужен.' : 'Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
+        setNote('Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
         if (code) trackEvent('apply_promo_code', { code: code });
+        return true;
       } catch (error) {
         form.dataset.appliedPromo = '';
-        if (people > 1) renderAllPrices(25);
+        if (people > 1) renderAllPrices(0);
         else resetPrice(selected);
         if (showErrors) setNote(error.message, true);
+        return false;
       }
       promoBtn.disabled = false;
     }
@@ -1783,10 +1785,10 @@
     var quoteTimer;
     function updatePromoUi(){
       var isGroup = Number(countSelect.value || 1) > 1;
-      promoInput.disabled = isGroup;
-      promoBtn.disabled = isGroup;
+      promoInput.disabled = false;
+      promoBtn.disabled = false;
       if (promoBox) promoBox.classList.toggle('is-group', isGroup);
-      if (isGroup) { promoInput.value = ''; renderAllPrices(25); }
+      if (isGroup && !(promoInput.value || '').trim()) renderAllPrices(0);
     }
     function scheduleQuote(){ clearTimeout(quoteTimer); quoteTimer = setTimeout(function(){ refreshQuote(false); }, 250); }
     promoBtn.addEventListener('click', function(){ refreshQuote(true); });
@@ -1797,6 +1799,7 @@
       if (e.key === 'Enter') { e.preventDefault(); refreshQuote(true); }
     });
     updatePromoUi();
+    window.refreshPromoQuote = refreshQuote;
     refreshQuote(false);
     Object.keys(TICKETS).forEach(function(key){
       var button = document.getElementById(TICKETS[key].btnId);
@@ -1854,6 +1857,15 @@
         e.preventDefault();
         submitBtn.disabled = true;
         if (note) { note.hidden = false; note.textContent = 'Изпращане…'; }
+        var promoRaw = (document.getElementById('promoApplyInput') || {}).value || '';
+        if (promoRaw.trim() && typeof window.refreshPromoQuote === 'function') {
+          var promoApplied = await window.refreshPromoQuote(true);
+          if (!promoApplied || form.dataset.appliedPromo !== promoRaw.trim().toUpperCase()) {
+            submitBtn.disabled = false;
+            if (note) { note.hidden = false; note.textContent = 'Промокодът не е потвърден. Провери кода и опитай отново.'; }
+            return;
+          }
+        }
         var data = Object.fromEntries(new FormData(form).entries());
         data.masterClasses = Array.from(form.querySelectorAll('input[name="masterClass"]:checked')).map(function(input){ return input.value; });
         data.agreeTerms = form.querySelector('input[name="agreeTerms"]:checked') !== null;
