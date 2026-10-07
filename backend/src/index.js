@@ -19,11 +19,7 @@ const cors = (request) => ({
 
 const now = () => new Date().toISOString();
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
-const ticketCode = (ticketKey, attendeeNo) => {
-  const type = ticketKey === 'vip' ? 'VIP' : ticketKey === 'standard_recording' ? 'REC' : 'STD';
-  const random = crypto.randomUUID().replaceAll('-', '').slice(0, 6).toUpperCase();
-  return `NBR26${type}${String(attendeeNo).padStart(2, '0')}${random}`;
-};
+const ticketCode = () => crypto.randomUUID().replaceAll('-', '').slice(0, 4).toUpperCase();
 const clean = (value, max = 240) => String(value || '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
