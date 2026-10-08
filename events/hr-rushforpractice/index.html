@@ -1890,5 +1890,18 @@
   const estelMentor = document.querySelector('#mentors .mentor-card:last-of-type');
   if (estelMentor && !document.querySelector('[data-mentor="estel-artuzo"]')) estelMentor.insertAdjacentHTML('afterend', '<article class="mentor-card" data-mentor="estel-artuzo"><div class="mentor-photo"><img src="assets/mentors/estel-artuzo.jpg" alt="Естел Артузо" loading="lazy"></div><div class="mentor-body"><h4>Естел Артузо</h4><div class="role">Победител в HR:Rush for Practice · Ментор</div><p>Вярвам, че най-ценният опит е този, който можеш да споделиш с другите.</p><p>Като настоящ победител познавам състезанието от страната на участника и знам колко важни са добрата комуникация, работата в екип и увереността в собствените идеи.</p><p>Като ментор искам да споделя този опит и да помогна на участниците да развият собствен подход, да използват силните страни на екипа си и да превърнат добрите идеи в работещи решения.</p><p>За мен HR:Rush for Practice не е просто състезание, а възможност да се учиш, да се предизвикваш и да откриеш на какво си способен, когато дадеш най-доброто от себе си.</p><div class="social-links"><a href="https://www.facebook.com/share/19Nw376rEX/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://www.linkedin.com/in/estelartuzo?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer">LinkedIn</a></div></div></article>');
 </script>
+<script>
+  (function(){
+    var grid = document.querySelector('#mentors .cards-grid');
+    if(!grid) return;
+    var order = ['Йоанна Михова','Цветелин Николов','Красен Станев','Илияна Георгиева','Десислава Кехайова','Емануел Тонев','Ивелина Танева','Виктория Димитрова','Дарина Христова','Бранислав Панов','Христо Чолаков','Роман Китипов','Естел Артузо'];
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.mentor-card'));
+    var byName = {};
+    cards.forEach(function(card){ var name = card.querySelector('h4'); if(name) byName[name.textContent.trim()] = card; });
+    order.forEach(function(name){ if(byName[name]) grid.appendChild(byName[name]); });
+    var hristoPhoto = grid.querySelector('[data-mentor="hristo-cholakov"] .mentor-photo');
+    if(hristoPhoto) hristoPhoto.innerHTML = '<img src="assets/mentors/hristo-cholakov.jpg" alt="Христо Чолаков" loading="lazy">';
+  })();
+</script>
 </html>
 
