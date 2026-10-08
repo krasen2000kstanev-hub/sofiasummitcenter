@@ -1901,6 +1901,7 @@
     order.forEach(function(name){ if(byName[name]) grid.appendChild(byName[name]); });
     var hristoPhoto = grid.querySelector('[data-mentor="hristo-cholakov"] .mentor-photo');
     if(hristoPhoto) hristoPhoto.innerHTML = '<img src="assets/mentors/hristo-cholakov.jpg" alt="Христо Чолаков" loading="lazy">';
+    grid.querySelectorAll('.mentor-photo img').forEach(function(img){ if(img.src.indexOf('?v=') === -1) img.src += '?v=20261008'; });
   })();
 </script>
 </html>
