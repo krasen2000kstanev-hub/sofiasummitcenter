@@ -1904,5 +1904,9 @@
     grid.querySelectorAll('.mentor-photo img').forEach(function(img){ if(img.src.indexOf('?v=') === -1) img.src += '?v=20261008'; });
   })();
 </script>
+<script>
+  const kameliyaMentor = document.querySelector('#mentors .mentor-card:last-of-type');
+  if (kameliyaMentor && !document.querySelector('[data-mentor="kameliya-ignatova"]')) kameliyaMentor.insertAdjacentHTML('afterend', '<article class="mentor-card" data-mentor="kameliya-ignatova"><div class="mentor-photo"><img src="assets/mentors/kameliya-ignatova.jpg" alt="Камелия Игнатова" loading="lazy"></div><div class="mentor-body"><h4>Камелия Игнатова</h4><div class="role">HR професионалист · Ментор · Фасилитатор · Лектор</div><p>Камелия е HR професионалист, ментор, фасилитатор и лектор с над 15 години международен опит в Европа, Азия, Австралия и Съединените щати. Работи с организации и хора, за да разгърнат своя потенциал и да постигат значими и устойчиви резултати.</p><p>Професионалният ѝ опит е съсредоточен в управлението на човешките ресурси и развитието на таланти. Ръководила е и осъществявала подбор за висши управленски и ключови позиции, разработвала и провеждала центрове за оценка и развитие и създава цялостни програми за обучение и развитие на лидерски умения.</p><p>Работата ѝ е насочена към укрепване на лидерските компетенции, повишаване на екипната ефективност и изграждане на здравословна работна култура, която подкрепя постигането на високи резултати.</p></div></article>');
+</script>
 </html>
 
