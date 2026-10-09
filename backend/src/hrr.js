@@ -1,4 +1,4 @@
-import { hrrUser } from './hrr-auth.js';
+import { hrrUser, isStudentPreviewUser } from './hrr-auth.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', ...headers } });
 const clean = (value, max = 500) => String(value ?? '').trim().slice(0, max);
@@ -19,6 +19,13 @@ async function requireUser(request, env, roles = []) {
   } catch (error) {
     return { response: json({ error: error.message || 'Invalid authentication' }, 401) };
   }
+}
+
+async function requireStudent(request, env) {
+  const auth = await requireUser(request, env);
+  if (auth.response) return auth;
+  if (auth.user.role !== 'student' && !(request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user))) return { response: json({ error: 'Insufficient permissions' }, 403) };
+  return auth;
 }
 
 async function currentSeason(env) {
@@ -49,7 +56,7 @@ async function ranking(env) {
 }
 
 async function joinTeam(request, env) {
-  const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const body = await request.json(); const code = clean(body.code, 80); const season = await currentSeason(env);
   if (!season || !code) return json({ error: 'Missing team code' }, 400);
   const team = await env.DB.prepare('SELECT * FROM hrr_teams WHERE season_id=? AND join_code_hash=?').bind(season.id, await hash(code)).first();
@@ -62,7 +69,7 @@ async function joinTeam(request, env) {
 }
 
 async function team(request, env) {
-  const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env);
   const membership = await env.DB.prepare('SELECT t.* FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.season_id=? AND tm.active=1 LIMIT 1').bind(auth.user.id, season?.id || '').first();
   if (!membership) return json({ team: null, members: [] });
@@ -78,14 +85,15 @@ async function team(request, env) {
 async function missions(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
-  const rows = auth.user.role === 'mentor' || auth.user.role === 'admin'
+  const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
+  const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
     ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND (m.mentor_user_id=? OR ?='admin') GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id, auth.user.id, auth.user.role).all()
     : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
   return json({ missions: rows.results || [] });
 }
 
 async function submit(request, env, missionId) {
-  const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE id=? AND status='active'").bind(missionId).first();
   const membership = await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND active=1 LIMIT 1').bind(auth.user.id).first();
   const body = await request.json();
@@ -119,13 +127,13 @@ async function review(request, env, submissionId) {
 }
 
 async function notifications(request, env, roles = ['student']) {
-  const auth = await requireUser(request, env, roles); if (auth.response) return auth.response;
+  const auth = roles.length === 1 && roles[0] === 'student' ? await requireStudent(request, env) : await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
   return json({ notifications: rows.results || [] });
 }
 
 async function history(request, env) {
-  const auth = await requireUser(request, env, ['student']); if (auth.response) return auth.response;
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
       m.title,m.description,m.category,m.points,m.scope,m.deadline,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email

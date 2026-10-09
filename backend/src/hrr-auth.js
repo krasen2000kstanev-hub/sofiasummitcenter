@@ -1,4 +1,7 @@
 let jwksCache = null;
+const STUDENT_PREVIEW_EMAILS = new Set(['krasen.k.stanev@gmail.com', 'krasen2000.k.stanev@gmail.com']);
+
+export const isStudentPreviewUser = (user) => STUDENT_PREVIEW_EMAILS.has(String(user?.email || '').trim().toLowerCase());
 
 const base64UrlToBytes = (value) => {
   const normalized = value.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - value.length % 4) % 4);

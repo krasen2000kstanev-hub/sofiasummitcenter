@@ -9,16 +9,16 @@ const originalFetch = globalThis.fetch;
 globalThis.fetch = async () => new Response(JSON.stringify({ keys: [jwk] }), { headers: { 'content-type': 'application/json' } });
 after(() => { globalThis.fetch = originalFetch; });
 
-function token(role) {
+function token(role, email = `${role}@example.test`) {
   const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
   const header = encode({ alg: 'RS256', kid: jwk.kid });
-  const payload = encode({ iss: 'https://issuer.test', exp: Math.floor(Date.now() / 1000) + 300, token_use: 'id', aud: 'test-client', sub: `user-${role}`, email: `${role}@example.test`, name: role });
+  const payload = encode({ iss: 'https://issuer.test', exp: Math.floor(Date.now() / 1000) + 300, token_use: 'id', aud: 'test-client', sub: `user-${role}`, email, name: role });
   const content = `${header}.${payload}`;
   return `${content}.${sign('RSA-SHA256', Buffer.from(content), privateKey).toString('base64url')}`;
 }
 
-function envFor(role, queryResults = {}) {
-  const user = { id: `user-${role}`, cognito_sub: `user-${role}`, email: `${role}@example.test`, display_name: role, role };
+function envFor(role, queryResults = {}, email = `${role}@example.test`) {
+  const user = { id: `user-${role}`, cognito_sub: `user-${role}`, email, display_name: role, role };
   return {
     HRR_COGNITO_ISSUER: 'https://issuer.test',
     HRR_COGNITO_CLIENT_ID: 'test-client',
@@ -42,8 +42,8 @@ function envFor(role, queryResults = {}) {
   };
 }
 
-async function request(path, role, method = 'GET', env = envFor(role)) {
-  return handleHrr(new Request(`https://local.test/api/hrr/${path}`, { method, headers: { authorization: `Bearer ${token(role)}`, 'content-type': 'application/json' }, ...(method === 'POST' ? { body: '{}' } : {}) }), env, new URL(`https://local.test/api/hrr/${path}`));
+async function request(path, role, method = 'GET', env = envFor(role), extraHeaders = {}) {
+  return handleHrr(new Request(`https://local.test/api/hrr/${path}`, { method, headers: { authorization: `Bearer ${token(role, env.userEmail || `${role}@example.test`)}`, 'content-type': 'application/json', ...extraHeaders }, ...(method === 'POST' ? { body: '{}' } : {}) }), env, new URL(`https://local.test/api/hrr/${path}`));
 }
 
 test('student and mentor endpoints reject the other role', async () => {
@@ -61,6 +61,14 @@ test('student mission feed exposes mentor contact for the detail panel', async (
   const response = await request('missions', 'student', 'GET', envFor('student', { missions: [expected] }));
   assert.equal(response.status, 200);
   assert.deepEqual((await response.json()).missions[0], expected);
+});
+
+test('Krasen can preview the student endpoints without opening them to other admins', async () => {
+  const krasenEnv = envFor('admin', {}, 'krasen.k.stanev@gmail.com'); krasenEnv.userEmail = 'krasen.k.stanev@gmail.com';
+  assert.equal((await request('team', 'admin', 'GET', krasenEnv)).status, 403);
+  assert.equal((await request('team', 'admin', 'GET', krasenEnv, { 'x-hrr-view': 'student' })).status, 200);
+  const otherAdminEnv = envFor('admin', {}, 'other-admin@example.test'); otherAdminEnv.userEmail = 'other-admin@example.test';
+  assert.equal((await request('team', 'admin', 'GET', otherAdminEnv, { 'x-hrr-view': 'student' })).status, 403);
 });
 
 test('student history includes mission metadata and the latest mentor feedback timestamps', async () => {
