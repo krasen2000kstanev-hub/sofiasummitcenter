@@ -289,7 +289,7 @@ async function dskWebhook(request, env, ctx) {
   const eventId = id('payment');
   await env.DB.prepare('INSERT INTO payment_events (id,order_id,provider,provider_status,provider_reference,payload_hash,received_at) VALUES (?,?,?,?,?,?,?)')
     .bind(eventId, orderId, 'dsk', status, reference || null, await sha256(raw), now()).run();
-  if (!['paid', 'success', 'successful', 'completed'].includes(status)) return json({ ok: true, status }, 200, cors(request));
+  if (!['paid', 'success', 'successful', 'completed', 'deposited'].includes(status)) return json({ ok: true, status }, 200, cors(request));
   await finalizeOrder(orderId, reference, env, ctx);
   return json({ ok: true, status: 'paid' }, 200, cors(request));
 }
