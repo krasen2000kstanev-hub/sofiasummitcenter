@@ -32,6 +32,7 @@ function envFor(role, queryResults = {}, email = `${role}@example.test`) {
             if (sql.startsWith('SELECT role FROM hrr_mentor_allowlist')) return ['mentor', 'admin'].includes(role) ? { role } : null;
             if (sql.startsWith('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=?')) return user;
             if (sql.startsWith('SELECT * FROM hrr_users WHERE cognito_sub=?')) return user;
+            if (sql.startsWith('SELECT * FROM hrr_missions WHERE id=?')) return queryResults.mission || null;
             return null;
           },
           async run() { return { success: true, params }; },
@@ -42,8 +43,8 @@ function envFor(role, queryResults = {}, email = `${role}@example.test`) {
   };
 }
 
-async function request(path, role, method = 'GET', env = envFor(role), extraHeaders = {}) {
-  return handleHrr(new Request(`https://local.test/api/hrr/${path}`, { method, headers: { authorization: `Bearer ${token(role, env.userEmail || `${role}@example.test`)}`, 'content-type': 'application/json', ...extraHeaders }, ...(method === 'POST' ? { body: '{}' } : {}) }), env, new URL(`https://local.test/api/hrr/${path}`));
+async function request(path, role, method = 'GET', env = envFor(role), extraHeaders = {}, body = '{}') {
+  return handleHrr(new Request(`https://local.test/api/hrr/${path}`, { method, headers: { authorization: `Bearer ${token(role, env.userEmail || `${role}@example.test`)}`, 'content-type': 'application/json', ...extraHeaders }, ...(method !== 'GET' ? { body } : {}) }), env, new URL(`https://local.test/api/hrr/${path}`));
 }
 
 test('student and mentor endpoints reject the other role', async () => {
@@ -69,6 +70,14 @@ test('Krasen can preview the student endpoints without opening them to other adm
   assert.equal((await request('team', 'admin', 'GET', krasenEnv, { 'x-hrr-view': 'student' })).status, 200);
   const otherAdminEnv = envFor('admin', {}, 'other-admin@example.test'); otherAdminEnv.userEmail = 'other-admin@example.test';
   assert.equal((await request('team', 'admin', 'GET', otherAdminEnv, { 'x-hrr-view': 'student' })).status, 403);
+});
+
+test('mission owners and admins can edit mission dates', async () => {
+  const mission = { id: 'mission-1', mentor_user_id: 'user-mentor', scope: 'team' };
+  const ownerEnv = envFor('mentor', { mission });
+  const body = JSON.stringify({ title: 'Актуализирана мисия', description: 'Ново описание', startDate: '2026-10-10', endDate: '2026-10-20', points: 8, scope: 'team' });
+  assert.equal((await request('mentor/missions/mission-1', 'mentor', 'PATCH', ownerEnv, {}, body)).status, 200);
+  assert.equal((await request('mentor/missions/mission-1', 'admin', 'PATCH', envFor('admin', { mission }), {}, body)).status, 200);
 });
 
 test('student history includes mission metadata and the latest mentor feedback timestamps', async () => {
