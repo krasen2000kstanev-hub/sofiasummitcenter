@@ -147,10 +147,21 @@ async function history(request, env) {
 async function createMission(request, env) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const season = await currentSeason(env); const body = await request.json();
-  if (!season || !clean(body.title, 160) || !Number.isFinite(Number(body.points))) return json({ error: 'Title and points are required' }, 400);
+  const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20);
+  if (!season || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Title, points and a valid date range are required' }, 400);
   const missionId = id('hrr_mission');
-  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,title,description,category,points,deadline,scope,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, clean(body.title, 160), clean(body.description, 4000), clean(body.category, 40) || 'general', Math.max(0, Number(body.points)), clean(body.deadline, 80), ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now()).run();
+  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,title,description,category,points,deadline,start_date,end_date,scope,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now()).run();
   return json({ ok: true, missionId }, 201);
+}
+
+async function updateMission(request, env, missionId) {
+  const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
+  const mission = await env.DB.prepare('SELECT * FROM hrr_missions WHERE id=?').bind(missionId).first();
+  if (!mission || (auth.user.role !== 'admin' && mission.mentor_user_id !== auth.user.id)) return json({ error: 'Mission not found' }, 404);
+  const body = await request.json(); const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20);
+  if (!clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Title, points and a valid date range are required' }, 400);
+  await env.DB.prepare('UPDATE hrr_missions SET title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=? WHERE id=?').bind(clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionId).run();
+  return json({ ok: true, missionId });
 }
 
 async function createTeam(request, env) {
@@ -192,6 +203,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);
+  if (request.method === 'PATCH' && /^\/api\/hrr\/mentor\/missions\/[^/]+$/.test(url.pathname)) return updateMission(request, env, url.pathname.split('/').at(-1));
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/allowlist') return addMentor(request, env);
   return json({ error: 'Not found' }, 404);
