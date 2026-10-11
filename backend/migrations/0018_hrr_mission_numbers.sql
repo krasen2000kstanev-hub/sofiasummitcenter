@@ -1,0 +1,1 @@
+ALTER TABLE hrr_missions ADD COLUMN mission_number INTEGER NOT NULL DEFAULT 0;

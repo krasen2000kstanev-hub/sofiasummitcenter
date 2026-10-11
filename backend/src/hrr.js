@@ -148,9 +148,10 @@ async function createMission(request, env) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const season = await currentSeason(env); const body = await request.json();
   const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20);
-  if (!season || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Title, points and a valid date range are required' }, 400);
+  const missionNumber = Number(body.missionNumber);
+  if (!season || !Number.isInteger(missionNumber) || missionNumber < 1 || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Mission number, title, points and a valid date range are required' }, 400);
   const missionId = id('hrr_mission');
-  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,title,description,category,points,deadline,start_date,end_date,scope,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now()).run();
+  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,mission_number,title,description,category,points,deadline,start_date,end_date,scope,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, missionNumber, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now()).run();
   return json({ ok: true, missionId }, 201);
 }
 
@@ -158,15 +159,15 @@ async function updateMission(request, env, missionId) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const mission = await env.DB.prepare('SELECT * FROM hrr_missions WHERE id=?').bind(missionId).first();
   if (!mission || (auth.user.role !== 'admin' && mission.mentor_user_id !== auth.user.id)) return json({ error: 'Mission not found' }, 404);
-  const body = await request.json(); const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20);
-  if (!clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Title, points and a valid date range are required' }, 400);
+  const body = await request.json(); const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20); const missionNumber = Number(body.missionNumber || mission.mission_number);
+  if (!Number.isInteger(missionNumber) || missionNumber < 1 || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Mission number, title, points and a valid date range are required' }, 400);
   let mentorUserId = mission.mentor_user_id;
   if (auth.user.role === 'admin' && body.mentorUserId) {
     const mentor = await env.DB.prepare("SELECT id FROM hrr_users WHERE id=? AND role IN ('mentor','admin')").bind(clean(body.mentorUserId, 100)).first();
     if (!mentor) return json({ error: 'Invalid mission mentor' }, 400);
     mentorUserId = mentor.id;
   }
-  await env.DB.prepare('UPDATE hrr_missions SET mentor_user_id=?,title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=? WHERE id=?').bind(mentorUserId, clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionId).run();
+  await env.DB.prepare('UPDATE hrr_missions SET mentor_user_id=?,mission_number=?,title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=? WHERE id=?').bind(mentorUserId, missionNumber, clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionId).run();
   return json({ ok: true, missionId });
 }
 

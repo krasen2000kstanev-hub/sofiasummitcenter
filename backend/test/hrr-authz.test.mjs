@@ -75,7 +75,7 @@ test('Krasen can preview the student endpoints without opening them to other adm
 test('mission owners and admins can edit mission dates', async () => {
   const mission = { id: 'mission-1', mentor_user_id: 'user-mentor', scope: 'team' };
   const ownerEnv = envFor('mentor', { mission });
-  const body = JSON.stringify({ title: 'Актуализирана мисия', description: 'Ново описание', startDate: '2026-10-10', endDate: '2026-10-20', points: 8, scope: 'team' });
+  const body = JSON.stringify({ missionNumber: 7, title: 'Актуализирана мисия', description: 'Ново описание', startDate: '2026-10-10', endDate: '2026-10-20', points: 8, scope: 'team' });
   assert.equal((await request('mentor/missions/mission-1', 'mentor', 'PATCH', ownerEnv, {}, body)).status, 200);
   assert.equal((await request('mentor/missions/mission-1', 'admin', 'PATCH', envFor('admin', { mission }), {}, body)).status, 200);
 });
