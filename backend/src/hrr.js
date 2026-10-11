@@ -87,7 +87,7 @@ async function missions(request, env) {
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
   const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
-    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND (m.mentor_user_id=? OR ?='admin') GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id, auth.user.id, auth.user.role).all()
+    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
     : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
   return json({ missions: rows.results || [] });
 }
