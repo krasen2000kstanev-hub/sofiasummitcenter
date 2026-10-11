@@ -76,9 +76,10 @@ async function team(request, env) {
   const members = await env.DB.prepare(`SELECT u.id,u.display_name,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points ELSE 0 END),0) points
     FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id LEFT JOIN hrr_submissions s ON s.student_user_id=u.id LEFT JOIN hrr_missions m ON m.id=s.mission_id AND m.season_id=?
     WHERE tm.team_id=? AND tm.season_id=? AND tm.active=1 GROUP BY u.id ORDER BY points DESC`).bind(season.id, membership.id, season.id).all();
-  const teamPoints = await env.DB.prepare(`SELECT COALESCE(SUM(m.points),0) points
-    FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
-    WHERE s.team_id=? AND s.status='approved' AND m.scope='team' AND m.season_id=?`).bind(membership.id, season.id).first();
+  const teamPoints = await env.DB.prepare(`SELECT COALESCE(SUM(points),0) points FROM (
+    SELECT m.points FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
+    WHERE s.team_id=? AND s.status='approved' AND m.scope='team' AND m.season_id=? GROUP BY s.mission_id,m.points
+  ) approved_team_missions`).bind(membership.id, season.id).first();
   return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) });
 }
 
@@ -87,7 +88,7 @@ async function missions(request, env) {
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
   const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
-    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
+    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
     : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
   return json({ missions: rows.results || [] });
 }
@@ -135,7 +136,7 @@ async function notifications(request, env, roles = ['student']) {
 async function history(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
-      m.title,m.description,m.category,m.points,m.scope,m.deadline,m.status mission_status,m.created_at published_at,
+      m.mission_number,m.title,m.description,m.category,m.points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id

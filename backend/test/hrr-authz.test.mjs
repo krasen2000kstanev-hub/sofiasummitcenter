@@ -72,6 +72,29 @@ test('Krasen can preview the student endpoints without opening them to other adm
   assert.equal((await request('team', 'admin', 'GET', otherAdminEnv, { 'x-hrr-view': 'student' })).status, 403);
 });
 
+test('team points query counts an approved team mission once', async () => {
+  const statements = [];
+  const user = { id: 'user-student', cognito_sub: 'user-student', email: 'student@example.test', display_name: 'student', role: 'student' };
+  const env = {
+    HRR_COGNITO_ISSUER: 'https://issuer.test', HRR_COGNITO_CLIENT_ID: 'test-client',
+    DB: { prepare(sql) {
+      statements.push(sql);
+      return { bind() { return this; }, async first() {
+        if (sql.includes('FROM hrr_seasons')) return { id: 'season-8' };
+        if (sql.startsWith('SELECT role FROM hrr_mentor_allowlist')) return null;
+        if (sql.includes('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=?') || sql.startsWith('SELECT * FROM hrr_users WHERE cognito_sub=?')) return user;
+        if (sql.startsWith('SELECT t.* FROM hrr_team_members')) return { id: 'team-1', name: 'Екип 1', university: 'СУ', city: 'София' };
+        if (sql.includes('SELECT COALESCE(SUM(points),0) points FROM (')) return { points: 10 };
+        return null;
+      }, async run() { return { success: true }; }, async all() { return { results: [] }; } };
+    } }
+  };
+  const response = await request('team', 'student', 'GET', env);
+  assert.equal(response.status, 200, `${await response.clone().text()}\n${statements.join('\n')}`);
+  assert.ok(statements.some(sql => sql.includes('GROUP BY s.mission_id,m.points')));
+  assert.equal((await response.json()).teamPoints, 10);
+});
+
 test('mission owners and admins can edit mission dates', async () => {
   const mission = { id: 'mission-1', mentor_user_id: 'user-mentor', scope: 'team' };
   const ownerEnv = envFor('mentor', { mission });
@@ -81,7 +104,7 @@ test('mission owners and admins can edit mission dates', async () => {
 });
 
 test('student history includes mission metadata and the latest mentor feedback timestamps', async () => {
-  const expected = { id: 'submission-1', mission_id: 'mission-1', status: 'approved', review_note: 'Добра работа', submitted_at: '2026-09-03T10:00:00.000Z', reviewed_at: '2026-09-04T10:00:00.000Z', title: 'Подготви профил', description: 'Описание', category: 'profile', points: 5, scope: 'team', deadline: '2026-10-01', mission_status: 'archived', published_at: '2026-09-01T10:00:00.000Z', mentor_name: 'Ментор', mentor_email: 'mentor@example.test' };
+  const expected = { id: 'submission-1', mission_id: 'mission-1', status: 'approved', review_note: 'Добра работа', submitted_at: '2026-09-03T10:00:00.000Z', reviewed_at: '2026-09-04T10:00:00.000Z', mission_number: 4, title: 'Подготви профил', description: 'Описание', category: 'profile', points: 5, scope: 'team', deadline: '2026-10-01', start_date: '2026-09-20', end_date: '2026-10-01', mission_status: 'archived', published_at: '2026-09-01T10:00:00.000Z', mentor_name: 'Ментор', mentor_email: 'mentor@example.test' };
   const response = await request('history', 'student', 'GET', envFor('student', { history: [expected] }));
   assert.equal(response.status, 200);
   const body = await response.json();
@@ -90,4 +113,7 @@ test('student history includes mission metadata and the latest mentor feedback t
   assert.equal(body.history[0].review_note, expected.review_note);
   assert.equal(body.history[0].submitted_at, expected.submitted_at);
   assert.equal(body.history[0].published_at, expected.published_at);
+  assert.equal(body.history[0].mission_number, expected.mission_number);
+  assert.equal(body.history[0].start_date, expected.start_date);
+  assert.equal(body.history[0].end_date, expected.end_date);
 });
