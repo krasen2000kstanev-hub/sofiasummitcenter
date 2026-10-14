@@ -52,13 +52,13 @@ if (guestsSection) {
   window.addEventListener('scroll', revealGuests, {passive:true});
 }
 const heroPhotos = [
-  'assets/hero-01.jpg', 'assets/hero-11.jpg',
-  'assets/hero-02.jpg', 'assets/hero-12.jpg',
-  'assets/hero-03.jpg', 'assets/hero-13.jpg',
-  'assets/hero-04.jpg', 'assets/hero-14.jpg',
-  'assets/hero-05.jpg', 'assets/hero-15.jpg',
-  'assets/hero-07.jpg', 'assets/hero-08.jpg',
-  'assets/hero-09.jpg', 'assets/hero-10.jpg'
+  'assets/hero/hero-01.jpg', 'assets/hero/hero-11.jpg',
+  'assets/hero/hero-02.jpg', 'assets/hero/hero-12.jpg',
+  'assets/hero/hero-03.jpg', 'assets/hero/hero-13.jpg',
+  'assets/hero/hero-04.jpg', 'assets/hero/hero-14.jpg',
+  'assets/hero/hero-07.jpg', 'assets/hero/hero-08.jpg',
+  'assets/hero/hero-09.jpg', 'assets/hero/hero-10.jpg',
+  'assets/hero/hero-15.jpg'
 ];
 if (hero) {
   let heroIndex = 0;

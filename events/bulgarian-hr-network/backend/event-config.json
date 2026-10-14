@@ -1,20 +1,20 @@
 {
   "title": "Bulgarian HR Network",
-  "date": "25 септември 2026",
-  "time": "Ще бъде публикувано на сайта",
+  "date": "28 октомври 2026",
+  "time": "19:00",
   "venue": "Sofia Summit Center",
   "address": "ул. „8-ми декември“ 13, София",
   "url": "https://sofiasummit.bg/events/bulgarian-hr-network/",
   "speakers": [
     {
-      "name": "Бойко Проданов",
-      "company": "ActionCOACH",
-      "topic": "Война за таланти? Или как да не губите най-добрите кандидати?"
+      "name": "Йоанна Маринова",
+      "company": "Artime",
+      "topic": "Съвети за по-уверени презентации"
     },
     {
-      "name": "Радослава Кроснева",
-      "company": "Co-Partner",
-      "topic": "Какво ще отличава търсения HR професионалист през следващите години?"
+      "name": "Василена Винченцо",
+      "company": "Artime",
+      "topic": "Импро игри, смях и сближаване с колегите"
     }
   ]
 }
