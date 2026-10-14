@@ -3,7 +3,7 @@
 ## HR Bulgaria Network landing page
 
 - Репозиториум: `krasen2000kstanev-hub/sofiasummitcenter`
-- Целеви публичен адрес: `https://sofiasummit.bg/events/hr-bulgaria-network`
+- Целеви публичен адрес: `https://sofiasummit.bg/events/bulgarian-hr-network/`
 - Локален preview: `http://127.0.0.1:4173/`
 - Хостинг: GitHub Pages, като част от Sofia Summit Center.
 
