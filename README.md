@@ -101,3 +101,12 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - The season process cards are numbered sequentially 01–04.
 - Company and university applications use matching organization labels and include a required position field; the company CTA links to the form and preselects the company role.
 - Removed the decorative circle from the final call-to-action section.
+
+
+## Career Cafe — форма и контакт — 16 октомври 2026 г.
+
+- Задължителните полета се маркират с червена рамка и показват съобщение „Полето е задължително.“ при пропускане.
+- При липса на билет се показва „Моля, избери билет.“.
+- Полето „Защо съм на това събитие?“ е незадължително.
+- Doppio вече не изглежда предварително избран или препоръчан.
+- Footer-ът съдържа +359 894 202 086 и tsvetelin@pleggi.com.
