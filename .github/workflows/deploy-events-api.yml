@@ -19,6 +19,9 @@ jobs:
           node-version: 22
       - name: Install Wrangler
         run: npm install --global wrangler@4.131.1
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
       - name: Resolve D1 database id
         working-directory: backend
         shell: bash
