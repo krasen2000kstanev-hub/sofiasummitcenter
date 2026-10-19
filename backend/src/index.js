@@ -216,7 +216,7 @@ async function quotePromo(request, env) {
   return json({ valid: true, code, discountPercent: percent, amountCents: Math.round(ticket.price_cents * count * (100 - percent) / 100), currency: ticket.currency }, 200, headers);
 }
 
-async function createOrder(request, env) {
+async function createOrder(request, env, ctx) {
   const headers = cors(request);
   const body = await readBody(request);
   const eventSlug = clean(body.eventSlug || 'nail-business-restart', 80);
@@ -333,7 +333,7 @@ export default {
         const used = await env.DB.prepare("SELECT COALESCE(SUM(attendee_count),0) total FROM orders WHERE event_id=? AND (status='paid' OR (status='pending_payment' AND expires_at > ?))").bind(event.id, now()).first();
         return json({ event, tickets: tickets.results || [], seatsRemaining: Math.max(0, event.capacity - Number(used.total || 0)) }, 200, headers);
       }
-      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env);
+      if (request.method === 'POST' && url.pathname === '/api/orders') return createOrder(request, env, ctx);
       if (request.method === 'POST' && url.pathname === '/api/promo/quote') return quotePromo(request, env);
       if (request.method === 'POST' && url.pathname === '/api/payments/dsk/webhook') return dskWebhook(request, env, ctx);
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
