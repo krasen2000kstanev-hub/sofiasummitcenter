@@ -258,3 +258,13 @@ Sofia Summit Center · ул. „8-ми декември“ 13, София · +35
 - Вторият билет Doppio вече не изглежда предварително маркиран и е премахнат етикетът „Най-поръчван“.
 - Footer-ът на Career Cafe съдържа телефона +359 894 202 086 и имейла tsvetelin@pleggi.com.
 - Промените са публикувани в GitHub main след локална проверка.
+
+
+## Bulgarian HR Network — мобилна оптимизация и лого — 20 октомври 2026 г.
+
+- Добавен е изолиран responsive слой `events/bulgarian-hr-network/mobile-fix.css`, зареден след останалите стилове с cache версия `mobile2`.
+- Мобилният изглед подрежда hero, лекторите, story секцията, галерията и регистрационната форма в удобен едноколоночен layout, премахва хоризонталния скрол и пази 16px размер на полетата за iOS.
+- Добавени са safe-spacing правила за устройства до 380px, по-удобни touch targets и `prefers-reduced-motion` fallback.
+- Официалното пълно лого е `events/bulgarian-hr-network/assets/hr-bulgaria-network-logo.png`, с изрични размери и cache busting в HTML.
+- Live страницата е <https://sofiasummit.bg/events/bulgarian-hr-network/>; зареждането на `mobile-fix.css?v=mobile2` е потвърдено live.
+- Публикувани commit-и: `c63ed11` (mobile stylesheet) и `fc0cfd8` (HTML link).
