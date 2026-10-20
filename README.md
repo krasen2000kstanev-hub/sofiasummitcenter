@@ -110,3 +110,11 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - Полето „Защо съм на това събитие?“ е незадължително.
 - Doppio вече не изглежда предварително избран или препоръчан.
 - Footer-ът съдържа +359 894 202 086 и tsvetelin@pleggi.com.
+
+
+## Bulgarian HR Network — responsive UI update — 20 октомври 2026 г.
+
+- The next-speaker section now uses a responsive editorial layout with the optimized Artime speaker photo, direct ticket CTA, speaker links and a short no-experience note.
+- Desktop uses a 12-column photo/text composition; mobile stacks headline, copy, CTA, photo and links without horizontal overflow.
+- The image is `events/bulgarian-hr-network/assets/speakers/artime-speakers.webp` with explicit dimensions, lazy loading and descriptive Bulgarian alt text.
+- Live page: `https://sofiasummit.bg/events/bulgarian-hr-network/`.
