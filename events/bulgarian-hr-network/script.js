@@ -21,7 +21,8 @@ form.addEventListener('submit', async (event) => {
     const response = await fetch(`${API_BASE}/registrations`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(data)});
     const result = await response.json();
     if (!response.ok) throw new Error(result.errors ? Object.values(result.errors)[0] : 'registration_failed');
-    window.location.href = result.paymentUrl || PAYMENT_LINK;
+    status.textContent = 'Регистрацията е получена. След потвърждение на плащането ще получите билета си по имейл до 24 часа. Пренасочваме към плащане…';
+    window.setTimeout(() => { window.location.href = result.paymentUrl || PAYMENT_LINK; }, 700);
   } catch (error) {
     status.textContent = error.message === 'Failed to fetch' ? 'Временно няма връзка със сървъра. Опитай отново.' : error.message;
   }
@@ -80,4 +81,6 @@ const updateStory = () => {
 window.addEventListener('scroll', () => {
   if (!storyFrame) storyFrame = requestAnimationFrame(updateStory);
 }, {passive:true});
+
+
 
