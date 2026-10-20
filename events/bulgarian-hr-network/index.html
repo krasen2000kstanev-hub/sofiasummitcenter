@@ -35,7 +35,24 @@
       <a href="#moments">Моменти</a>
       <a class="nav-cta" href="#register">Запиши се <span>↗</span></a>
     </nav>
+    <button class="menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Отвори меню">
+      <span></span><span></span><span></span>
+    </button>
   </header>
+  <div class="mobile-menu-backdrop" data-menu-close></div>
+  <aside class="mobile-menu" id="mobile-menu" aria-label="Мобилна навигация" aria-hidden="true">
+    <div class="mobile-menu-head">
+      <span>Меню</span>
+      <button class="menu-close" type="button" data-menu-close aria-label="Затвори меню">×</button>
+    </div>
+    <nav class="mobile-menu-links" aria-label="Мобилна навигация">
+      <a href="#about">За мрежата <span>↘</span></a>
+      <a href="#guests">Лектори <span>↘</span></a>
+      <a href="#next-speaker">Следващ лектор <span>↘</span></a>
+      <a href="#moments">Моменти <span>↘</span></a>
+      <a class="mobile-menu-cta" href="#register">Запиши се <span>↗</span></a>
+    </nav>
+  </aside>
 
   <main id="top">
     <section class="hero">
