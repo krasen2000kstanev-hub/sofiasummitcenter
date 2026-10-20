@@ -141,3 +141,9 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 
 - The former 25 September Pixieset URL returned HTTP 404, so the broken external link was removed from the public page.
 - The date remains visible as a non-clickable label until a new valid album URL is provided.
+
+
+## Bulgarian HR Network — updated 25 September gallery URL — 20 октомври 2026 г.
+
+- Replaced the retired Pixieset link with the working PicSpace gallery: <https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-d33703>.
+- The gallery resolves to “HR среща” and lists 38 photos from 25 September 2026.
