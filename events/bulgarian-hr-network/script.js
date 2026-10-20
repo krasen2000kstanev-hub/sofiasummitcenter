@@ -3,6 +3,26 @@ const PAYMENT_LINK = 'https://epg.dskbank.bg/sc/YqwigIbIWMnGQnRP';
 const form = document.querySelector('#registration-form');
 const status = document.querySelector('.form-status');
 
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileMenu = document.querySelector('#mobile-menu');
+const menuCloseTargets = document.querySelectorAll('[data-menu-close]');
+const closeMobileMenu = () => {
+  document.body.classList.remove('menu-open');
+  menuToggle?.setAttribute('aria-expanded', 'false');
+  menuToggle?.setAttribute('aria-label', 'Отвори меню');
+  mobileMenu?.setAttribute('aria-hidden', 'true');
+};
+const openMobileMenu = () => {
+  document.body.classList.add('menu-open');
+  menuToggle?.setAttribute('aria-expanded', 'true');
+  menuToggle?.setAttribute('aria-label', 'Затвори меню');
+  mobileMenu?.setAttribute('aria-hidden', 'false');
+};
+menuToggle?.addEventListener('click', () => document.body.classList.contains('menu-open') ? closeMobileMenu() : openMobileMenu());
+menuCloseTargets.forEach((target) => target.addEventListener('click', closeMobileMenu));
+mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
+window.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMobileMenu(); });
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!form.reportValidity()) return;
