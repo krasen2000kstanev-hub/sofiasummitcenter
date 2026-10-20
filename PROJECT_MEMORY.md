@@ -1,5 +1,12 @@
 # Project memory
 
+## Bulgarian HR Network — live UI update — 20 октомври 2026 г.
+
+- Публикувана е responsive редакционна секция „Следващата среща“ с директен CTA „Вземи билет · 12 €“, speaker линкове и бележка, че не се изисква опит.
+- Добавена е оптимизирана WebP снимка events/bulgarian-hr-network/assets/speakers/artime-speakers.webp (1600×1067, около 86 KB) с размери, lazy loading и описателен alt текст.
+- Desktop използва 12-колонна композиция със снимка и припокриващ се текстов панел; mobile подрежда съдържанието вертикално без хоризонтално преливане.
+- Live URL: https://sofiasummit.bg/events/bulgarian-hr-network/.
+
 ## Bulgarian HR Network — начална страница и следваща среща — 14 октомври 2026 г.
 
 - Bulgarian HR Network е добавен като трета карта в секцията „Предстоящи събития“ на началната страница, със снимка, описание и линк към `events/bulgarian-hr-network/`.
