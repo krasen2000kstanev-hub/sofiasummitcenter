@@ -128,3 +128,10 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - The official Drive logo is stored at `events/bulgarian-hr-network/assets/hr-bulgaria-network-logo.png`; the image is served with explicit dimensions and cache busting.
 - Live page: <https://sofiasummit.bg/events/bulgarian-hr-network/>.
 - Published commits: `c63ed11` (mobile stylesheet) and `fc0cfd8` (HTML link).
+
+
+## Bulgarian HR Network — ticket delivery copy — 20 октомври 2026 г.
+
+- Registration now states that the ticket is emailed within 24 hours after payment confirmation.
+- After a successful registration, the page briefly confirms the delivery timing before redirecting to the DSK payment page.
+- Ticket sending remains tied to the confirmed-payment flow; no ticket is promised before payment confirmation.
