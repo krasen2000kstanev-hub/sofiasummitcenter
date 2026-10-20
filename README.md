@@ -118,3 +118,13 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - Desktop uses a 12-column photo/text composition; mobile stacks headline, copy, CTA, photo and links without horizontal overflow.
 - The image is `events/bulgarian-hr-network/assets/speakers/artime-speakers.webp` with explicit dimensions, lazy loading and descriptive Bulgarian alt text.
 - Live page: `https://sofiasummit.bg/events/bulgarian-hr-network/`.
+
+
+## Bulgarian HR Network — mobile optimization and logo fix — 20 октомври 2026 г.
+
+- Added the isolated responsive override stylesheet `events/bulgarian-hr-network/mobile-fix.css`, loaded after the event styles with cache version `mobile2`.
+- Mobile layout now keeps the full Bulgarian HR Network logo visible, removes horizontal overflow, stacks the hero/gallery/story/form sections for one-column screens, and uses 16px form controls to prevent iOS focus zoom.
+- Added narrow-device safeguards for screens up to 380px and a reduced-motion fallback.
+- The official Drive logo is stored at `events/bulgarian-hr-network/assets/hr-bulgaria-network-logo.png`; the image is served with explicit dimensions and cache busting.
+- Live page: <https://sofiasummit.bg/events/bulgarian-hr-network/>.
+- Published commits: `c63ed11` (mobile stylesheet) and `fc0cfd8` (HTML link).
