@@ -1,0 +1,106 @@
+/* Mobile layout: keep the editorial desktop composition, but remove overflow,
+   reduce tap targets to a comfortable one-handed layout, and keep form text
+   at 16px so iOS does not zoom the page when an input receives focus. */
+@media (max-width: 760px) {
+  :root { --mobile-gutter: 18px; }
+
+  html { overflow-x: hidden; }
+  body { overflow-x: hidden; -webkit-tap-highlight-color: rgba(237, 113, 91, .22); }
+
+  .site-header {
+    height: 72px;
+    padding: 0 var(--mobile-gutter);
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .brand { min-width: 0; gap: 8px; }
+  .brand-logo { width: 56px; height: 56px; flex-basis: 56px; }
+  .site-header nav { margin-left: auto; }
+  .nav-cta { padding: 10px 13px; gap: 8px; font-size: 12px; white-space: nowrap; }
+
+  .hero {
+    min-height: 0;
+    padding: 38px var(--mobile-gutter) 62px;
+  }
+  .hero-copy { max-width: 100%; }
+  h1 { font-size: clamp(3.1rem, 15vw, 5rem); line-height: .94; margin: 18px 0 22px; text-wrap: balance; }
+  .hero-text { max-width: 34ch; font-size: 17px; line-height: 1.45; }
+  .event-meta { display: grid; gap: 4px; margin-bottom: 18px; }
+  .button-primary { width: 100%; justify-content: space-between; margin: 12px 0 20px; min-height: 52px; }
+  .hero-visual { display: block; min-height: 0; margin-top: 34px; }
+  .hero-image { height: clamp(300px, 90vw, 430px); border-radius: 34% 34% 18px 18px; }
+  .hero-sticker { width: 92px; height: 92px; left: -4px; top: 14px; font-size: 11px; }
+  .hero-sticker b { font-size: 13px; }
+  .hero-caption { right: 8px; bottom: 12px; padding: 13px 14px; font-size: 10px; }
+  .hero-caption span { font-size: 18px; margin-left: 10px; }
+
+  .stats { margin: 0 var(--mobile-gutter) 64px; padding: 18px 0; gap: 14px; }
+  .stats div { gap: 14px; }
+  .stats strong { font-size: 34px; }
+
+  .section { padding-left: var(--mobile-gutter); padding-right: var(--mobile-gutter); padding-bottom: 74px; }
+  .about .section-label { margin-bottom: 24px; }
+  .section h2 { font-size: clamp(2.7rem, 12vw, 4.5rem); line-height: .98; text-wrap: balance; }
+  .lead { font-size: 19px; }
+  .about-grid { grid-template-columns: 1fr; gap: 16px; margin-top: 28px; }
+
+  .guests { padding: 72px var(--mobile-gutter) 74px; }
+  .guest-track { gap: 12px; }
+  .guest-card { flex-basis: 82%; }
+  .guest-photo { height: min(330px, 88vw); }
+
+  .next-speaker-card { padding-top: 26px; }
+
+  .story { padding: 72px var(--mobile-gutter) 0; }
+  .story-shell { min-height: auto; }
+  .story-media { height: 60vh; min-height: 360px; }
+  .story-card,
+  .story-card:nth-child(2),
+  .story-card:nth-child(3) {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    top: auto;
+    min-height: 0;
+    padding: 22px;
+    opacity: 1;
+    transform: none;
+  }
+  .story-card + .story-card { margin-top: 12px; }
+  .story-steps { position: relative; padding: 16px 0 42px; }
+
+  .moments { padding: 68px var(--mobile-gutter) 70px; }
+  .gallery { grid-template-columns: 1fr; gap: 12px; margin-top: 28px; }
+  .gallery-wide,
+  .gallery-tall,
+  .gallery-small {
+    grid-column: auto;
+    height: clamp(220px, 64vw, 330px);
+    min-height: 0;
+    border-radius: 18px !important;
+  }
+
+  .register { padding: 70px var(--mobile-gutter) 80px; }
+  .register-copy { margin-bottom: 36px; }
+  .registration-form { padding: 18px 16px; border-radius: 18px; }
+  .registration-form input,
+  .registration-form textarea,
+  .registration-form select { font-size: 16px; }
+  .registration-form .button-dark { width: 100%; min-height: 54px; }
+
+  .site-footer { padding: 24px var(--mobile-gutter); gap: 16px; }
+  .site-footer .brand-logo { width: 56px; height: 56px; flex-basis: 56px; }
+}
+
+@media (max-width: 380px) {
+  .site-header { padding-left: 14px; padding-right: 14px; }
+  .brand-logo { width: 48px; height: 48px; flex-basis: 48px; }
+  .nav-cta { padding-left: 10px; padding-right: 10px; font-size: 11px; }
+  .hero, .section, .guests, .story, .moments, .register, .site-footer { --mobile-gutter: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
