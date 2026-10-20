@@ -147,3 +147,10 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 
 - Replaced the retired Pixieset link with the working PicSpace gallery: <https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-d33703>.
 - The gallery resolves to “HR среща” and lists 38 photos from 25 September 2026.
+
+
+## Bulgarian HR Network — mobile side drawer menu — 20 октомври 2026 г.
+
+- Mobile navigation now uses a right-side drawer with hamburger trigger, backdrop, close button, Escape support and link-close behavior.
+- Desktop navigation remains unchanged; the drawer is enabled only below 760px.
+- The interaction is implemented in events/bulgarian-hr-network/script.js and mobile-fix.css with accessible labels and aria-expanded/aria-hidden state.
