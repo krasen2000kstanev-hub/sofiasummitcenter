@@ -289,3 +289,11 @@ Sofia Summit Center · ул. „8-ми декември“ 13, София · +35
 - Старият 404 Pixieset линк е заменен с работещата галерия: <https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-d33703>.
 - Проверено е, че страницата се зарежда като „HR среща“ с 38 снимки от 25 септември 2026 г.
 - Commit: `3ebc759`.
+
+
+## Bulgarian HR Network — странично мобилно меню — 20 октомври 2026 г.
+
+- Мобилната навигация вече е right-side drawer с hamburger бутон, overlay, X/Escape затваряне и автоматично затваряне след избор на линк.
+- Desktop менюто остава непроменено; drawer-ът се активира под 760px.
+- Използвани са достъпни aria-expanded, aria-hidden и описателни labels.
+- Публикувани commit-и: 04c2b42 (HTML), 21583ba (CSS), da7356d (JavaScript).
