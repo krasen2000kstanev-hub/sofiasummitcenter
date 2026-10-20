@@ -135,3 +135,9 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - Registration now states that the ticket is emailed within 24 hours after payment confirmation.
 - After a successful registration, the page briefly confirms the delivery timing before redirecting to the DSK payment page.
 - Ticket sending remains tied to the confirmed-payment flow; no ticket is promised before payment confirmation.
+
+
+## Bulgarian HR Network — photo album link cleanup — 20 октомври 2026 г.
+
+- The former 25 September Pixieset URL returned HTTP 404, so the broken external link was removed from the public page.
+- The date remains visible as a non-clickable label until a new valid album URL is provided.
