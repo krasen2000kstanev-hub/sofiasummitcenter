@@ -241,3 +241,5 @@
 <style id="all-sections-full-width">main>.section,main>.stats{width:100%!important;max-width:none!important;box-sizing:border-box!important;padding-left:clamp(32px,6vw,180px)!important;padding-right:clamp(32px,6vw,180px)!important}@media(max-width:760px){main>.section,main>.stats{padding-left:24px!important;padding-right:24px!important}}</style>
 
 <script id="remove-stray-styles-text">document.querySelectorAll('.next-speaker-links').forEach(el=>[...el.childNodes].filter(n=>n.nodeType===3&&n.textContent.includes('href=\"styles.css\"')).forEach(n=>n.remove()));</script>
+
+<style id="static-site-header">.site-header{position:static!important;top:auto!important;z-index:10!important}</style>
