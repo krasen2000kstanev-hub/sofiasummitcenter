@@ -37,3 +37,15 @@
 - Payment линкът е зададен в `script.js`; API Gateway адресът е зададен в `api-config.js`.
 - При нова HR среща обнови Pixieset линка и добави новите снимки в `assets/events/` или `assets/hero/`.
 - За пълен production тест потвърди реалния DSK payload и merchant reference; статичният payment link може да не подава `registrationId`.
+
+
+## Последни промени
+
+- Hero-ът е full-screen с 7 изображения, slide анимация, стрелки, пауза/продължи и counter.
+- Клик върху hero изображение отваря оригинала в нов таб за преглед или изтегляне.
+- Всички основни секции са full-width с responsive вътрешна подредба.
+- Header менюто е статично; не остава видимо при скрол.
+- Responsive/cross-browser overrides покриват desktop, tablet и mobile, включително safe-area и fallback за `svh`.
+- QA проверка: всички изображения се зареждат, няма хоризонтален overflow, навигационните targets съществуват, стрелките и паузата работят.
+- Галерия 07.07.2026: `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-e4f128`.
+- Премахнат е видимият остатък `href="styles.css"` от секцията за лектори.
