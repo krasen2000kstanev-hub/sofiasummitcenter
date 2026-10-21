@@ -11,6 +11,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Sync branch
+        run: git pull --rebase origin main
       - name: Update label
         shell: python
         run: |
@@ -26,7 +28,6 @@ jobs:
         run: |
           git config user.name "codex-site-bot"
           git config user.email "codex-site-bot@users.noreply.github.com"
-          git pull --rebase origin main
           git add events/nail-business-restart/index.html
           git commit -m "Show remaining seats only on nail event page"
           git push origin HEAD:main
