@@ -65,7 +65,12 @@
         <div class="hero-note"><span>✦</span> Следващото събитие е място за нови разговори.</div>
       </div>
       <div class="hero-visual" aria-label="Снимка от HR общност">
-        <div class="hero-image event-hero-image"></div>
+        <div class="hero-gallery" id="hero-gallery" aria-label="Снимки от HR общност">
+          <div class="hero-slide is-active"><img src="event-last-event-networking.jpg" alt="Участници на HR събитие"></div>
+          <div class="hero-slide"><img src="event-last-event-stage.jpg" alt="Лектор на HR събитие"></div>
+          <div class="hero-slide"><img src="event-previous-event-people.jpg" alt="Гости на HR събитие"></div>
+          <div class="hero-gallery-controls"><button id="hero-prev" type="button" aria-label="Предишна снимка">←</button><button id="hero-pause" type="button">Пауза</button><button id="hero-next" type="button" aria-label="Следваща снимка">→</button><span id="hero-counter">1 / 3</span></div>
+        </div>
         <div class="hero-caption">networking<br>in real life <span>↗</span></div>
       </div>
     </section>
@@ -214,7 +219,9 @@
   <script>document.querySelectorAll('img[src^="assets/"]').forEach(img=>{img.src += (img.src.includes('?')?'&':'?')+'v=2'});</script>
   <script src="../../analytics-consent.js"></script>
   <script src="script.js?v=hrhero20"></script>
-</body>
+<script>
+(()=>{const s=[...document.querySelectorAll('.hero-slide')],c=document.querySelector('#hero-counter'),p=document.querySelector('#hero-pause');let i=0,run=true,t;function show(n){i=(n+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('is-active',j===i));c.textContent=(i+1)+' / '+s.length}function restart(){clearInterval(t);if(run)t=setInterval(()=>show(i+1),4500)}document.querySelector('#hero-prev').onclick=()=>{show(i-1);restart()};document.querySelector('#hero-next').onclick=()=>{show(i+1);restart()};p.onclick=()=>{run=!run;p.textContent=run?'Пауза':'Продължи';restart()};let x=0;document.querySelector('#hero-gallery').addEventListener('pointerdown',e=>x=e.clientX);document.querySelector('#hero-gallery').addEventListener('pointerup',e=>{let n=e.clientX-x;if(Math.abs(n)>45){show(i+(n<0?1:-1));restart()}});restart()})();
+</script></body>
 </html>
 
 
