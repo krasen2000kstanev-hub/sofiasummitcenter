@@ -1,0 +1,33 @@
+name: Update homepage nail event date
+on:
+  push:
+    paths:
+      - .github/workflows/update-homepage-nail-date.yml
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync branch
+        run: git pull --rebase origin main
+      - name: Update homepage card
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+          old = "26 октомври 2026 · София"
+          new = "15 ноември 2026 · 09:00 ч. · София"
+          if text.count(old) != 1:
+              raise SystemExit(f"expected one homepage date, found {text.count(old)}")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+      - name: Commit and push
+        run: |
+          git config user.name "codex-site-bot"
+          git config user.email "codex-site-bot@users.noreply.github.com"
+          git add index.html
+          git commit -m "Update nail event date on homepage"
+          git push origin HEAD:main
