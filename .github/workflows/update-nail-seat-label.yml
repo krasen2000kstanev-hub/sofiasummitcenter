@@ -1,5 +1,8 @@
 name: Update nail seats label
 on:
+  push:
+    paths:
+      - .github/workflows/update-nail-seat-label.yml
   workflow_dispatch:
 jobs:
   update:
