@@ -1,0 +1,39 @@
+name: Update Nail Business event date
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-nail-business-date.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-date:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update event date
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("events/nail-business-restart/index.html")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("2026-10-26", "2026-11-15")
+          text = text.replace("26 октомври 2026", "15 ноември 2026")
+          path.write_text(text, encoding="utf-8")
+          PY
+
+          if git diff --quiet -- events/nail-business-restart/index.html; then
+            echo "No date changes needed"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add events/nail-business-restart/index.html
+          git commit -m "Update Nail Business event date"
+          git push
