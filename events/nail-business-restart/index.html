@@ -1771,12 +1771,14 @@
         form.dataset.appliedPromo = code;
         setNote('Промокодът е приложен. Отстъпка: ' + quote.discountPercent + '%.', false);
         if (code) trackEvent('apply_promo_code', { code: code });
+        promoBtn.disabled = false;
         return true;
       } catch (error) {
         form.dataset.appliedPromo = '';
         if (people > 1) renderAllPrices(0);
         else resetPrice(selected);
         if (showErrors) setNote(error.message, true);
+        promoBtn.disabled = false;
         return false;
       }
       promoBtn.disabled = false;
