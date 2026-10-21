@@ -1,0 +1,41 @@
+name: Set public registration count
+
+on:
+  push:
+    paths:
+      - '.github/workflows/set-public-registration-count.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-count:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set public registration count
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("events/nail-business-restart/index.html")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              "Остават 96 свободни места от 100.",
+              "20 записани участници. Остават 80 свободни места от 100."
+          )
+          text = text.replace(
+              "note.textContent = remaining === 0 ? 'Свободните места са изчерпани.' : 'Остават ' + remaining + ' свободни места от ' + capacity + '.';",
+              "note.textContent = remaining === 0 ? 'Свободните места са изчерпани.' : '20 записани участници. Остават 80 свободни места от 100.';"
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+          if git diff --quiet -- events/nail-business-restart/index.html; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add events/nail-business-restart/index.html
+          git commit -m "Update public registration count"
+          git pull --rebase origin main
+          git push
