@@ -38,3 +38,13 @@ node preview-server.cjs
 - Снимките в долните секции са в `assets/events/`.
 - Линкът към Pixieset се поддържа в секцията „Снимки от събития“ на `index.html`.
 - Backend инструкциите и Terraform променливите са в `backend/README.md`.
+
+
+## Актуално състояние
+
+- Hero-ът е full-screen с 7 снимки, плъзгаща анимация и работещи бутони назад, пауза/продължи и напред.
+- Клик върху hero снимка отваря оригиналния файл за преглед или изтегляне.
+- Основните секции са full-width; съдържанието запазва четима вътрешна ширина.
+- Header менюто е статично и не следва потребителя при скрол.
+- Responsive/cross-browser CSS покрива desktop, tablet и mobile ширини, без хоризонтален скрол.
+- Линкът за галерията от 07.07.2026 е `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-e4f128`.
