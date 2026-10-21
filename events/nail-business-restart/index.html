@@ -1827,7 +1827,7 @@
         var remaining = Number(data.seatsRemaining);
         var capacity = Number(data.event && data.event.capacity);
         if (!Number.isInteger(remaining) || remaining < 0 || !Number.isInteger(capacity) || capacity < 1) throw new Error('invalid availability');
-        note.textContent = remaining === 0 ? 'Свободните места са изчерпани.' : '20 записани участници. Остават 80 свободни места от 100.';
+        note.textContent = remaining === 0 ? 'Свободните места са изчерпани.' : 'Остават ' + remaining + ' свободни места от ' + capacity + '.';
         note.classList.toggle('is-sold-out', remaining === 0);
       } catch (error) {
         note.textContent = 'Свободните места се проверяват при записване.';
