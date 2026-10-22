@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 14 октомври 2026 г.
+Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 22 октомври 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -32,6 +32,10 @@ The HR:Rush student dashboard is available at `http://127.0.0.1:8765/events/hr-r
 
 The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the main cards, buttons, event-format pills and selected gallery imagery. Hover states add a subtle edge highlight. The rotating gallery sphere keeps its own interaction model so the two effects do not conflict.
 
+## Project map and maintenance
+
+The local `graphify-out/` directory contains a Graphify knowledge graph of the codebase: `graph.html` is the interactive map, `graph.json` is the machine-readable graph, and `GRAPH_REPORT.md` is the plain-language report. Rebuild it after structural changes with `graphify <project-path> --update`. The graph is documentation only; it does not deploy or modify the live site. Review the generated diff before publishing it to GitHub.
+
 ## Event backend status
 
 The NAIL BUSINESS RE:START page is wired for registration through the Cloudflare Worker `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. The Worker validates ticket type, promo codes, attendee data and the 100-person capacity, then creates a temporary order in D1. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend is available and webhook processing is idempotent.
@@ -43,6 +47,8 @@ The PDF generator uses an embedded Arial font for Cyrillic and follows the appro
 ## Career Cafe — текущ статус
 
 The public page at `events/career-cafe/` uses the approved Bulgarian copy for the value proposition and program. The ticket tiers are Espresso — 12 €, Doppio — 24 € and Lungo+ — 36 €; the hero copy also starts at 12 €. The brand is consistently written as **Pleggi**. Visible dash punctuation was removed from the visitor-facing copy and replaced with commas or short sentences. The helper section remains unchanged until its participants are confirmed. The preview is available through the local preview server at `http://127.0.0.1:8765/events/career-cafe/`.
+
+The registration form now marks all required fields with a red border and displays a red required-field message when submission is attempted with missing data. Ticket selection also shows a dedicated red validation message. The Doppio ticket is no longer visually preselected or labeled as most popular. The optional textarea asks **„Защо съм на това събитие?“**. The contact footer includes `+359 894 202 086` alongside `tsvetelin@pleggi.com`.
 
 ## Adding an event
 
@@ -101,56 +107,3 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - The season process cards are numbered sequentially 01–04.
 - Company and university applications use matching organization labels and include a required position field; the company CTA links to the form and preselects the company role.
 - Removed the decorative circle from the final call-to-action section.
-
-
-## Career Cafe — форма и контакт — 16 октомври 2026 г.
-
-- Задължителните полета се маркират с червена рамка и показват съобщение „Полето е задължително.“ при пропускане.
-- При липса на билет се показва „Моля, избери билет.“.
-- Полето „Защо съм на това събитие?“ е незадължително.
-- Doppio вече не изглежда предварително избран или препоръчан.
-- Footer-ът съдържа +359 894 202 086 и tsvetelin@pleggi.com.
-
-
-## Bulgarian HR Network — responsive UI update — 20 октомври 2026 г.
-
-- The next-speaker section now uses a responsive editorial layout with the optimized Artime speaker photo, direct ticket CTA, speaker links and a short no-experience note.
-- Desktop uses a 12-column photo/text composition; mobile stacks headline, copy, CTA, photo and links without horizontal overflow.
-- The image is `events/bulgarian-hr-network/assets/speakers/artime-speakers.webp` with explicit dimensions, lazy loading and descriptive Bulgarian alt text.
-- Live page: `https://sofiasummit.bg/events/bulgarian-hr-network/`.
-
-
-## Bulgarian HR Network — mobile optimization and logo fix — 20 октомври 2026 г.
-
-- Added the isolated responsive override stylesheet `events/bulgarian-hr-network/mobile-fix.css`, loaded after the event styles with cache version `mobile2`.
-- Mobile layout now keeps the full Bulgarian HR Network logo visible, removes horizontal overflow, stacks the hero/gallery/story/form sections for one-column screens, and uses 16px form controls to prevent iOS focus zoom.
-- Added narrow-device safeguards for screens up to 380px and a reduced-motion fallback.
-- The official Drive logo is stored at `events/bulgarian-hr-network/assets/hr-bulgaria-network-logo.png`; the image is served with explicit dimensions and cache busting.
-- Live page: <https://sofiasummit.bg/events/bulgarian-hr-network/>.
-- Published commits: `c63ed11` (mobile stylesheet) and `fc0cfd8` (HTML link).
-
-
-## Bulgarian HR Network — ticket delivery copy — 20 октомври 2026 г.
-
-- Registration now states that the ticket is emailed within 24 hours after payment confirmation.
-- After a successful registration, the page briefly confirms the delivery timing before redirecting to the DSK payment page.
-- Ticket sending remains tied to the confirmed-payment flow; no ticket is promised before payment confirmation.
-
-
-## Bulgarian HR Network — photo album link cleanup — 20 октомври 2026 г.
-
-- The former 25 September Pixieset URL returned HTTP 404, so the broken external link was removed from the public page.
-- The date remains visible as a non-clickable label until a new valid album URL is provided.
-
-
-## Bulgarian HR Network — updated 25 September gallery URL — 20 октомври 2026 г.
-
-- Replaced the retired Pixieset link with the working PicSpace gallery: <https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-d33703>.
-- The gallery resolves to “HR среща” and lists 38 photos from 25 September 2026.
-
-
-## Bulgarian HR Network — mobile side drawer menu — 20 октомври 2026 г.
-
-- Mobile navigation now uses a right-side drawer with hamburger trigger, backdrop, close button, Escape support and link-close behavior.
-- Desktop navigation remains unchanged; the drawer is enabled only below 760px.
-- The interaction is implemented in events/bulgarian-hr-network/script.js and mobile-fix.css with accessible labels and aria-expanded/aria-hidden state.
