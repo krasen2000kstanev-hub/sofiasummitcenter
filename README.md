@@ -1,6 +1,6 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 22 октомври 2026 г.
+Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 23 октомври 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -36,11 +36,19 @@ The homepage includes a CodePen-inspired, pointer-aware 3D tilt effect on the ma
 
 The local `graphify-out/` directory contains a Graphify knowledge graph of the codebase: `graph.html` is the interactive map, `graph.json` is the machine-readable graph, and `GRAPH_REPORT.md` is the plain-language report. Rebuild it after structural changes with `graphify <project-path> --update`. The graph is documentation only; it does not deploy or modify the live site. Review the generated diff before publishing it to GitHub.
 
+## NAIL BUSINESS RE:START — production update — 23 октомври 2026 г.
+
+- Събитието е насрочено за 15 ноември 2026 г. от 09:00 ч. в Sofia Summit Center.
+- Публичният текст за капацитет показва „Остават 80 свободни места от 100.“; backend capacity остава 100.
+- Добавено е официалното лого на Банка ДСК в партньорската секция на началната страница.
+- Активните промокодове са 18: 13×20% (`BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20`, `OGI20`, `DENI20`, `BOYANA20`), 4×50% (`IREN50`, `TAXI50`, `YOANNA50`, `DENI50`) и 1×100% (`IREN100`).
+- `DENI50` е добавен като нов промокод без промяна на `DENI20` и е проверен live за трите типа билети.
+
 ## Event backend status
 
 The NAIL BUSINESS RE:START page is wired for registration through the Cloudflare Worker `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. The Worker validates ticket type, promo codes, attendee data and the 100-person capacity, then creates a temporary order in D1. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend is available and webhook processing is idempotent.
 
-Current active promo codes: `BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20` and `OGI20`. They provide 20% server-side discount. The `/api/promo/quote` endpoint calculates the discounted amount before an order is created.
+Активните промокодове са 18: 13×20% (`BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20`, `OGI20`, `DENI20`, `BOYANA20`), 4×50% (`IREN50`, `TAXI50`, `YOANNA50`, `DENI50`) и 1×100% (`IREN100`). Те се валидират server-side чрез `/api/promo/quote` преди създаване на поръчка. `DENI50` е проверен live за Standard (44.50 €), Standard + запис (57 €) и VIP (64.50 €), като `DENI20` остава активен и непроменен.
 
 The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 
