@@ -1,4 +1,4 @@
-# Graph Report - sofiasummitcenter-main  (2026-10-22)
+# Graph Report - sofiasummitcenter-main  (2026-10-23)
 
 ## Corpus Check
 - cluster-only mode — file stats not available
@@ -7,6 +7,14 @@
 - 391 nodes · 667 edges · 51 communities (14 shown, 37 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
+
+## Current operational context
+
+- NAIL BUSINESS RE:START: 15 ноември 2026 г., начало 09:00 ч.
+- Публичен капацитет: „Остават 80 свободни места от 100.“; backend capacity: 100.
+- Homepage partner update: добавено официалното лого на Банка ДСК.
+- Активни промокодове: 18 общо — 13×20%, 4×50% и 1×100%; `DENI50` е проверен за Standard, Standard + запис и VIP.
+- Графовата структура е запазена (391 nodes, 667 edges, 51 communities); синхронизирана е оперативната документация.
 
 ## Community Hubs (Navigation)
 - DUPX_Bootstrap
