@@ -10,7 +10,7 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 - `styles.css`, `styles-enhancements.css`, `design-overrides.css`, `script.js` — homepage styling and behavior.
 - `assets/` — venue photos, logos and supporting media.
 - `events/` — standalone landing pages for individual events. The first event page is `events/nail-business-restart/index.html` for NAIL BUSINESS RE:START.
-- `events/bulgarian-hr-network/` — public Bulgarian HR Network page. Its next meeting is on 28 October 2026, and the event is featured alongside NAIL BUSINESS RE:START and Career Cafe on the homepage.
+- `events/bulgarian-hr-network/` — public Bulgarian HR Network page. Its next meeting is on 11 November 2026 (speaker to be announced), and the event is featured alongside NAIL BUSINESS RE:START and Career Cafe on the homepage.
 - `events/hr-rushforpractice/misii/` — student Mission Control with team, active missions, submissions, notifications and points history. Mentor/admin access uses the separate `/events/hr-rushforpractice/misii/mentor/` entry and its mission, notification and review panel. Google sign-in determines the role; the API enforces role boundaries.
 - `events/hr-rushforpractice/` — public HR:Rush for Practice page, including participant stories with photos, mentor profiles and an HR feedback section. Current HR feedback section lists Kaufland, Ficosota and Sportal as upcoming contributors; approved quotes are still to be added.
 - `backend/` — Cloudflare Worker + D1 scaffold for event registration, ticket orders, payment webhooks and ticket emails.

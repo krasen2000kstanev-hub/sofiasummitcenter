@@ -10,3 +10,4 @@
 @media(prefers-reduced-motion:reduce){.guests h2,.guests h2 span{animation:none}}
 .guests h2,.guests h2 span{animation:none;opacity:0;transform:translateX(70px);clip-path:inset(0 0 100%)}.guests.is-visible h2{animation:guest-title-in .95s cubic-bezier(.22,1,.36,1) both}.guests.is-visible h2 span{animation:guest-title-in .95s .22s cubic-bezier(.22,1,.36,1) both;transform:translateX(-70px)}
 @media(prefers-reduced-motion:reduce){.guests h2,.guests h2 span,.guests.is-visible h2,.guests.is-visible h2 span{animation:none;opacity:1;transform:none;clip-path:none}}
+.photo-artime img{object-position:center}
