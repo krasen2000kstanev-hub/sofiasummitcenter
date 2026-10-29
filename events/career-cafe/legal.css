@@ -40,4 +40,6 @@ li{margin:4px 0;}
   font:inherit; font-weight:600; cursor:pointer;
 }
 .legal-button:hover{background:var(--gold-light);}
+.legal-merchant{margin:0 0 10px; line-height:1.7; color:#c9bcaa;}
+.legal-merchant strong{color:var(--gold-light);}
 footer{border-top:1px solid var(--line-gold); padding:24px 0; color:#a99a86; font-size:0.8rem; text-align:center;}
