@@ -92,7 +92,7 @@
     banner.className = 'sofia-cookie-banner';
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Настройки за бисквитки');
-    banner.innerHTML = '<div class="sofia-cookie-banner-inner"><p>Използваме технически необходими бисквитки. Аналитичните бисквитки на Google Analytics и Meta Pixel се включват само с твое съгласие. <a href="/privacy.html" target="_blank" rel="noopener">Повече информация</a>.</p><div class="sofia-cookie-banner-actions"><button type="button" data-cookie="reject">Само необходимите</button><button type="button" data-cookie="accept">Приемам</button></div></div>';
+    banner.innerHTML = '<div class="sofia-cookie-banner-inner"><p>Използваме технически необходими бисквитки. Аналитичните бисквитки на Google Analytics и Meta Pixel се включват само с твое съгласие. <a href="' + (location.pathname.indexOf('/events/career-cafe') === 0 ? '/events/career-cafe/biskvitki/' : '/privacy.html') + '" target="_blank" rel="noopener">Повече информация</a>.</p><div class="sofia-cookie-banner-actions"><button type="button" data-cookie="reject">Само необходимите</button><button type="button" data-cookie="accept">Приемам</button></div></div>';
     if (!document.getElementById('sofia-cookie-banner-styles')) {
       var style = document.createElement('style');
       style.id = 'sofia-cookie-banner-styles';
