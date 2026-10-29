@@ -1,2 +1,8 @@
 @media(min-width:761px){.guest-card{flex-basis:calc((100% - 28px)/2)}}
 @media(min-width:761px){.carousel-arrow{display:none}.guest-track{overflow:visible}}
+.guest-track{overflow-x:auto!important;scrollbar-width:none}
+.guest-track::-webkit-scrollbar{display:none}
+.guest-controls{display:flex;gap:10px;align-items:center;width:max-content;margin:28px auto 0;padding:12px 16px;background:#122a35e8;border-radius:10px}
+.guest-controls button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 14px;border:1px solid #ffffffb3;border-radius:999px;background:#102f3a;color:#fff;font:600 16px 'DM Sans',sans-serif;cursor:pointer}
+.guest-controls button:hover,.guest-controls button:focus-visible{background:#1d4a58}
+.guest-controls span{margin-left:4px;color:#fff9;font:500 14px 'DM Sans',sans-serif}

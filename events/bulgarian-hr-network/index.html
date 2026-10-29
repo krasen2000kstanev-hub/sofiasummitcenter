@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="guests.css">
   <link rel="stylesheet" href="guest-fix.css?v=guestlayout3">
-  <link rel="stylesheet" href="guest-layout-fix.css?v=wide1">
+  <link rel="stylesheet" href="guest-layout-fix.css?v=wide3">
   <link rel="stylesheet" href="social-fix.css">
   <link rel="stylesheet" href="registration.css">
   <link rel="stylesheet" href="form-fixes.css">
@@ -120,13 +120,12 @@
         <h2>Нашите <span>лектори.</span></h2>
       </div>
       <div class="guests-carousel" aria-label="Гости на Bulgarian HR Network">
-        <button class="carousel-arrow carousel-prev" type="button" aria-label="Предишни гости">←</button>
         <div class="guest-track">
             <article class="guest-card"><div class="guest-photo photo-artime"><img src="assets/speakers/artime-speakers.webp" alt="Йоанна Маринова и Василена Винченцо от Artime"><div class="guest-socials"><a href="https://www.linkedin.com/in/yoannamarinova/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn профил на Йоанна Маринова">in</a><a href="https://nationaltheatre.bg/en/artist/vasilena-vinchenco" target="_blank" rel="noopener noreferrer" aria-label="Профил на Василена Винченцо в Народния театър">↗</a><a href="https://www.instagram.com/artime.bg/" target="_blank" rel="noopener noreferrer" aria-label="Instagram на Artime">ig</a></div></div><p class="guest-company">Artime</p><p class="guest-topic">„Импро игри за по-уверени презентации“</p><h3>Йоанна Маринова<br>Василена Винченцо</h3></article>
             <article class="guest-card"><div class="guest-photo photo-boyko"><img src="boyko-prodanov.jpg" alt="Бойко Проданов"><div class="guest-socials"><a href="https://www.facebook.com/boiko.prodanov" target="_blank" rel="noopener noreferrer" aria-label="Facebook профил на Бойко Проданов">f</a><a href="https://www.linkedin.com/in/boiko-prodanov-baaa6619b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn профил на Бойко Проданов">in</a></div></div><p class="guest-company">ActionCOACH</p><p class="guest-topic">„Война за таланти? Или как да не губите най-добрите кандидати?“</p><h3>Бойко<br>Проданов</h3></article>
             <article class="guest-card"><div class="guest-photo photo-radoslava"><img src="radoslava-krosneva.jpg" alt="Радослава Кроснева"><div class="guest-socials"><a href="https://www.facebook.com/radoslava.krosneva/" target="_blank" rel="noopener noreferrer" aria-label="Facebook профил на Радослава Кроснева">f</a><a href="https://www.linkedin.com/in/radoslava-krosneva/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn профил на Радослава Кроснева">in</a></div></div><p class="guest-company">Co-Partner</p><p class="guest-topic">„Какво ще отличава търсения HR професионалист през следващите години?“</p><h3>Радослава<br>Кроснева</h3></article>
         </div>
-        <button class="carousel-arrow carousel-next" type="button" aria-label="Следващи гости">→</button>
+        <div class="guest-controls"><button class="carousel-prev" type="button" aria-label="Предишен лектор">←</button><button class="guest-pause" type="button">Пауза</button><button class="carousel-next" type="button" aria-label="Следващ лектор">→</button><span class="guest-counter" aria-live="polite">1 / 1</span></div>
       </div>
     </section>
 
@@ -213,7 +212,7 @@
   <script src="api-config.js"></script>
   <script>document.querySelectorAll('img[src^="assets/"]').forEach(img=>{img.src += (img.src.includes('?')?'&':'?')+'v=2'});</script>
   <script src="../../analytics-consent.js"></script>
-  <script src="script.js?v=hrhero20"></script>
+  <script src="script.js?v=hrhero24"></script>
 <script>
 (()=>{const s=[...document.querySelectorAll('.hero-slide')],c=document.querySelector('#hero-counter'),p=document.querySelector('#hero-pause');let i=0,run=true,t;function show(n){i=(n+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('is-active',j===i));c.textContent=(i+1)+' / '+s.length}function restart(){clearInterval(t);if(run)t=setInterval(()=>show(i+1),4500)}document.querySelector('#hero-prev').onclick=()=>{show(i-1);restart()};document.querySelector('#hero-next').onclick=()=>{show(i+1);restart()};p.onclick=()=>{run=!run;p.textContent=run?'Пауза':'Продължи';restart()};let x=0;document.querySelector('#hero-gallery').addEventListener('pointerdown',e=>x=e.clientX);document.querySelector('#hero-gallery').addEventListener('pointerup',e=>{let n=e.clientX-x;if(Math.abs(n)>45){show(i+(n<0?1:-1));restart()}});restart()})();
 </script></body>
