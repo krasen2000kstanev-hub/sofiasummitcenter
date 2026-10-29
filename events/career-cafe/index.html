@@ -436,6 +436,7 @@
   .registration-form{margin-top:42px; padding:34px; border:1px solid var(--line-gold); border-radius:var(--radius-m); background:var(--charcoal-2);}
   .registration-form h3{font-family:"Playfair Display",serif; font-size:1.8rem; margin:0 0 8px;}
   .registration-form > p{color:var(--muted); margin:0 0 24px;}
+  .registration-form > p.ticket-delivery-note{margin:20px 0 0; font-size:0.9rem;}
   .form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px;}
   .form-field{display:flex; flex-direction:column; gap:7px;}
   .form-field.full{grid-column:1/-1;}
@@ -902,6 +903,7 @@
         <label class="parking-option"><input type="checkbox" name="agreeTerms" value="true" id="registration-consent" required> <span>Запознат/а съм и приемам <a href="obshti-usloviya/" target="_blank" rel="noopener">Общите условия</a> и <a href="poveritelnost/" target="_blank" rel="noopener">Политиката за поверителност</a>.</span></label>
         <label class="parking-option"><input type="checkbox" name="marketingConsent" value="true" id="marketing-consent"> <span>Съгласявам се, посочения от мен имейл да се използва за маркетингови съобщения от Администратора - РЪШ ФОР ПРАКТИС ЕООД. Мога да оттегля съгласието си по всяко време на <a href="mailto:didka2208@gmail.com">didka2208@gmail.com</a>.</span></label>
         <p class="discount-note" id="discount-note">Имате отстъпка от 6 € за избрания билет.</p>
+        <p class="ticket-delivery-note">Ще получите Вашият билет на имейла, който сте използвали за закупуването му. Моля, имайте предвид, че трябва да го покажете на входа - разпечатан или в електронен формат, за да бъдете допуснат на събитието. По този начин ще удостоверите, че имате закупен билет.</p>
         <button class="registration-submit" type="submit">Изпрати записване →</button>
         <div class="registration-result" id="registration-result" hidden aria-live="polite"></div>
       </form>
@@ -970,7 +972,7 @@
         </details>
         <details>
           <summary>Как ще получа билета си? <span class="plus"></span></summary>
-          <p>На имейла, с който си поръчал, го показваш на входа, на телефон или разпечатан.</p>
+          <p>Ще получите Вашият билет на имейла, който сте използвали за закупуването му. Моля, имайте предвид, че трябва да го покажете на входа - разпечатан или в електронен формат, за да бъдете допуснат на събитието. По този начин ще удостоверите, че имате закупен билет.</p>
         </details>
         <details>
           <summary>Мога ли да сменя или върна билет? <span class="plus"></span></summary>
