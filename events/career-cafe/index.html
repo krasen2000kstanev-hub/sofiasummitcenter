@@ -448,7 +448,8 @@
   .ticket-choice:has(input:checked){border-color:var(--gold); background:rgba(185,122,63,.12);}
   .ticket-choice input{accent-color:var(--gold);}
   .parking-option{display:flex; align-items:center; gap:10px; margin-top:20px; color:var(--white);}
-  .parking-option input{accent-color:var(--gold);}
+  .parking-option input{accent-color:var(--gold); flex:none;}
+  .parking-option span{flex:1;}
   .registration-submit{margin-top:24px; border:1px solid var(--gold); background:var(--gold); color:#241a10; padding:14px 22px; border-radius:2px; font:inherit; font-weight:700; cursor:pointer;}
   .registration-submit:hover{background:var(--gold-light);}
   .discount-note{display:none; margin-top:14px; color:var(--gold-light); font-size:0.9rem;}
@@ -894,7 +895,8 @@
           </div>
         </div>
         <label class="parking-option"><input type="checkbox" name="parking" value="true" id="parking-option"> Да, желая да заявя паркинг (+5 €)</label>
-        <label class="parking-option"><input type="checkbox" name="agreeTerms" value="true" id="registration-consent" required> Запознат/а съм и приемам <a href="obshti-usloviya/" target="_blank" rel="noopener">Общите условия</a> и <a href="poveritelnost/" target="_blank" rel="noopener">Политиката за поверителност</a>.</label>
+        <label class="parking-option"><input type="checkbox" name="agreeTerms" value="true" id="registration-consent" required> <span>Запознат/а съм и приемам <a href="obshti-usloviya/" target="_blank" rel="noopener">Общите условия</a> и <a href="poveritelnost/" target="_blank" rel="noopener">Политиката за поверителност</a>.</span></label>
+        <label class="parking-option"><input type="checkbox" name="marketingConsent" value="true" id="marketing-consent"> <span>Съгласявам се, посочения от мен имейл да се използва за маркетингови съобщения от Администратора - РЪШ ФОР ПРАКТИС ЕООД. Мога да оттегля съгласието си по всяко време на <a href="mailto:didka2208@gmail.com">didka2208@gmail.com</a>.</span></label>
         <p class="discount-note" id="discount-note">Имате отстъпка от 6 € за избрания билет.</p>
         <button class="registration-submit" type="submit">Изпрати записване →</button>
         <div class="registration-result" id="registration-result" hidden aria-live="polite"></div>
@@ -1498,7 +1500,8 @@
           formerPosition: document.getElementById('registration-position').value,
           need: document.getElementById('registration-need').value,
           ticket: selected.value, parking: parkingOption.checked,
-          agreeTerms: document.getElementById('registration-consent').checked
+          agreeTerms: document.getElementById('registration-consent').checked,
+          marketingConsent: document.getElementById('marketing-consent').checked
         }) });
         var data = await response.json();
         resultBox.hidden = false;

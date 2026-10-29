@@ -63,10 +63,11 @@ async function calculate(input) {
   const formerPosition = text(input.formerPosition, 160);
   const need = text(input.need, 500);
   const parking = input.parking === true;
+  const marketingConsent = input.marketingConsent === true;
   if (!ticket || !name || !formerPosition || !need || !/^\S+@\S+\.\S+$/.test(email) || input.agreeTerms !== true) return { error: 'Моля, попълнете правилно всички задължителни полета.' };
   const eligible = (await discountNames()).includes(normalizeName(name));
   const ticketKey = text(input.ticket, 20).toLocaleLowerCase();
-  return { ticketKey, ticket, name, email, formerPosition, need, parking, eligible, ...calculatePrice(ticketKey, eligible, parking) };
+  return { ticketKey, ticket, name, email, formerPosition, need, parking, marketingConsent, eligible, ...calculatePrice(ticketKey, eligible, parking) };
 }
 
 async function createRegistration(event) {
@@ -81,6 +82,7 @@ async function createRegistration(event) {
     ticketKey: calculated.ticketKey, ticketName: calculated.ticket.name, parking: calculated.parking,
     baseAmountCents: calculated.ticket.priceCents, discountCents: calculated.discountCents,
     parkingCents: calculated.parkingCents, amountCents: calculated.amountCents, currency: 'EUR',
+    marketingConsent: calculated.marketingConsent, marketingConsentAt: calculated.marketingConsent ? now() : null,
     status: 'pending_payment', createdAt: now(), expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     ttl: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 90
   };
