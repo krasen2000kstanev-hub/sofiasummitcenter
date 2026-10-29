@@ -47,7 +47,7 @@
 
   <h2 id="nastroiki">Настройки за бисквитки на този сайт</h2>
   <p>Можете по всяко време да промените или оттеглите съгласието си за аналитичните бисквитки (Google Analytics и Meta Pixel).</p>
-  <button type="button" class="legal-button" id="cookie-reset">Промени настройките за бисквитки</button>
+  <button type="button" class="legal-button" data-cookie-settings>Промени настройките за бисквитки</button>
 
   <h2>Въпроси на защита и поверителността</h2>
   <p>По принцип, браузърите имат интегрирани настройки за поверителност, които осигуряват различни нива на приемане на бисквитки, период на валидност и автоматично изтриване, след като потребителят е посетил определен сайт.</p>
@@ -72,16 +72,10 @@
     <a href="../obshti-usloviya/">Общи условия</a>
     <a href="../poveritelnost/">Политика за поверителност</a>
     <a href="./" aria-current="page">Политика за бисквитки</a>
+    <a href="#" data-cookie-settings>Настройки за бисквитки</a>
   </nav>
 </main>
 
 <footer>© 2026 „РЪШ ФОР ПРАКТИС“ ЕООД · Кариерно кафе · Sofia Summit Center, София</footer>
-<script>
-  // Clears the stored choice so analytics-consent.js shows its banner again on reload.
-  document.getElementById('cookie-reset').addEventListener('click', function () {
-    try { localStorage.removeItem('sofiasummit_cookie_consent'); } catch (_) {}
-    location.reload();
-  });
-</script>
 </body>
 </html>
