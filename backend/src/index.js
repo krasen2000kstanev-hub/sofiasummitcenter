@@ -2,19 +2,13 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import arialFont from '../assets/arial.ttf';
+import { cors } from './cors.js';
 import { handleHrr } from './hrr.js';
 import { handleHrrApplications, processHrrApplicationOutbox } from './hrr-applications.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
   headers: { 'content-type': 'application/json; charset=utf-8', ...extra }
-});
-
-const cors = (request) => ({
-  'access-control-allow-origin': request.headers.get('Origin') || '*',
-  'access-control-allow-methods': /^\/api\/hrr\/mentor\/missions\/[^/]+$/.test(new URL(request.url).pathname) ? 'GET,POST,PATCH,DELETE,OPTIONS' : 'GET,POST,OPTIONS',
-  'access-control-allow-headers': 'content-type,authorization,x-dsk-signature',
-  'access-control-max-age': '86400'
 });
 
 const now = () => new Date().toISOString();
