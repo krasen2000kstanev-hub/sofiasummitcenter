@@ -33,8 +33,8 @@ node preview-server.cjs
 
 ## Поддръжка
 
-- Hero снимките са в `assets/hero/`.
-- Автоматичната hero ротация е в `script.js`; при добавяне на снимки използвай хоризонтален формат и не добавяй `hero-05.jpg` обратно.
+- Hero каруселът се управлява в `index.html`, script `hero-slider-all-photos`, масив `photos`. Снимките от 28.10.2026 са в `assets/events/hr-2026-10-28-*.jpg`.
+- Новите снимки са хоризонтални, 1920×1081 px, JPEG с качество около 78. Не добавяй `hero-05.jpg` обратно.
 - Снимките в долните секции са в `assets/events/`.
 - Линкът към Pixieset се поддържа в секцията „Снимки от събития“ на `index.html`.
 - Backend инструкциите и Terraform променливите са в `backend/README.md`.
@@ -42,9 +42,10 @@ node preview-server.cjs
 
 ## Актуално състояние
 
-- Hero-ът е full-screen с 7 снимки, плъзгаща анимация и работещи бутони назад, пауза/продължи и напред.
+- Hero-ът е full-screen с 13 различни снимки, плъзгаща анимация и работещи бутони назад, пауза/продължи и напред. Зарежда само текущата и съседните снимки, а при `prefers-reduced-motion` не се върти автоматично.
 - Клик върху hero снимка отваря оригиналния файл за преглед или изтегляне.
 - Основните секции са full-width; съдържанието запазва четима вътрешна ширина.
 - Header менюто е статично и не следва потребителя при скрол.
 - Responsive/cross-browser CSS покрива desktop, tablet и mobile ширини, без хоризонтален скрол.
-- Линкът за галерията от 07.07.2026 е `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-e4f128`.
+- Линкове към галериите: 28.10.2026 `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-28-10-fde3b4#photos`, 25.09.2026 `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-d33703`, 07.07.2026 `https://krasen2000kstanev-hub.github.io/Pixiset--/gallery.html?slug=hr-sreshta-e4f128`.
+- Снимки от 28.10.2026 има още в „Снимки от събития“, секцията със следващия лектор, секцията с историята и картата на началната страница.
