@@ -37,3 +37,10 @@ infra/terraform/*.tfstate.*
 infra/terraform/terraform.tfvars
 infra/terraform/lambda/node_modules/
 infra/terraform/lambda.zip
+tfplan*
+/test/
+/memory.md
+/PROJECT_MEMORY.md
+/GRAPH_REPORT.md
+/graph.json
+/graph.html

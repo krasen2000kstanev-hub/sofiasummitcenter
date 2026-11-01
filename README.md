@@ -1,6 +1,5 @@
 # Sofia Summit Center
 
-Актуално обобщение на български за направеното и оставащите задачи: [PROJECT_MEMORY.md](PROJECT_MEMORY.md) — обновено на 23 октомври 2026 г.
 
 Website for Sofia Summit Center, an event and meeting venue in Studentski grad, Sofia. The public-facing content is primarily Bulgarian.
 
@@ -41,14 +40,13 @@ The local `graphify-out/` directory contains a Graphify knowledge graph of the c
 - Събитието е насрочено за 15 ноември 2026 г. от 09:00 ч. в Sofia Summit Center.
 - Публичният текст за капацитет показва „Остават 80 свободни места от 100.“; backend capacity остава 100.
 - Добавено е официалното лого на Банка ДСК в партньорската секция на началната страница.
-- Активните промокодове са 18: 13×20% (`BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20`, `OGI20`, `DENI20`, `BOYANA20`), 4×50% (`IREN50`, `TAXI50`, `YOANNA50`, `DENI50`) и 1×100% (`IREN100`).
-- `DENI50` е добавен като нов промокод без промяна на `DENI20` и е проверен live за трите типа билети.
+- Активните промокодове се управляват в D1, таблица `promo_codes`.
 
 ## Event backend status
 
 The NAIL BUSINESS RE:START page is wired for registration through the Cloudflare Worker `https://sofiasummit-events-api.krasen2000-k-stanev.workers.dev`. The Worker validates ticket type, promo codes, attendee data and the 100-person capacity, then creates a temporary order in D1. A confirmed Bank DSK webhook marks the order as paid and sends an individual Bulgarian PDF ticket to each attendee through Resend. Explicit admin resend is available and webhook processing is idempotent.
 
-Активните промокодове са 18: 13×20% (`BIBI20`, `EVA20`, `EMI20`, `IRINA20`, `LINA20`, `ILIYANA20`, `ZLATINA20`, `IREN20`, `BORISLAVA20`, `ELENA20`, `OGI20`, `DENI20`, `BOYANA20`), 4×50% (`IREN50`, `TAXI50`, `YOANNA50`, `DENI50`) и 1×100% (`IREN100`). Те се валидират server-side чрез `/api/promo/quote` преди създаване на поръчка. `DENI50` е проверен live за Standard (44.50 €), Standard + запис (57 €) и VIP (64.50 €), като `DENI20` остава активен и непроменен.
+Активните промокодове се управляват в D1, таблица `promo_codes`.
 
 The PDF generator uses an embedded Arial font for Cyrillic and follows the approved Canva-inspired visual layout. It contains the attendee name, ticket type, order number, event date/time, venue and address, without a QR code. Configure secrets and DSK payment links as described in [`backend/README.md`](backend/README.md).
 
@@ -102,7 +100,7 @@ The request form posts name, email, phone, space, date, guests and message to PO
 
 ## HR:Rush applications — production status
 
-The public form posts to `POST /api/apply` on the Cloudflare Worker `sofiasummit-events-api`. Applications are stored in D1 with durable delivery jobs for the private Google Sheet and Resend email notifications. The production Worker is configured for season 9, the organizer notification goes to `krasen2000.k.stanev@gmail.com` without candidate details, and a five-minute cron retries failed deliveries. The Google Sheet remains private; only the dedicated service identity `HR Rush Applications Writer` has Editor access to it.
+The public form posts to `POST /api/apply` on the Cloudflare Worker `sofiasummit-events-api`. Applications are stored in D1 with durable delivery jobs for the private Google Sheet and Resend email notifications. The production Worker is configured for season 9, the organizer notification goes to адреса от `wrangler.toml` without candidate details, and a five-minute cron retries failed deliveries. The Google Sheet remains private; only the dedicated service identity `HR Rush Applications Writer` has Editor access to it.
 
 Production deployment was completed on 25 September 2026. The D1 migration ledger reports no pending migrations; local automated tests pass 4/4. Live checks returned HTTP 200 for health, HTTP 400 for an empty invalid application (no write), and HTTP 401 for the admin applications list without credentials. An authorized end-to-end test submitted one clearly marked synthetic application for each role (student, company, university); all three returned HTTP 201 and each D1 record, private Sheet row, organizer notice, and candidate confirmation reached `sent`. The three test records, their nine outbox jobs, and Sheet rows 2–4 were then removed; the Sheet retains its header only, with no test data left in D1. See [`backend/README.md`](backend/README.md) for configuration and rollback details.
 
