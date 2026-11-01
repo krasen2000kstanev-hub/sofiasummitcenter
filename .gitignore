@@ -1,4 +1,5 @@
 # Keep hosting backups and local configuration out of the GitHub Pages repository.
+_site/
 *.zip
 *-installer-backup.php
 .upload-temp/
