@@ -5,7 +5,7 @@ set -euo pipefail
 rm -rf _site
 mkdir _site
 
-cp index.html privacy.html terms.html admin.html \
+cp privacy.html terms.html admin.html \
   konferentni-zali.html sabitiya.html social-preview.html \
   google8a6052dc0c428fd3.html \
   styles.css styles-enhancements.css design-overrides.css blue-theme.css detail.css \

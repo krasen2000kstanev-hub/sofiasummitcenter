@@ -5,7 +5,7 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 
 ## Current structure
 
-- `index.html` — public homepage and main site navigation.
+- `src/pages/index.html` — public homepage; the build turns it into `index.html`. It sends old one-page links such as `/#spaces` to the page that replaced that section.
 - `styles.css`, `styles-enhancements.css`, `design-overrides.css`, `script.js` — homepage styling and behavior.
 - `assets/` — venue photos, logos and supporting media.
 - `events/` — standalone landing pages for individual events. The first event page is `events/nail-business-restart/index.html` for NAIL BUSINESS RE:START.
