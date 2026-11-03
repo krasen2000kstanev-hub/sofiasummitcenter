@@ -27,6 +27,8 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 
 New pages live in `src/pages/<path>/index.html`. Each starts with `<!--page {"title":"…","description":"…"} -->` and contains only the page's own sections; `scripts/build-site.js` wraps it in `src/layout.html` and the header and footer from `src/partials/`, and writes it to `_site/<path>/`. Styles are in `site.css`, behavior in `site.js`. Optional fields: `image`, `jsonld`, and `alt` for the same page in the other language.
 
+The build also adds breadcrumb and FAQ structured data from each page's markup, and writes `sitemap.xml` from all built pages plus the extra URLs listed in the repository's `sitemap.xml` (event and legal pages). Add a new standalone event page there.
+
 Build and preview with `bash scripts/build-pages.sh`, then `node preview-server.js _site`. Run the checks with `node --test scripts/build-site.test.js scripts/prices.test.js`.
 
 ## Local preview

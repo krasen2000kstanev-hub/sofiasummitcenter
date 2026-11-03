@@ -11,7 +11,7 @@ cp privacy.html terms.html admin.html \
   styles.css styles-enhancements.css design-overrides.css blue-theme.css detail.css \
   site.css site.js prices.js gallery.css gallery.js \
   script.js motion.js analytics-consent.js \
-  robots.txt sitemap.xml CNAME .nojekyll \
+  robots.txt llms.txt sitemap.xml CNAME .nojekyll \
   _site/
 cp -R assets events _site/
 

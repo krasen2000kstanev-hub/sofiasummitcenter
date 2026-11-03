@@ -1,7 +1,7 @@
 // Run with: node --test scripts/build-site.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { urlFor, fill, renderPage } = require('./build-site.js');
+const { urlFor, fill, renderPage, breadcrumbData, faqData, sitemapXml } = require('./build-site.js');
 
 const templates = {
   layout: '<html lang="{{lang}}"><title>{{title}}</title><meta content="{{description}}"><link href="{{canonical}}"><meta content="{{image}}">{{hreflang}}{{jsonld}}{{header}}{{content}}{{footer}}</html>',
@@ -52,4 +52,28 @@ test('structured data cannot close its script tag', () => {
   const html = renderPage(page({ title: 'X', description: 'y', jsonld: { name: '</script>' } }), '/x/', templates);
   assert.doesNotMatch(html, /<\/script>"/);
   assert.match(html, /\\u003c\/script>/);
+});
+
+test('breadcrumbs become structured data, ending on the current page', () => {
+  const data = breadcrumbData('<ol class="breadcrumb"><li><a href="/">Начало</a></li><li><a href="/prostranstva/">Пространства</a></li><li>Зала</li></ol>', '/prostranstva/zala/');
+  assert.deepStrictEqual(data.itemListElement.map((item) => [item.position, item.name, item.item]), [
+    [1, 'Начало', 'https://sofiasummit.bg/'],
+    [2, 'Пространства', 'https://sofiasummit.bg/prostranstva/'],
+    [3, 'Зала', 'https://sofiasummit.bg/prostranstva/zala/'],
+  ]);
+  assert.strictEqual(breadcrumbData('<p>no trail</p>', '/'), null);
+});
+
+test('questions become FAQ data with plain-text answers', () => {
+  const data = faqData('<details class="faq-item" name="faq" open>\n<summary>Колко струва?</summary>\n<p>От 350 €. Вижте <a href="/tseni/">цените</a> &amp; още.</p>\n</details>');
+  assert.strictEqual(data.mainEntity.length, 1);
+  assert.strictEqual(data.mainEntity[0].name, 'Колко струва?');
+  assert.strictEqual(data.mainEntity[0].acceptedAnswer.text, 'От 350 €. Вижте цените & още.');
+  assert.strictEqual(faqData('<p>none</p>'), null);
+});
+
+test('sitemap merges built pages with extra pages without duplicates', () => {
+  const xml = sitemapXml(new Set(['/', '/tseni/']), ['https://sofiasummit.bg/', 'https://sofiasummit.bg/events/x/']);
+  assert.strictEqual(xml.match(/<loc>/g).length, 3);
+  assert.match(xml, /<loc>https:\/\/sofiasummit\.bg\/events\/x\/<\/loc>/);
 });

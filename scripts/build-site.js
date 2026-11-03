@@ -40,6 +40,38 @@ function parsePage(source, url) {
   return { meta, content: source.slice(match[0].length) };
 }
 
+function plainText(html) {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+}
+
+// Search engines read breadcrumbs and questions from structured data, so build it from the visible markup.
+function breadcrumbData(content, url) {
+  const list = content.match(/<ol class="breadcrumb">([\s\S]*?)<\/ol>/);
+  if (!list) return null;
+  const items = [...list[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map((match, index) => {
+    const link = match[1].match(/href="([^"]+)"/);
+    return { '@type': 'ListItem', position: index + 1, name: plainText(match[1]), item: ORIGIN + (link ? link[1] : url) };
+  });
+  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
+}
+
+function faqData(content) {
+  const questions = [...content.matchAll(/<details class="faq-item"[^>]*>\s*<summary>([\s\S]*?)<\/summary>\s*<p>([\s\S]*?)<\/p>/g)];
+  if (!questions.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: questions.map((match) => ({ '@type': 'Question', name: plainText(match[1]), acceptedAnswer: { '@type': 'Answer', text: plainText(match[2]) } })),
+  };
+}
+
+function jsonldScripts(items) {
+  return items.filter(Boolean)
+    .map((item) => `<script type="application/ld+json">${JSON.stringify(item).replace(/</g, '\\u003c')}</script>`)
+    .join('\n');
+}
+
 function renderPage(source, url, templates) {
   const { meta, content } = parsePage(source, url);
   const lang = url === '/en/' || url.startsWith('/en/') ? 'en' : 'bg';
@@ -51,9 +83,7 @@ function renderPage(source, url, templates) {
   const langSwitch = meta.alt
     ? `<a class="lang-switch" href="${meta.alt}" hreflang="${lang === 'bg' ? 'en' : 'bg'}">${lang === 'bg' ? 'EN' : 'БГ'}</a>`
     : '';
-  const jsonld = meta.jsonld
-    ? `<script type="application/ld+json">${JSON.stringify(meta.jsonld).replace(/</g, '\\u003c')}</script>`
-    : '';
+  const jsonld = jsonldScripts([].concat(meta.jsonld || [], breadcrumbData(content, url), faqData(content)));
   const shared = { langSwitch };
   return fill(templates.layout, {
     lang,
@@ -85,6 +115,18 @@ function loadTemplates() {
   return templates;
 }
 
+// The sitemap lists every built page plus the hand-made pages kept in the repository's sitemap.xml (events, legal).
+function sitemapXml(pageUrls, extraLocs) {
+  const locs = [...new Set([...[...pageUrls].map((url) => ORIGIN + url), ...extraLocs])].sort();
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    + locs.map((loc) => `  <url><loc>${loc}</loc></url>`).join('\n') + '\n</urlset>\n';
+}
+
+function writeSitemap(pageUrls) {
+  const extra = [...fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), sitemapXml(pageUrls, extra));
+}
+
 function build() {
   const pagesDir = path.join(SRC, 'pages');
   const templates = loadTemplates();
@@ -94,6 +136,7 @@ function build() {
     source: fs.readFileSync(path.join(pagesDir, relativePath), 'utf8'),
   }));
   const urls = new Set(pages.map((page) => page.url));
+  writeSitemap(urls);
   for (const page of pages) {
     const { alt } = parsePage(page.source, page.url).meta;
     if (alt && !urls.has(alt)) throw new Error(`${page.url}: language version ${alt} does not exist`);
@@ -106,4 +149,4 @@ function build() {
 
 if (require.main === module) build();
 
-module.exports = { urlFor, fill, markCurrent, parsePage, renderPage };
+module.exports = { urlFor, fill, markCurrent, parsePage, renderPage, breadcrumbData, faqData, sitemapXml };
