@@ -1,0 +1,75 @@
+<!--page {"title":"Контакти и запитване за зала в София","description":"Изпратете запитване за зала за събития, зала за срещи или подкаст студио в Студентски град, София. Адрес: ул. „8-ми декември“ 13, телефон: +359 894 202 086."} -->
+<section class="page-hero">
+  <div class="wrap">
+    <ol class="breadcrumb">
+      <li><a href="/">Начало</a></li>
+      <li>Контакти</li>
+    </ol>
+    <div class="page-hero-grid">
+      <div>
+        <p class="eyebrow">Контакти</p>
+        <h1>Говорете с нашия екип</h1>
+        <p class="lede">Пишете, обадете се или минете на място. Отговаряме в рамките на работния ден.</p>
+      </div>
+      <ul class="contact-list">
+        <li><span class="contact-label">Адрес</span><a href="https://www.google.com/maps/place/Sofia+Summit+Center/@42.651405,23.3518015,17z" target="_blank" rel="noopener noreferrer">ул. „8-ми декември“ 13, Студентски град, София</a></li>
+        <li><span class="contact-label">Телефон</span><a href="tel:+359894202086">+359 894 202 086</a></li>
+        <li><span class="contact-label">Имейл</span><a href="mailto:info@sofiasummit.bg">info@sofiasummit.bg</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint" id="zapitvane">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">Запитване</p>
+      <h2>Имате план? Нека го направим.</h2>
+      <p>Попълнете формата и ще се свържем с вас с наличност и оферта.</p>
+    </div>
+    <div class="form-wrap">
+      <form id="inquiry-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="f-name">Име</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Име и фамилия" required>
+          </div>
+          <div class="field">
+            <label for="f-email">Имейл</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@company.bg" required>
+          </div>
+          <div class="field">
+            <label for="f-phone">Телефон</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="+359 ..." required>
+          </div>
+          <div class="field">
+            <label for="f-space">Пространство</label>
+            <select id="f-space" name="space">
+              <option data-slug="event-hall">Зала за събития</option>
+              <option data-slug="meeting-room">Зала за срещи</option>
+              <option data-slug="podcast-studio">Подкаст студио</option>
+              <option>Все още не съм сигурен/а</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-date">Желана дата</label>
+            <input id="f-date" name="date" type="date" required>
+            <div id="availability-note" class="form-note" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="f-guests">Брой гости</label>
+            <input id="f-guests" name="guests" type="number" min="1" max="150" placeholder="напр. 20" required>
+          </div>
+          <div class="field field-full">
+            <label for="f-msg">Съобщение</label>
+            <textarea id="f-msg" name="message" placeholder="Разкажете ни накратко за срещата или събитието"></textarea>
+          </div>
+        </div>
+        <div class="form-foot">
+          <button type="submit" class="btn btn-primary">Изпрати запитване</button>
+        </div>
+        <div id="confirm" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>

@@ -21,7 +21,7 @@ Warm, credible editorial hospitality for a modern Sofia event venue. Keep the ex
 
 ## 3. Typography Rules
 
-Use `Inter, Arial, sans-serif` for interface text and `Manrope, Inter, sans-serif` for headings if already loaded. H1 44–64px, H2 30–40px, H3 22–28px, body 17–19px with 1.6 line-height. Keep Bulgarian copy direct and benefit-led. Every page needs one H1.
+Use `Golos Text` for interface text and `Unbounded` for headings, loaded from Google Fonts. H1 44–64px, H2 30–40px, H3 22–28px, body 17–19px with 1.6 line-height. Keep Bulgarian copy direct and benefit-led. Every page needs one H1.
 
 ## 4. Component Stylings
 
@@ -29,15 +29,15 @@ Buttons use `--blue`, white text, 10–12px radius, 44px minimum height. Hover u
 
 ## 5. Layout Principles
 
-Use a centered max-width container of 1180px, 24px horizontal padding, and a spacing scale of 8/12/16/24/32/48/72px. Prefer two-column layouts above 900px and one column below 720px. Keep primary CTA visible near the first screen and repeat it after proof sections.
+Sections run the full width of the screen with `--gutter` side padding (`.wrap` in `site.css`); there is no centered max-width container. Only long text keeps a readable line length (`.prose`, about 72 characters). Grids use `auto-fit`, so wide screens get more columns. Spacing scale: 8/12/16/24/32/48/72px. Prefer two-column layouts above 900px and one column below 720px. Keep primary CTA visible near the first screen and repeat it after proof sections.
 
 ## 6. Depth & Elevation
 
-Use one shadow family: `0 12px 32px rgba(16,38,83,.10)` for cards and `0 18px 48px rgba(16,38,83,.14)` for featured panels. Avoid blurred moving layers and excessive glass effects.
+Use one shadow family: `0 12px 32px rgba(16,38,83,.10)` for cards and `0 18px 48px rgba(16,38,83,.14)` for featured panels. The only moving layer is the shared ambient background (Sofia map, drifting event photos, network lines); avoid other blurred layers and excessive glass effects.
 
 ## 7. Animation & Interaction
 
-L1 only: cards reveal with opacity/translateY once via IntersectionObserver; buttons lift 2px on hover; gallery images scale to 1.02 on hover. Respect `prefers-reduced-motion: reduce` by disabling transitions and animation. Use native `scroll-behavior: smooth`.
+Every page keeps the signature effects from `site.js`: ambient background, pointer tilt on cards and buttons, and headings and cards revealed via IntersectionObserver. Content stays visible without JavaScript. Touch screens skip the drifting photos and tilt. Respect `prefers-reduced-motion: reduce` by disabling transitions and animation. Use native `scroll-behavior: smooth`.
 
 ## 8. Do's and Don'ts
 

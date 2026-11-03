@@ -1,0 +1,18 @@
+/* Rotating 3D album sphere on /galeriya/. */
+.gallery-orbit{padding-block:0;overflow:hidden}
+.gallery-orbit-stage{position:relative;height:110vh}
+.gallery-orbit-scene{position:sticky;top:0;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden;perspective:1200px}
+.gallery-orbit-sphere{position:relative;width:0;height:0;transform-style:preserve-3d;cursor:grab;touch-action:pan-y}
+.gallery-orbit-sphere.is-dragging{cursor:grabbing}
+.gallery-orbit-card{position:absolute;left:-96px;top:-126px;width:192px;height:252px;padding:7px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 14px 30px rgba(36,82,184,.16);color:var(--ink);text-decoration:none;backface-visibility:visible;transform-style:preserve-3d}
+.gallery-orbit-card img{width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius) - 3px);filter:saturate(.72) brightness(.82);transition:filter .3s ease}
+.gallery-orbit-card span{position:absolute;left:14px;right:14px;bottom:14px;padding:8px 10px;background:rgba(248,250,255,.92);border-radius:10px;color:var(--accent-strong);font-size:.74rem;font-weight:700;line-height:1.25;box-shadow:var(--shadow)}
+.gallery-orbit-card:hover img,.gallery-orbit-card:focus-visible img{filter:none}
+@media(max-width:900px){
+  .gallery-orbit-stage{height:640px}
+  .gallery-orbit-scene{position:relative;height:640px}
+  .gallery-orbit-card{left:-75px;top:-99px;width:150px;height:198px}
+  .gallery-orbit-sphere{scale:.62}
+}
+@media(max-width:420px){.gallery-orbit-stage,.gallery-orbit-scene{height:520px}.gallery-orbit-sphere{scale:.5}}
+@media(prefers-reduced-motion:reduce){.gallery-orbit-stage{height:auto}.gallery-orbit-scene{position:relative;height:auto;min-height:560px}.gallery-orbit-sphere{scale:.72}}

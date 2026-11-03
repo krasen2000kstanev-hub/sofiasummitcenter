@@ -6,9 +6,10 @@ rm -rf _site
 mkdir _site
 
 cp index.html privacy.html terms.html admin.html \
-  konferentni-zali.html sabitiya.html vremenen-ofis.html social-preview.html \
+  konferentni-zali.html sabitiya.html social-preview.html \
   google8a6052dc0c428fd3.html \
   styles.css styles-enhancements.css design-overrides.css blue-theme.css detail.css \
+  site.css site.js prices.js gallery.css gallery.js \
   script.js motion.js analytics-consent.js \
   robots.txt sitemap.xml CNAME .nojekyll \
   _site/
@@ -16,3 +17,6 @@ cp -R assets events _site/
 
 find _site/events -type d -name backend -prune -exec rm -rf {} +
 find _site -type f \( -name '*.md' -o -name 'preview-server.*' -o -name '.htaccess' \) -delete
+
+# Render src/pages with the shared layout. A page that fails to render stops the deploy.
+node scripts/build-site.js

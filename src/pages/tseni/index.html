@@ -1,0 +1,269 @@
+<!--page {"title":"Цени за наем на зали в София и калкулатор","description":"Зала за събития от 350 €, зала за срещи от 25 € на час, подкаст запис от 120 € и рубрики от 100 € в София. Цени без ДДС и калкулатор.","image":"/assets/home/event-hall.jpg"} -->
+<section class="page-hero">
+  <div class="wrap">
+    <ol class="breadcrumb">
+      <li><a href="/">Начало</a></li>
+      <li>Цени</li>
+    </ol>
+    <p class="eyebrow">Студентски град · София</p>
+    <h1>Цени за наем на зали в София</h1>
+    <p class="lede">Вижте колко струва всяко пространство и изчислете ориентировъчна цена според нуждите на вашето събитие. Всички цени са без ДДС.</p>
+  </div>
+</section>
+
+<section class="band band-tint" id="kalkulator">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Изчислете цена</h2>
+      <p>Изберете пространство и параметрите на събитието. Услугите се смятат за същия брой часове, а точната оферта потвърждаваме след запитване.</p>
+    </div>
+    <form class="form-wrap calc-grid" id="price-calculator">
+      <div class="form-grid">
+        <div class="field">
+          <label for="calc-space">Пространство</label>
+          <select id="calc-space" name="space">
+            <option value="event-hall">Зала за събития</option>
+            <option value="meeting-room">Зала за срещи</option>
+            <option value="podcast-studio">Подкаст студио</option>
+            <option value="rubric">Рубрики за YouTube</option>
+          </select>
+        </div>
+        <div class="field" id="calc-day-field">
+          <label for="calc-day">Кога</label>
+          <select id="calc-day" name="day">
+            <option value="weekday">Понеделник до петък</option>
+            <option value="weekend">Почивен или празничен ден</option>
+          </select>
+        </div>
+        <div class="field" id="calc-hours-field">
+          <label for="calc-hours" id="calc-hours-label">Брой часове</label>
+          <input id="calc-hours" name="hours" type="number" min="0" max="24" value="4" inputmode="numeric">
+        </div>
+        <div class="field" id="calc-recording120-field" hidden>
+          <label for="calc-recording120">Записи до 120 минути, по 160 €</label>
+          <input id="calc-recording120" type="number" min="0" max="24" value="0" inputmode="numeric" data-studio-qty="recording120" data-label="Запис до 120 минути">
+        </div>
+        <div class="field" id="calc-guests-field">
+          <label for="calc-guests">Брой гости</label>
+          <input id="calc-guests" name="guests" type="number" min="1" max="150" value="50" inputmode="numeric">
+        </div>
+        <fieldset class="field-full calc-extras" id="calc-extras-field">
+          <legend>Допълнителни услуги</legend>
+          <label><input type="checkbox" name="extra" value="video" data-label="Видео заснемане и базов монтаж" data-negotiable-for="meeting-room"> Видео заснемане и базов монтаж</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="photo" data-label="Фотограф"> Фотограф</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="photobooth" data-label="360° фотобудка"> 360° фотобудка</label>
+          <label><input type="checkbox" name="extra" value="landing" data-label="Лендинг страница"> Лендинг страница</label>
+          <label><input type="checkbox" name="extra" value="organization" data-label="Организация на събитие" data-on-request="по договаряне"> Организация на събитие</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="catering" data-label="Кетъринг" data-on-request="по договаряне"> Кетъринг</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="dj" data-label="DJ" data-on-request="по договаряне"> DJ</label>
+        </fieldset>
+        <fieldset class="field-full calc-extras" id="calc-rubric-field" hidden>
+          <legend>Рубрики с две камери и монтаж</legend>
+          <div class="calc-qty-grid">
+            <div class="field">
+              <label for="calc-rubric5">Рубрики до 5 минути, по 100 €</label>
+              <input id="calc-rubric5" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="rubric5" data-label="Рубрики до 5 минути">
+            </div>
+            <div class="field">
+              <label for="calc-rubric10">Рубрики до 10 минути, по 150 €</label>
+              <input id="calc-rubric10" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="rubric10" data-label="Рубрики до 10 минути">
+            </div>
+            <div class="field">
+              <label for="calc-scripts">Скриптове за рубрики до 5 минути, по 20 €</label>
+              <input id="calc-scripts" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="script" data-label="Скрипт за рубрика до 5 минути">
+            </div>
+            <div class="field">
+              <label for="calc-scripts10">Скриптове за рубрики до 10 минути, по 25 €</label>
+              <input id="calc-scripts10" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="script10" data-label="Скрипт за рубрика до 10 минути">
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="field-full calc-extras" id="calc-studio-extras-field" hidden>
+          <legend>Допълнително към записа</legend>
+          <label><input type="checkbox" name="studio-extra" value="trailer" data-label="Трейлър"> Трейлър до 1 минута</label>
+          <label><input type="checkbox" name="studio-extra" value="thumbnail" data-label="Тъмбнейл"> Тъмбнейл</label>
+          <label><input type="checkbox" name="studio-extra" value="guest-photos" data-label="Фотозаснемане на гостите"> Фотозаснемане на гостите за тъмбнейли</label>
+          <label><input type="checkbox" name="studio-extra" value="intro" data-label="Шапка"> Шапка, еднократно</label>
+          <label><input type="checkbox" name="studio-extra" value="channels" data-label="Качване и поддръжка на каналите"> Качване, поддръжка на каналите и създаване на общество</label>
+          <label><input type="checkbox" name="studio-extra" value="guests-help" data-label="Помощ с гости и въпроси" data-on-request="по договаряне"> Помощ с гости и въпроси</label>
+          <div class="calc-qty-grid">
+            <div class="field">
+              <label for="calc-reels">Рийлове, от 25 до 35 € за всеки</label>
+              <input id="calc-reels" name="reels" type="number" min="0" max="50" value="0" inputmode="numeric">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="calc-result" aria-live="polite">
+        <p class="contact-label">Вашият избор</p>
+        <ul class="calc-items" id="calc-items"></ul>
+        <p class="contact-label">Ориентировъчна цена</p>
+        <p class="calc-total" id="calc-total">Изберете параметри</p>
+        <p class="calc-note" id="calc-note"></p>
+        <a class="btn btn-primary" id="calc-cta" href="/kontakti/#zapitvane">Изпрати запитване</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Цени по пространства</h2>
+      <p>Всички цени са без ДДС. Времето за подготовка и освобождаване на залата е включено.</p>
+    </div>
+    <ul class="card-grid price-grid">
+      <li class="card">
+        <h3><a href="/prostranstva/zala-za-sabitiya/">Зала за събития</a></h3>
+        <p>До 150 седящи места.</p>
+        <table class="price-table">
+          <caption>Понеделник до петък</caption>
+          <thead><tr><th scope="col">Време</th><th scope="col">До 100 гости</th><th scope="col">101–150 гости</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">До 4 часа</th><td data-room="event-hall" data-day="weekday" data-duration="up4" data-guests="small" data-price="350">350 €</td><td data-room="event-hall" data-day="weekday" data-duration="up4" data-guests="large" data-price="400">400 €</td></tr>
+            <tr><th scope="row">От 4 до 8 часа</th><td data-room="event-hall" data-day="weekday" data-duration="up8" data-guests="small" data-price="450">450 €</td><td data-room="event-hall" data-day="weekday" data-duration="up8" data-guests="large" data-price="500">500 €</td></tr>
+            <tr><th scope="row">Просрочие, на час</th><td>80 €</td><td>100 €</td></tr>
+          </tbody>
+        </table>
+        <table class="price-table">
+          <caption>Почивни и празнични дни</caption>
+          <thead><tr><th scope="col">Време</th><th scope="col">До 100 гости</th><th scope="col">101–150 гости</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">До 4 часа</th><td data-room="event-hall" data-day="weekend" data-duration="up4" data-guests="small" data-price="450">450 €</td><td data-room="event-hall" data-day="weekend" data-duration="up4" data-guests="large" data-price="500">500 €</td></tr>
+            <tr><th scope="row">От 4 до 8 часа</th><td data-room="event-hall" data-day="weekend" data-duration="up8" data-guests="small" data-price="550">550 €</td><td data-room="event-hall" data-day="weekend" data-duration="up8" data-guests="large" data-price="600">600 €</td></tr>
+            <tr><th scope="row">Просрочие, на час</th><td>100 €</td><td>120 €</td></tr>
+          </tbody>
+        </table>
+        <p>Над 8 часа: по запитване.</p>
+      </li>
+      <li class="card">
+        <h3><a href="/prostranstva/zala-za-sreshti/">Зала за срещи</a></h3>
+        <p>До 15 седящи места.</p>
+        <table class="price-table">
+          <thead><tr><th scope="col">Ден</th><th scope="col">Наем, на час</th><th scope="col">Просрочие, на час</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Понеделник до петък</th><td data-room="meeting-room" data-day="weekday" data-price="25">25 €</td><td>40 €</td></tr>
+            <tr><th scope="row">Почивни и празнични дни</th><td data-room="meeting-room" data-day="weekend" data-price="35">35 €</td><td>50 €</td></tr>
+          </tbody>
+        </table>
+      </li>
+      <li class="card">
+        <h3><a href="/prostranstva/podkast-studio/">Подкаст студио</a></h3>
+        <table class="price-table">
+          <thead><tr><th scope="col">Услуга</th><th scope="col">Цена</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Запис до 60 минути</th><td data-room="podcast-studio" data-day="any" data-price="120">120 €</td></tr>
+            <tr data-studio-qty-row="recording120" data-price="160"><th scope="row">Запис до 120 минути</th><td>160 €</td></tr>
+          </tbody>
+        </table>
+        <p><b>Включено в записа:</b> три камери и базов монтаж.</p>
+        <p>Над 120 минути: по запитване.</p>
+      </li>
+      <li class="card">
+        <h3><a href="/prostranstva/podkast-studio/">Рубрики за YouTube</a></h3>
+        <p>Заснемат се отделно от подкаста, с две камери и монтаж.</p>
+        <table class="price-table">
+          <thead><tr><th scope="col">Услуга</th><th scope="col">Цена</th></tr></thead>
+          <tbody>
+            <tr data-studio-qty-row="rubric5" data-price="100"><th scope="row">Рубрика до 5 минути</th><td>100 €</td></tr>
+            <tr data-studio-qty-row="rubric10" data-price="150"><th scope="row">Рубрика до 10 минути</th><td>150 €</td></tr>
+            <tr data-studio-qty-row="script" data-price="20"><th scope="row">Скрипт за рубрика до 5 минути</th><td>20 €</td></tr>
+            <tr data-studio-qty-row="script10" data-price="25"><th scope="row">Скрипт за рубрика до 10 минути</th><td>25 €</td></tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band band-tint">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Включено в цената на залите</h2>
+    </div>
+    <ul class="tag-list">
+      <li>Wi-Fi</li>
+      <li>Микрофони</li>
+      <li>Мултимедия</li>
+      <li>Катедра</li>
+      <li>Кетъринг маси</li>
+      <li>Мека мебел</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Допълнителни услуги</h2>
+      <p>Услугите са за залите. Всички цени са без ДДС. В залата за срещи видео заснемането е по договаряне, а фотограф и 360° фотобудка не се предлагат. <a href="/uslugi/">Вижте какво включва всяка услуга</a>.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="price-table extras-table">
+        <thead><tr><th scope="col">Услуга</th><th scope="col">До 4 часа</th><th scope="col">От 4 до 8 часа</th><th scope="col">Просрочие, на започнат час</th></tr></thead>
+        <tbody>
+          <tr data-extra="video" data-price-up4="250" data-price-up8="350"><th scope="row">Видео заснемане и базов монтаж</th><td>250 €</td><td>350 €</td><td>60 €</td></tr>
+          <tr data-extra="photo" data-price-up4="200" data-price-up8="280"><th scope="row">Фотограф</th><td>200 €</td><td>280 €</td><td>50 €</td></tr>
+          <tr data-extra="photobooth" data-price-up4="300" data-price-up8="300" data-per-hour-over4="60"><th scope="row">360° фотобудка</th><td>300 €</td><td>300 € и 60 € за всеки час над 4</td><td>70 €</td></tr>
+          <tr data-extra="landing"><th scope="row">Лендинг страница</th><td colspan="3">По запитване. Включва домейн, хостинг, поддръжка, форма за регистрация и GEO оптимизация за AI търсачки.</td></tr>
+          <tr data-extra="organization"><th scope="row">Организация на събитие</th><td colspan="3">По договаряне</td></tr>
+          <tr data-extra="catering"><th scope="row">Кетъринг, за залата за събития</th><td colspan="3">По договаряне</td></tr>
+          <tr data-extra="dj"><th scope="row">DJ, за залата за събития</th><td colspan="3">По договаряне</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Допълнително към записа в подкаст студиото</h2>
+      <p>Всички цени са без ДДС. При много записи за един ден, по-голямо количество, дългосрочно партньорство или ползване на повече от една услуга можем да направим отстъпка.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="price-table extras-table">
+        <thead><tr><th scope="col">Услуга</th><th scope="col">Цена</th></tr></thead>
+        <tbody>
+          <tr data-studio-extra="trailer" data-price="60" data-per-recording><th scope="row">Трейлър до 1 минута с най-добрите моменти от записа</th><td>60 €</td></tr>
+          <tr data-reels-max="3" data-price="35"><th scope="row">До 3 рийла</th><td>35 € за всеки</td></tr>
+          <tr data-reels-max="5" data-price="30"><th scope="row">До 5 рийла</th><td>30 € за всеки</td></tr>
+          <tr data-reels-max="7" data-price="25"><th scope="row">До 7 рийла</th><td>25 € за всеки</td></tr>
+          <tr><th scope="row">Над 7 рийла</th><td>По запитване</td></tr>
+          <tr data-studio-extra="intro" data-price="250"><th scope="row">Шапка</th><td>250 € еднократно</td></tr>
+          <tr data-studio-extra="thumbnail" data-price="40" data-per-recording><th scope="row">Тъмбнейл</th><td>40 €</td></tr>
+          <tr data-studio-extra="guest-photos" data-price="30" data-per-recording><th scope="row">Фотозаснемане на гостите за тъмбнейли</th><td>30 €</td></tr>
+          <tr data-studio-extra="guests-help"><th scope="row">Помощ с гости и въпроси</th><td>По договаряне</td></tr>
+          <tr data-studio-extra="channels"><th scope="row">Качване на съдържанието, поддръжка на каналите и създаване на общество</th><td>По запитване</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap prose">
+    <div class="sechead">
+      <h2>Важно да знаете</h2>
+    </div>
+    <ul class="note-list">
+      <li><b>Просрочие на зала:</b> ако залата не бъде освободена и върната в уговорения вид до края на наемния срок, се дължи посочената цена за всеки започнат час.</li>
+      <li><b>Просрочие на услуга:</b> ако услугата продължи след уговорения срок, се дължи посочената цена за всеки започнат час.</li>
+      <li><b>След 21:00 ч.:</b> при ползване на допълнителна услуга след 21:00 ч. се дължат още 20 € за всеки започнат час.</li>
+      <li><b>Повреди:</b> при повреда на зала или техника се дължи сумата за възстановяването в троен размер.</li>
+      <li>Ценоразписът е с информативен характер и не представлява обвързваща оферта.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band cta-band">
+  <div class="wrap">
+    <h2>Имате въпрос за цената?</h2>
+    <p class="prose">Изпратете запитване и ще се свържем с вас с наличност и точна оферта.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/kontakti/#zapitvane">Направете запитване</a>
+    </div>
+  </div>
+</section>
+
+<script src="/prices.js" defer></script>

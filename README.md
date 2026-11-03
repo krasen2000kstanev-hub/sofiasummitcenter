@@ -23,6 +23,12 @@ Website for Sofia Summit Center, an event and meeting venue in Studentski grad, 
 - `redesign-preview` is a preview branch; production changes go to `main`.
 - Legacy WordPress/PHP files remain in the repository. On Apache hosting, `.htaccess` sets `index.html` as the preferred homepage before `index.php`.
 
+## Multi-page site
+
+New pages live in `src/pages/<path>/index.html`. Each starts with `<!--page {"title":"…","description":"…"} -->` and contains only the page's own sections; `scripts/build-site.js` wraps it in `src/layout.html` and the header and footer from `src/partials/`, and writes it to `_site/<path>/`. Styles are in `site.css`, behavior in `site.js`. Optional fields: `image`, `jsonld`, and `alt` for the same page in the other language.
+
+Build and preview with `bash scripts/build-pages.sh`, then `node preview-server.js _site`. Run the checks with `node --test scripts/build-site.test.js scripts/prices.test.js`.
+
 ## Local preview
 
 There is no build step or package installation. Serve the repository with a local web server, or run `preview-server.ps1` and open `http://127.0.0.1:8765/`. A local server is recommended so relative asset paths behave like production.
