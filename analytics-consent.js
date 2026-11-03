@@ -143,21 +143,36 @@
     banner.id = 'sofiaCookieBanner';
     banner.className = 'sofia-cookie-banner';
     banner.setAttribute('role', 'dialog');
-    banner.setAttribute('aria-label', 'Настройки за бисквитки');
+    var t = document.documentElement.lang === 'en' ? {
+      label: 'Cookie settings',
+      text: 'We use necessary cookies to make the site work. Analytics (Google Analytics) and marketing (Meta Pixel) cookies are only switched on if you allow them. You can change your choice at any time.',
+      policy: 'Cookie policy (in Bulgarian)', reject: 'Reject all', settings: 'Settings', accept: 'Accept all',
+      necessary: 'Necessary', necessaryText: 'Needed for the site to work and to remember this choice. Always on.',
+      analytics: 'Analytics', analyticsText: 'Google Analytics, anonymous visit statistics.',
+      marketing: 'Marketing', marketingText: 'Meta Pixel, measuring ad campaigns on Facebook and Instagram.', save: 'Save choice'
+    } : {
+      label: 'Настройки за бисквитки',
+      text: 'Използваме необходими бисквитки, за да работи сайтът. Аналитичните (Google Analytics) и маркетинговите (Meta Pixel) бисквитки се включват само ако ги разрешите. Можете да промените избора си по всяко време.',
+      policy: 'Политика за бисквитки', reject: 'Отказвам всички', settings: 'Настройки', accept: 'Приемам всички',
+      necessary: 'Необходими', necessaryText: 'Нужни за работата на сайта и за запомняне на този избор. Винаги включени.',
+      analytics: 'Аналитични', analyticsText: 'Google Analytics — анонимна статистика за посещенията.',
+      marketing: 'Маркетингови', marketingText: 'Meta Pixel — измерване на рекламни кампании във Facebook и Instagram.', save: 'Запази избора'
+    };
+    banner.setAttribute('aria-label', t.label);
     banner.innerHTML =
       '<div class="sofia-cookie-banner-inner">' +
-        '<p>Използваме необходими бисквитки, за да работи сайтът. Аналитичните (Google Analytics) и маркетинговите (Meta Pixel) бисквитки се включват само ако ги разрешите. Можете да промените избора си по всяко време. <a href="' + policyUrl() + '" target="_blank" rel="noopener">Политика за бисквитки</a>.</p>' +
+        '<p>' + t.text + ' <a href="' + policyUrl() + '" target="_blank" rel="noopener">' + t.policy + '</a>.</p>' +
         '<div class="sofia-cookie-banner-actions">' +
-          '<button type="button" data-cookie="reject">Отказвам всички</button>' +
-          '<button type="button" data-cookie="settings" aria-expanded="false" aria-controls="sofiaCookiePrefs">Настройки</button>' +
-          '<button type="button" data-cookie="accept">Приемам всички</button>' +
+          '<button type="button" data-cookie="reject">' + t.reject + '</button>' +
+          '<button type="button" data-cookie="settings" aria-expanded="false" aria-controls="sofiaCookiePrefs">' + t.settings + '</button>' +
+          '<button type="button" data-cookie="accept">' + t.accept + '</button>' +
         '</div>' +
       '</div>' +
       '<div class="sofia-cookie-prefs" id="sofiaCookiePrefs" hidden>' +
-        '<label><input type="checkbox" checked disabled><span><b>Необходими</b><small>Нужни за работата на сайта и за запомняне на този избор. Винаги включени.</small></span></label>' +
-        '<label><input type="checkbox" data-cookie-category="analytics"' + (consent.analytics ? ' checked' : '') + '><span><b>Аналитични</b><small>Google Analytics — анонимна статистика за посещенията.</small></span></label>' +
-        '<label><input type="checkbox" data-cookie-category="marketing"' + (consent.marketing ? ' checked' : '') + '><span><b>Маркетингови</b><small>Meta Pixel — измерване на рекламни кампании във Facebook и Instagram.</small></span></label>' +
-        '<button type="button" class="sofia-cookie-save" data-cookie="save">Запази избора</button>' +
+        '<label><input type="checkbox" checked disabled><span><b>' + t.necessary + '</b><small>' + t.necessaryText + '</small></span></label>' +
+        '<label><input type="checkbox" data-cookie-category="analytics"' + (consent.analytics ? ' checked' : '') + '><span><b>' + t.analytics + '</b><small>' + t.analyticsText + '</small></span></label>' +
+        '<label><input type="checkbox" data-cookie-category="marketing"' + (consent.marketing ? ' checked' : '') + '><span><b>' + t.marketing + '</b><small>' + t.marketingText + '</small></span></label>' +
+        '<button type="button" class="sofia-cookie-save" data-cookie="save">' + t.save + '</button>' +
       '</div>';
     document.body.appendChild(banner);
 

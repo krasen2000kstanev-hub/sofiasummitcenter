@@ -1,0 +1,269 @@
+<!--page {"title":"Venue hire prices in Sofia and calculator","description":"Event hall from €350, meeting room from €25 per hour, podcast recording from €120 and YouTube segments from €100 in Sofia. Prices excl. VAT, with a calculator.","image":"/assets/home/event-hall.jpg","alt":"/tseni/"} -->
+<section class="page-hero">
+  <div class="wrap">
+    <ol class="breadcrumb">
+      <li><a href="/en/">Home</a></li>
+      <li>Prices</li>
+    </ol>
+    <p class="eyebrow">Studentski Grad · Sofia</p>
+    <h1>Venue hire prices in Sofia</h1>
+    <p class="lede">See what each space costs and calculate an estimated price for your event. All prices exclude VAT.</p>
+  </div>
+</section>
+
+<section class="band band-tint" id="calculator">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Calculate a price</h2>
+      <p>Choose a space and the details of your event. Services are calculated for the same number of hours, and we confirm the exact offer after your inquiry.</p>
+    </div>
+    <form class="form-wrap calc-grid" id="price-calculator">
+      <div class="form-grid">
+        <div class="field">
+          <label for="calc-space">Space</label>
+          <select id="calc-space" name="space">
+            <option value="event-hall">Event hall</option>
+            <option value="meeting-room">Meeting room</option>
+            <option value="podcast-studio">Podcast studio</option>
+            <option value="rubric">YouTube segments</option>
+          </select>
+        </div>
+        <div class="field" id="calc-day-field">
+          <label for="calc-day">When</label>
+          <select id="calc-day" name="day">
+            <option value="weekday">Monday to Friday</option>
+            <option value="weekend">Weekend or public holiday</option>
+          </select>
+        </div>
+        <div class="field" id="calc-hours-field">
+          <label for="calc-hours" id="calc-hours-label">Number of hours</label>
+          <input id="calc-hours" name="hours" type="number" min="0" max="24" value="4" inputmode="numeric">
+        </div>
+        <div class="field" id="calc-recording120-field" hidden>
+          <label for="calc-recording120">Recordings up to 120 minutes, €160 each</label>
+          <input id="calc-recording120" type="number" min="0" max="24" value="0" inputmode="numeric" data-studio-qty="recording120" data-label="Recording up to 120 minutes">
+        </div>
+        <div class="field" id="calc-guests-field">
+          <label for="calc-guests">Number of guests</label>
+          <input id="calc-guests" name="guests" type="number" min="1" max="150" value="50" inputmode="numeric">
+        </div>
+        <fieldset class="field-full calc-extras" id="calc-extras-field">
+          <legend>Extra services</legend>
+          <label><input type="checkbox" name="extra" value="video" data-label="Video recording and basic editing" data-negotiable-for="meeting-room"> Video recording and basic editing</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="photo" data-label="Photographer"> Photographer</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="photobooth" data-label="360° photo booth"> 360° photo booth</label>
+          <label><input type="checkbox" name="extra" value="landing" data-label="Landing page"> Landing page</label>
+          <label><input type="checkbox" name="extra" value="organization" data-label="Event organization" data-on-request="by agreement"> Event organization</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="catering" data-label="Catering" data-on-request="by agreement"> Catering</label>
+          <label data-not-for="meeting-room"><input type="checkbox" name="extra" value="dj" data-label="DJ" data-on-request="by agreement"> DJ</label>
+        </fieldset>
+        <fieldset class="field-full calc-extras" id="calc-rubric-field" hidden>
+          <legend>Segments with two cameras and editing</legend>
+          <div class="calc-qty-grid">
+            <div class="field">
+              <label for="calc-rubric5">Segments up to 5 minutes, €100 each</label>
+              <input id="calc-rubric5" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="rubric5" data-label="Segments up to 5 minutes">
+            </div>
+            <div class="field">
+              <label for="calc-rubric10">Segments up to 10 minutes, €150 each</label>
+              <input id="calc-rubric10" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="rubric10" data-label="Segments up to 10 minutes">
+            </div>
+            <div class="field">
+              <label for="calc-scripts">Scripts for 5-minute segments, €20 each</label>
+              <input id="calc-scripts" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="script" data-label="Script for a 5-minute segment">
+            </div>
+            <div class="field">
+              <label for="calc-scripts10">Scripts for 10-minute segments, €25 each</label>
+              <input id="calc-scripts10" type="number" min="0" max="50" value="0" inputmode="numeric" data-studio-qty="script10" data-label="Script for a 10-minute segment">
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="field-full calc-extras" id="calc-studio-extras-field" hidden>
+          <legend>Extras for your recording</legend>
+          <label><input type="checkbox" name="studio-extra" value="trailer" data-label="Trailer"> Trailer up to 1 minute</label>
+          <label><input type="checkbox" name="studio-extra" value="thumbnail" data-label="Thumbnail"> Thumbnail</label>
+          <label><input type="checkbox" name="studio-extra" value="guest-photos" data-label="Guest photos"> Guest photos for thumbnails</label>
+          <label><input type="checkbox" name="studio-extra" value="intro" data-label="Intro"> Intro, one-time</label>
+          <label><input type="checkbox" name="studio-extra" value="channels" data-label="Content upload and channel management"> Content upload, channel management and community building</label>
+          <label><input type="checkbox" name="studio-extra" value="guests-help" data-label="Help with guests and questions" data-on-request="by agreement"> Help with guests and questions</label>
+          <div class="calc-qty-grid">
+            <div class="field">
+              <label for="calc-reels">Reels, €25 to €35 each</label>
+              <input id="calc-reels" name="reels" type="number" min="0" max="50" value="0" inputmode="numeric">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="calc-result" aria-live="polite">
+        <p class="contact-label">Your selection</p>
+        <ul class="calc-items" id="calc-items"></ul>
+        <p class="contact-label">Estimated price</p>
+        <p class="calc-total" id="calc-total">Choose your options</p>
+        <p class="calc-note" id="calc-note"></p>
+        <a class="btn btn-primary" id="calc-cta" href="/en/contact/#inquiry">Send inquiry</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Prices by space</h2>
+      <p>All prices exclude VAT. Time to set up and clear the hall is included.</p>
+    </div>
+    <ul class="card-grid price-grid">
+      <li class="card">
+        <h3><a href="/en/spaces/event-hall/">Event hall</a></h3>
+        <p>Up to 150 seats.</p>
+        <table class="price-table">
+          <caption>Monday to Friday</caption>
+          <thead><tr><th scope="col">Time</th><th scope="col">Up to 100 guests</th><th scope="col">101–150 guests</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Up to 4 hours</th><td data-room="event-hall" data-day="weekday" data-duration="up4" data-guests="small" data-price="350">€350</td><td data-room="event-hall" data-day="weekday" data-duration="up4" data-guests="large" data-price="400">€400</td></tr>
+            <tr><th scope="row">4 to 8 hours</th><td data-room="event-hall" data-day="weekday" data-duration="up8" data-guests="small" data-price="450">€450</td><td data-room="event-hall" data-day="weekday" data-duration="up8" data-guests="large" data-price="500">€500</td></tr>
+            <tr><th scope="row">Overstay, per hour</th><td>€80</td><td>€100</td></tr>
+          </tbody>
+        </table>
+        <table class="price-table">
+          <caption>Weekends and public holidays</caption>
+          <thead><tr><th scope="col">Time</th><th scope="col">Up to 100 guests</th><th scope="col">101–150 guests</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Up to 4 hours</th><td data-room="event-hall" data-day="weekend" data-duration="up4" data-guests="small" data-price="450">€450</td><td data-room="event-hall" data-day="weekend" data-duration="up4" data-guests="large" data-price="500">€500</td></tr>
+            <tr><th scope="row">4 to 8 hours</th><td data-room="event-hall" data-day="weekend" data-duration="up8" data-guests="small" data-price="550">€550</td><td data-room="event-hall" data-day="weekend" data-duration="up8" data-guests="large" data-price="600">€600</td></tr>
+            <tr><th scope="row">Overstay, per hour</th><td>€100</td><td>€120</td></tr>
+          </tbody>
+        </table>
+        <p>Over 8 hours: on request.</p>
+      </li>
+      <li class="card">
+        <h3><a href="/en/spaces/meeting-room/">Meeting room</a></h3>
+        <p>Up to 15 seats.</p>
+        <table class="price-table">
+          <thead><tr><th scope="col">Day</th><th scope="col">Rent, per hour</th><th scope="col">Overstay, per hour</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Monday to Friday</th><td data-room="meeting-room" data-day="weekday" data-price="25">€25</td><td>€40</td></tr>
+            <tr><th scope="row">Weekends and public holidays</th><td data-room="meeting-room" data-day="weekend" data-price="35">€35</td><td>€50</td></tr>
+          </tbody>
+        </table>
+      </li>
+      <li class="card">
+        <h3><a href="/en/spaces/podcast-studio/">Podcast studio</a></h3>
+        <table class="price-table">
+          <thead><tr><th scope="col">Service</th><th scope="col">Price</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Recording up to 60 minutes</th><td data-room="podcast-studio" data-day="any" data-price="120">€120</td></tr>
+            <tr data-studio-qty-row="recording120" data-price="160"><th scope="row">Recording up to 120 minutes</th><td>€160</td></tr>
+          </tbody>
+        </table>
+        <p><b>Included in the recording:</b> three cameras and basic editing.</p>
+        <p>Over 120 minutes: on request.</p>
+      </li>
+      <li class="card">
+        <h3><a href="/en/spaces/podcast-studio/">YouTube segments</a></h3>
+        <p>Filmed separately from the podcast, with two cameras and editing.</p>
+        <table class="price-table">
+          <thead><tr><th scope="col">Service</th><th scope="col">Price</th></tr></thead>
+          <tbody>
+            <tr data-studio-qty-row="rubric5" data-price="100"><th scope="row">Segment up to 5 minutes</th><td>€100</td></tr>
+            <tr data-studio-qty-row="rubric10" data-price="150"><th scope="row">Segment up to 10 minutes</th><td>€150</td></tr>
+            <tr data-studio-qty-row="script" data-price="20"><th scope="row">Script for a 5-minute segment</th><td>€20</td></tr>
+            <tr data-studio-qty-row="script10" data-price="25"><th scope="row">Script for a 10-minute segment</th><td>€25</td></tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band band-tint">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Included in the price of the halls</h2>
+    </div>
+    <ul class="tag-list">
+      <li>Wi-Fi</li>
+      <li>Microphones</li>
+      <li>Multimedia</li>
+      <li>Lectern</li>
+      <li>Catering tables</li>
+      <li>Lounge furniture</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Extra services</h2>
+      <p>These services are for the halls. All prices exclude VAT. In the meeting room video recording is by agreement, and a photographer and the 360° photo booth are not offered. <a href="/en/services/">See what each service includes</a>.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="price-table extras-table">
+        <thead><tr><th scope="col">Service</th><th scope="col">Up to 4 hours</th><th scope="col">4 to 8 hours</th><th scope="col">Overtime, per started hour</th></tr></thead>
+        <tbody>
+          <tr data-extra="video" data-price-up4="250" data-price-up8="350"><th scope="row">Video recording and basic editing</th><td>€250</td><td>€350</td><td>€60</td></tr>
+          <tr data-extra="photo" data-price-up4="200" data-price-up8="280"><th scope="row">Photographer</th><td>€200</td><td>€280</td><td>€50</td></tr>
+          <tr data-extra="photobooth" data-price-up4="300" data-price-up8="300" data-per-hour-over4="60"><th scope="row">360° photo booth</th><td>€300</td><td>€300 plus €60 for each hour over 4</td><td>€70</td></tr>
+          <tr data-extra="landing"><th scope="row">Landing page</th><td colspan="3">On request. Includes a domain, hosting, maintenance, a registration form and GEO optimization for AI search.</td></tr>
+          <tr data-extra="organization"><th scope="row">Event organization</th><td colspan="3">By agreement</td></tr>
+          <tr data-extra="catering"><th scope="row">Catering, for the event hall</th><td colspan="3">By agreement</td></tr>
+          <tr data-extra="dj"><th scope="row">DJ, for the event hall</th><td colspan="3">By agreement</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band band-tint">
+  <div class="wrap">
+    <div class="sechead">
+      <h2>Extras for podcast studio recordings</h2>
+      <p>All prices exclude VAT. We can offer a discount for many recordings in one day, larger quantities, a long-term partnership or using more than one service.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="price-table extras-table">
+        <thead><tr><th scope="col">Service</th><th scope="col">Price</th></tr></thead>
+        <tbody>
+          <tr data-studio-extra="trailer" data-price="60" data-per-recording><th scope="row">Trailer up to 1 minute with the best moments of the recording</th><td>€60</td></tr>
+          <tr data-reels-max="3" data-price="35"><th scope="row">Up to 3 reels</th><td>€35 each</td></tr>
+          <tr data-reels-max="5" data-price="30"><th scope="row">Up to 5 reels</th><td>€30 each</td></tr>
+          <tr data-reels-max="7" data-price="25"><th scope="row">Up to 7 reels</th><td>€25 each</td></tr>
+          <tr><th scope="row">More than 7 reels</th><td>On request</td></tr>
+          <tr data-studio-extra="intro" data-price="250"><th scope="row">Intro</th><td>€250 one-time</td></tr>
+          <tr data-studio-extra="thumbnail" data-price="40" data-per-recording><th scope="row">Thumbnail</th><td>€40</td></tr>
+          <tr data-studio-extra="guest-photos" data-price="30" data-per-recording><th scope="row">Guest photos for thumbnails</th><td>€30</td></tr>
+          <tr data-studio-extra="guests-help"><th scope="row">Help with guests and questions</th><td>By agreement</td></tr>
+          <tr data-studio-extra="channels"><th scope="row">Content upload, channel management and community building</th><td>On request</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap prose">
+    <div class="sechead">
+      <h2>Good to know</h2>
+    </div>
+    <ul class="note-list">
+      <li><b>Hall overstay:</b> if the hall is not vacated and returned in the agreed condition by the end of the rental, the listed price is due for each started hour.</li>
+      <li><b>Service overtime:</b> if a service continues after the agreed time, the listed price is due for each started hour.</li>
+      <li><b>After 9 pm:</b> using an extra service after 21:00 costs another €20 for each started hour.</li>
+      <li><b>Damage:</b> damage to a hall or equipment is charged at three times the cost of repair.</li>
+      <li>This price list is for information only and is not a binding offer.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band cta-band">
+  <div class="wrap">
+    <h2>A question about the price?</h2>
+    <p class="prose">Send an inquiry and we will get back to you with availability and an exact offer.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/en/contact/#inquiry">Send an inquiry</a>
+    </div>
+  </div>
+</section>
+
+<script src="/prices.js" defer></script>

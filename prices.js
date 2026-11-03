@@ -50,6 +50,18 @@
 
   var form = document.getElementById('price-calculator');
   if (!form) return;
+  var en = document.documentElement.lang === 'en';
+  var t = en ? {
+    locale: 'en-GB', vat: ' excl. VAT', onRequest: 'on request', choose: 'Choose a service', request: 'On request', notIncluded: 'Not included in the total: ',
+    recordingsLabel: 'Recordings up to 60 minutes, €120 each', hoursLabel: 'Number of hours', recording: 'Recording up to 60 minutes: ', hours: ' h', guests: ' guests',
+    interested: 'I am interested in: ', recordings: 'recordings up to 60 minutes: ', noRecording: 'no recording up to 60 minutes.', extras: ' Extras: ', estimate: ' Estimated price: ',
+    reels: 'Reels: ', agreed: 'by agreement', contact: '/en/contact/', inquiry: '#inquiry'
+  } : {
+    locale: 'bg-BG', vat: ' без ДДС', onRequest: 'по запитване', choose: 'Изберете услуга', request: 'По запитване', notIncluded: 'Не е включено в сумата: ',
+    recordingsLabel: 'Записи до 60 минути, по 120 €', hoursLabel: 'Брой часове', recording: 'Запис до 60 минути: ', hours: ' ч.', guests: ' гости',
+    interested: 'Интересувам се от: ', recordings: 'брой записи до 60 минути: ', noRecording: 'без запис до 60 минути.', extras: ' Допълнително: ', estimate: ' Ориентировъчна цена: ',
+    reels: 'Рийлове: ', agreed: 'по договаряне', contact: '/kontakti/', inquiry: '#zapitvane'
+  };
   var totalBox = document.getElementById('calc-total');
   var itemsBox = document.getElementById('calc-items');
   var noteBox = document.getElementById('calc-note');
@@ -65,10 +77,13 @@
   var wasStudio = false;
 
   function selectedText(select) { return select.options[select.selectedIndex].text; }
-  function formatAmount(price) { return price.toLocaleString('bg-BG', { maximumFractionDigits: 2 }) + ' €'; }
-  function formatPrice(price) { return formatAmount(price) + ' без ДДС'; }
+  function formatAmount(price) {
+    var amount = price.toLocaleString(t.locale, { maximumFractionDigits: 2 });
+    return en ? '€' + amount : amount + ' €';
+  }
+  function formatPrice(price) { return formatAmount(price) + t.vat; }
 
-  function onRequestText(box) { return box.dataset.onRequest || 'по запитване'; }
+  function onRequestText(box) { return box.dataset.onRequest || t.onRequest; }
 
   // Shows what each option costs right next to it, for the current hours or recordings.
   function setHint(box, price, onRequest) {
@@ -88,7 +103,7 @@
       var label = document.createElement('span');
       var amount = document.createElement('b');
       label.textContent = item.label;
-      amount.textContent = item.price === null ? (item.onRequest || 'по запитване') : formatAmount(item.price);
+      amount.textContent = item.price === null ? (item.onRequest || t.onRequest) : formatAmount(item.price);
       row.appendChild(label);
       row.appendChild(amount);
       itemsBox.appendChild(row);
@@ -110,7 +125,7 @@
   function readExtra(box, hours) {
     var row = document.querySelector('[data-extra="' + box.value + '"]').dataset;
     // Some rooms agree this service individually instead of using the listed price.
-    if ((box.dataset.negotiableFor || '').split(' ').indexOf(form.space.value) >= 0) return { label: box.dataset.label, onRequest: 'по договаряне', price: null };
+    if ((box.dataset.negotiableFor || '').split(' ').indexOf(form.space.value) >= 0) return { label: box.dataset.label, onRequest: t.agreed, price: null };
     return { label: box.dataset.label, onRequest: box.dataset.onRequest, price: extraPrice(toPrice(row.priceUp4), toPrice(row.priceUp8), toPrice(row.perHourOver4), hours) };
   }
 
@@ -141,7 +156,7 @@
       var tiers = Array.prototype.map.call(document.querySelectorAll('[data-reels-max]'), function (row) {
         return { max: Number(row.dataset.reelsMax), price: toPrice(row.dataset.price) };
       });
-      extras.push({ label: 'Рийлове: ' + reels, price: reelsTotal(reels, tiers) });
+      extras.push({ label: t.reels + reels, price: reelsTotal(reels, tiers) });
     }
     return extras;
   }
@@ -161,7 +176,7 @@
     var isRubric = room === 'rubric';
     if (isStudio !== wasStudio) form.hours.value = isStudio ? 1 : 4;
     wasStudio = isStudio;
-    hoursLabel.textContent = isStudio ? 'Записи до 60 минути, по 120 €' : 'Брой часове';
+    hoursLabel.textContent = isStudio ? t.recordingsLabel : t.hoursLabel;
     dayField.hidden = isStudio || isRubric;
     hoursField.hidden = isRubric;
     rubricField.hidden = !isRubric;
@@ -191,18 +206,18 @@
     form.querySelectorAll('input[name=extra]').forEach(function (box) { var extra = readExtra(box, hours); setHint(box, extra.price, extra.onRequest); });
     form.querySelectorAll('input[name=studio-extra]').forEach(function (box) { setHint(box, studioExtraPrice(box, recordings)); });
 
-    var roomLabel = isStudio ? 'Запис до 60 минути: ' + hours : selectedText(form.space) + ', ' + hours + ' ч.' + (isHall ? ', ' + guests + ' гости' : '');
+    var roomLabel = isStudio ? t.recording + hours : selectedText(form.space) + ', ' + hours + t.hours + (isHall ? ', ' + guests + t.guests : '');
     renderItems((isRubric || (isStudio && !hours) ? [] : [{ label: roomLabel, price: roomPrice }]).concat(extras));
 
-    if (quote.total === 0) totalBox.textContent = 'Изберете услуга';
-    else totalBox.textContent = quote.total === null ? 'По запитване' : formatPrice(quote.total);
-    noteBox.textContent = quote.pending.length ? 'Не е включено в сумата: ' + quote.pending.join(', ') + '.' : '';
+    if (quote.total === 0) totalBox.textContent = t.choose;
+    else totalBox.textContent = quote.total === null ? t.request : formatPrice(quote.total);
+    noteBox.textContent = quote.pending.length ? t.notIncluded + quote.pending.join(', ') + '.' : '';
 
-    var summary = 'Интересувам се от: ' + selectedText(form.space) + (isRubric ? '.' : ', ') + (isRubric ? '' : isStudio ? (hours ? 'брой записи до 60 минути: ' + hours + '.' : 'без запис до 60 минути.') : selectedText(form.day).toLowerCase() + ', ' + hours + ' ч.');
-    if (extras.length) summary += (isRubric ? ' ' : ' Допълнително: ') + extras.map(function (extra) { return extra.label; }).join(', ') + '.';
-    if (quote.total) summary += ' Ориентировъчна цена: ' + formatPrice(quote.total) + '.';
+    var summary = t.interested + selectedText(form.space) + (isRubric ? '.' : ', ') + (isRubric ? '' : isStudio ? (hours ? t.recordings + hours + '.' : t.noRecording) : selectedText(form.day).toLowerCase() + ', ' + hours + t.hours + '.');
+    if (extras.length) summary += (isRubric ? ' ' : t.extras) + extras.map(function (extra) { return extra.label; }).join(', ') + '.';
+    if (quote.total) summary += t.estimate + formatPrice(quote.total) + '.';
     // Rubrics are filmed in the studio, so their inquiry books that space.
-    cta.href = '/kontakti/?space=' + (isRubric ? 'podcast-studio' : room) + (isHall ? '&guests=' + guests : '') + '&message=' + encodeURIComponent(summary) + '#zapitvane';
+    cta.href = t.contact + '?space=' + (isRubric ? 'podcast-studio' : room) + (isHall ? '&guests=' + guests : '') + '&message=' + encodeURIComponent(summary) + t.inquiry;
   }
 
   form.addEventListener('input', update);

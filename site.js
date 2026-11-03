@@ -123,6 +123,16 @@
     var note = document.getElementById('availability-note');
     var confirmBox = document.getElementById('confirm');
     var button = form.querySelector('button[type=submit]');
+    var en = document.documentElement.lang === 'en';
+    var t = en ? {
+      later: 'We will confirm availability after your inquiry.', checking: 'Checking availability…', busy: 'Booked dates: ', free: 'No confirmed bookings yet.',
+      unknown: 'Availability will be confirmed in our reply.', taken: 'This date is already booked for this space.', sending: 'Sending…',
+      thanks: '✓ Thank you! We received your inquiry and will get back to you.', failed: 'Something went wrong. Please try again or call us.'
+    } : {
+      later: 'Ще потвърдим наличността след запитването.', checking: 'Проверяваме наличността…', busy: 'Заети дати: ', free: 'Няма потвърдени заети дати.',
+      unknown: 'Наличността ще бъде потвърдена при отговор.', taken: 'Избраната дата вече е заета за това пространство.', sending: 'Изпращане…',
+      thanks: '✓ Благодарим! Получихме запитването и ще се свържем с вас.', failed: 'Възникна проблем. Опитайте отново или ни се обадете.'
+    };
     var buttonText = button.textContent;
     var occupied = [];
 
@@ -138,15 +148,15 @@
 
     function loadAvailability() {
       occupied = [];
-      if (!space.selectedOptions[0].dataset.slug) { note.textContent = 'Ще потвърдим наличността след запитването.'; return; }
-      note.textContent = 'Проверяваме наличността…';
+      if (!space.selectedOptions[0].dataset.slug) { note.textContent = t.later; return; }
+      note.textContent = t.checking;
       fetch(api + '/availability?space=' + encodeURIComponent(space.value))
         .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
         .then(function (d) {
           occupied = d.occupied_dates || [];
-          note.textContent = occupied.length ? 'Заети дати: ' + occupied.join(', ') : 'Няма потвърдени заети дати.';
+          note.textContent = occupied.length ? t.busy + occupied.join(', ') : t.free;
         })
-        .catch(function () { note.textContent = 'Наличността ще бъде потвърдена при отговор.'; });
+        .catch(function () { note.textContent = t.unknown; });
     }
     function showResult(text, isError) {
       confirmBox.textContent = text;
@@ -158,19 +168,19 @@
     form.addEventListener('submit', function (event) {
       event.preventDefault();
       confirmBox.className = '';
-      if (occupied.indexOf(date.value) >= 0) { showResult('Избраната дата вече е заета за това пространство.', true); return; }
+      if (occupied.indexOf(date.value) >= 0) { showResult(t.taken, true); return; }
       var data = Object.fromEntries(new FormData(form));
       data.guests = Number(data.guests);
       button.disabled = true;
-      button.textContent = 'Изпращане…';
+      button.textContent = t.sending;
       fetch(api + '/inquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) })
         .then(function (r) { return r.ok ? r.json() : r.json().then(function (x) { return Promise.reject(x); }); })
         .then(function () {
-          showResult('✓ Благодарим! Получихме запитването и ще се свържем с вас.', false);
+          showResult(t.thanks, false);
           form.reset();
           loadAvailability();
         })
-        .catch(function (err) { showResult(err && err.error ? err.error : 'Възникна проблем. Опитайте отново или ни се обадете.', true); })
+        .catch(function (err) { showResult(err && err.error && !en ? err.error : t.failed, true); })
         .finally(function () { button.disabled = false; button.textContent = buttonText; });
     });
   }
