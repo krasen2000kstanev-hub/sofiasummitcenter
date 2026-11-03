@@ -177,6 +177,7 @@
         .then(function (r) { return r.ok ? r.json() : r.json().then(function (x) { return Promise.reject(x); }); })
         .then(function () {
           showResult(t.thanks, false);
+          if (window.sofiaTrackLead) window.sofiaTrackLead({ space: space.selectedOptions[0].dataset.slug || 'unsure', language: en ? 'en' : 'bg' });
           form.reset();
           loadAvailability();
         })

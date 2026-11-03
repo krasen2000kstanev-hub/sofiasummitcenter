@@ -84,6 +84,12 @@
     if (window.__sofiaPixelLoaded) window.fbq('trackCustom', name, params || {});
   }
 
+  // A sent inquiry is the site's conversion: GA4 records it as generate_lead, Meta Pixel as Lead.
+  window.sofiaTrackLead = function (params) {
+    if (window.__sofiaAnalyticsLoaded) window.gtag('event', 'generate_lead', params || {});
+    if (window.__sofiaPixelLoaded) window.fbq('track', 'Lead', params || {});
+  };
+
   function trackInteractions() {
     if (window.__sofiaInteractionsTracked) return;
     window.__sofiaInteractionsTracked = true;
@@ -98,6 +104,9 @@
       } else if (target.closest('.social-row[aria-label="Последвайте HR:Rush for Practice"]')) {
         name = 'social_profile_click';
         params.platform = target.getAttribute('aria-label') || target.title || 'unknown';
+      } else if (target.id === 'calc-cta') {
+        name = 'calculator_inquiry_click';
+        params.space = document.getElementById('calc-space') ? document.getElementById('calc-space').value : '';
       } else if (target.getAttribute('href') === '#apply') {
         name = 'registration_click';
       } else if (target.getAttribute('href') === '#mentors') {
