@@ -60,14 +60,14 @@ async function calculate(input) {
   const ticket = TICKETS[text(input.ticket, 20).toLocaleLowerCase()];
   const name = text(input.name, 160);
   const email = text(input.email, 254).toLowerCase();
-  const formerPosition = text(input.formerPosition, 160);
+  const formerPosition = text(input.formerPosition, 160); const phone = text(input.phone, 40);
   const need = text(input.need, 500);
   const parking = input.parking === true;
   const marketingConsent = input.marketingConsent === true;
-  if (!ticket || !name || !formerPosition || !need || !/^\S+@\S+\.\S+$/.test(email) || input.agreeTerms !== true) return { error: 'Моля, попълнете правилно всички задължителни полета.' };
+  if (!ticket || !name || !formerPosition || (phone.match(/\d/g) || []).length < 8 || !/^\S+@\S+\.\S+$/.test(email) || input.agreeTerms !== true) return { error: 'Моля, попълнете правилно всички задължителни полета.' };
   const eligible = (await discountNames()).includes(normalizeName(name));
   const ticketKey = text(input.ticket, 20).toLocaleLowerCase();
-  return { ticketKey, ticket, name, email, formerPosition, need, parking, marketingConsent, eligible, ...calculatePrice(ticketKey, eligible, parking) };
+  return { ticketKey, ticket, name, email, phone, formerPosition, need, parking, marketingConsent, eligible, ...calculatePrice(ticketKey, eligible, parking) };
 }
 
 async function createRegistration(event) {
@@ -78,7 +78,7 @@ async function createRegistration(event) {
   const orderId = id();
   const item = {
     id: `REGISTRATION#${orderId}`, type: 'registration', eventId: EVENT_ID, orderId,
-    name: calculated.name, email: calculated.email, formerPosition: calculated.formerPosition, need: calculated.need,
+    name: calculated.name, email: calculated.email, phone: calculated.phone, formerPosition: calculated.formerPosition, need: calculated.need,
     ticketKey: calculated.ticketKey, ticketName: calculated.ticket.name, parking: calculated.parking,
     baseAmountCents: calculated.ticket.priceCents, discountCents: calculated.discountCents,
     parkingCents: calculated.parkingCents, amountCents: calculated.amountCents, currency: 'EUR',
