@@ -33,6 +33,9 @@ async function currentSeason(env) {
 }
 
 const TEAM_LIMIT = 2;
+// Mission dates are calendar days in Sofia; compare as YYYY-MM-DD strings.
+export const sofiaToday = (date = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sofia' }).format(date);
+export const isSafeUrl = (value) => /^https?:\/\//i.test(String(value || ''));
 const missionKind = (value, fallback = 'regular') => ['regular', 'secret', 'bonus'].includes(value) ? value : fallback;
 // Students never receive the real title/description of secret and bonus missions; they reveal a contact instead.
 export const maskMission = (row) => (row.kind === 'secret' || row.kind === 'bonus') ? { ...row, title: row.kind === 'secret' ? 'Тайна мисия' : 'Бонус мисия', description: '' } : row;
@@ -197,13 +200,18 @@ async function missions(request, env) {
 async function submit(request, env, missionId) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE id=? AND status='active'").bind(missionId).first();
-  const membership = await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND active=1 LIMIT 1').bind(auth.user.id).first();
-  const body = await request.json();
-  if (!mission || !membership || (!clean(body.evidenceUrl, 1000) && !clean(body.evidenceText, 4000))) return json({ error: 'Mission, team and evidence are required' }, 400);
-  const existing = await env.DB.prepare("SELECT id FROM hrr_submissions WHERE mission_id=? AND student_user_id=? AND status IN ('pending','approved') LIMIT 1").bind(missionId, auth.user.id).first();
-  if (existing) return json({ error: 'Submission already exists' }, 409);
+  // Only a team from the mission's own season counts, so old-season memberships cannot swallow points.
+  const membership = mission && await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1 LIMIT 1').bind(auth.user.id, mission.season_id).first();
+  const body = await request.json(); const evidenceUrl = clean(body.evidenceUrl, 1000);
+  if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000))) return json({ error: 'Mission, team and evidence are required' }, 400);
+  if (evidenceUrl && !isSafeUrl(evidenceUrl)) return json({ error: 'Линкът трябва да започва с http:// или https://' }, 400);
+  const today = sofiaToday(), end = mission.end_date || mission.deadline;
+  if (mission.start_date && mission.start_date > today) return json({ error: 'Мисията още не е започнала.' }, 400);
+  if (end && end < today) return json({ error: 'Срокът на мисията е изтекъл.' }, 400);
+  const existing = await env.DB.prepare("SELECT student_user_id FROM hrr_submissions WHERE mission_id=? AND status IN ('pending','approved') AND (student_user_id=? OR (?='team' AND team_id=?)) LIMIT 1").bind(missionId, auth.user.id, mission.scope, membership.team_id).first();
+  if (existing) return json({ error: existing.student_user_id === auth.user.id ? 'Submission already exists' : 'Отборът ти вече е предал тази мисия.' }, 409);
   const submissionId = id('hrr_submission');
-  await env.DB.prepare('INSERT INTO hrr_submissions (id,mission_id,team_id,student_user_id,evidence_url,evidence_text,status,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(submissionId, missionId, membership.team_id, auth.user.id, clean(body.evidenceUrl, 1000), clean(body.evidenceText, 4000), 'pending', now()).run();
+  await env.DB.prepare('INSERT INTO hrr_submissions (id,mission_id,team_id,student_user_id,evidence_url,evidence_text,status,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(submissionId, missionId, membership.team_id, auth.user.id, evidenceUrl, clean(body.evidenceText, 4000), 'pending', now()).run();
   await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), mission.mentor_user_id, 'submission', 'Ново изпълнение на мисия', `${auth.user.display_name} изпрати доказателство за „${mission.title}“.`, now()).run();
   return json({ ok: true, submissionId }, 201);
 }
@@ -242,12 +250,13 @@ async function notifications(request, env, roles = ['student']) {
 
 async function history(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
+  const season = await currentSeason(env); if (!season) return json({ history: [], approvedPoints: 0 });
   const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
       m.mission_number,m.kind,m.title,m.description,m.category,m.points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
-    WHERE s.student_user_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id).all();
+    WHERE s.student_user_id=? AND m.season_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id, season.id).all();
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0);
   return json({ history: (rows.results || []).map(maskMission), approvedPoints: points });
 }

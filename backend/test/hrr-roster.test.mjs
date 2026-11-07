@@ -22,3 +22,12 @@ test('maskMission hides secret and bonus content from students', async () => {
   assert.equal(maskMission({ kind: 'bonus', title: 'X', description: 'Y' }).title, 'Бонус мисия');
   assert.equal(maskMission({ kind: 'regular', title: 'X', description: 'Y' }).description, 'Y');
 });
+
+test('evidence links must be http(s) and dates use Sofia calendar days', async () => {
+  const { isSafeUrl, sofiaToday } = await import('../src/hrr.js');
+  assert.equal(isSafeUrl('https://linkedin.com/in/x'), true);
+  assert.equal(isSafeUrl('javascript:alert(1)'), false);
+  assert.equal(isSafeUrl(' JAVASCRIPT:alert(1)'), false);
+  // 22:30 UTC on 9 Nov is already 10 Nov in Sofia
+  assert.equal(sofiaToday(new Date('2026-11-09T22:30:00Z')), '2026-11-10');
+});

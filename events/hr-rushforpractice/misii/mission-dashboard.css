@@ -24,3 +24,4 @@ body[data-portal="mentor"] #studentNav{display:none!important}body[data-portal="
 .bell{cursor:pointer}.news-item.read{opacity:.6}
 .admin-tools{grid-column:1/-1}#syncTeamsSheet{width:100%;margin:8px 0}.sync-result{white-space:pre-wrap;font-size:12px;margin:8px 0 0;max-height:320px;overflow:auto}.sync-result:empty{display:none}
 .secret-box{margin:0 0 14px;padding:16px;border:1px dashed var(--purple);border-radius:14px;background:var(--purple-soft)}.secret-box .journey-mentor{margin-top:10px}
+.journey-stop.locked .stop-mark{fill:#eef0f5;stroke:#c9cfdc;stroke-dasharray:3 3}.journey-stop.locked text{fill:#9aa3b5}.journey-mission.locked{opacity:.65}.journey-mission.locked .journey-mission-number{background:#eef0f5;color:#9aa3b5}.detail-status.locked{background:#eef0f5;color:#71809a}
