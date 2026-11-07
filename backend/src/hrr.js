@@ -33,6 +33,9 @@ async function currentSeason(env) {
 }
 
 const TEAM_LIMIT = 2;
+const missionKind = (value, fallback = 'regular') => ['regular', 'secret', 'bonus'].includes(value) ? value : fallback;
+// Students never receive the real title/description of secret and bonus missions; they reveal a contact instead.
+export const maskMission = (row) => (row.kind === 'secret' || row.kind === 'bonus') ? { ...row, title: row.kind === 'secret' ? 'Тайна мисия' : 'Бонус мисия', description: '' } : row;
 // ponytail: one roster sheet per season, gids hardcoded; move to a table if the sheets change often
 const ROSTER_SHEETS = [['НБУ', 'NBU', '434191220'], ['УНСС', 'UNSS', '1743708126'], ['СУ', 'SU', '1017411608'], ['УЗФ', 'UZF', '530263534'], ['УниБИТ', 'UNIBIT', '1480888565']];
 const normalizeCode = (value) => clean(value, 80).toUpperCase().replace(/\s+/g, '');
@@ -188,7 +191,7 @@ async function missions(request, env) {
   const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
     ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
     : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
-  return json({ missions: rows.results || [] });
+  return json({ missions: studentView ? (rows.results || []).map(maskMission) : rows.results || [] });
 }
 
 async function submit(request, env, missionId) {
@@ -240,13 +243,13 @@ async function notifications(request, env, roles = ['student']) {
 async function history(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
-      m.mission_number,m.title,m.description,m.category,m.points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
+      m.mission_number,m.kind,m.title,m.description,m.category,m.points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
     WHERE s.student_user_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id).all();
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0);
-  return json({ history: rows.results || [], approvedPoints: points });
+  return json({ history: (rows.results || []).map(maskMission), approvedPoints: points });
 }
 
 async function createMission(request, env) {
@@ -256,7 +259,7 @@ async function createMission(request, env) {
   const missionNumber = Number(body.missionNumber);
   if (!season || !Number.isInteger(missionNumber) || missionNumber < 0 || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Mission number, title, points and a valid date range are required' }, 400);
   const missionId = id('hrr_mission');
-  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,mission_number,title,description,category,points,deadline,start_date,end_date,scope,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, missionNumber, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now()).run();
+  await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,mission_number,title,description,category,points,deadline,start_date,end_date,scope,status,created_at,kind) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, missionNumber, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now(), missionKind(body.kind)).run();
   return json({ ok: true, missionId }, 201);
 }
 
@@ -272,7 +275,7 @@ async function updateMission(request, env, missionId) {
     if (!mentor) return json({ error: 'Invalid mission mentor' }, 400);
     mentorUserId = mentor.id;
   }
-  await env.DB.prepare('UPDATE hrr_missions SET mentor_user_id=?,mission_number=?,title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=? WHERE id=?').bind(mentorUserId, missionNumber, clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionId).run();
+  await env.DB.prepare('UPDATE hrr_missions SET mentor_user_id=?,mission_number=?,title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=?,kind=? WHERE id=?').bind(mentorUserId, missionNumber, clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionKind(body.kind, mission.kind || 'regular'), missionId).run();
   return json({ ok: true, missionId });
 }
 
