@@ -127,6 +127,12 @@ async function review(request, env, submissionId) {
   return json({ ok: true, status });
 }
 
+async function markNotificationsRead(request, env) {
+  const auth = await requireUser(request, env); if (auth.response) return auth.response;
+  await env.DB.prepare('UPDATE hrr_notifications SET read_at=? WHERE user_id=? AND read_at IS NULL').bind(now(), auth.user.id).run();
+  return json({ ok: true });
+}
+
 async function notifications(request, env, roles = ['student']) {
   const auth = roles.length === 1 && roles[0] === 'student' ? await requireStudent(request, env) : await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
@@ -220,6 +226,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/review$/.test(url.pathname)) return review(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);
