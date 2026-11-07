@@ -32,8 +32,108 @@ async function currentSeason(env) {
   return env.DB.prepare("SELECT * FROM hrr_seasons WHERE status='active' ORDER BY id LIMIT 1").first();
 }
 
+const TEAM_LIMIT = 2;
+// ponytail: one roster sheet per season, gids hardcoded; move to a table if the sheets change often
+const ROSTER_SHEETS = [['НБУ', 'NBU', '434191220'], ['УНСС', 'UNSS', '1743708126'], ['СУ', 'SU', '1017411608'], ['УЗФ', 'UZF', '530263534'], ['УниБИТ', 'UNIBIT', '1480888565']];
+const normalizeCode = (value) => clean(value, 80).toUpperCase().replace(/\s+/g, '');
+
+export function parseCsv(text) {
+  const rows = []; let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') { cell += '"'; i += 1; }
+      else if (char === '"') quoted = false;
+      else cell += char;
+    } else if (char === '"') quoted = true;
+    else if (char === ',') { row.push(cell); cell = ''; }
+    else if (char === '\n' || char === '\r') {
+      if (char === '\r' && text[i + 1] === '\n') i += 1;
+      row.push(cell); rows.push(row); row = []; cell = '';
+    } else cell += char;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+// Main team block only: stops at the first row without a name or with a non-increasing team number.
+export function parseRoster(rows) {
+  const teams = []; let previous = 0;
+  for (const row of rows.slice(1)) {
+    const number = Number.parseInt(row[0], 10); const name = String(row[1] || '').trim();
+    if (!name || !number || number <= previous) break;
+    previous = number;
+    const emails = [row[2], row[5]].map((email) => String(email || '').replace(/^mailto:/i, '').trim().toLowerCase()).filter((email) => email.includes('@'));
+    teams.push({ number, emails });
+  }
+  return teams;
+}
+
+function randomCode(length = 4) {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return [...crypto.getRandomValues(new Uint8Array(length))].map((byte) => alphabet[byte % alphabet.length]).join('');
+}
+
+const activeMembers = async (env, teamId, seasonId, userId) => Number((await env.DB.prepare('SELECT COUNT(*) total FROM hrr_team_members WHERE team_id=? AND season_id=? AND active=1 AND user_id<>?').bind(teamId, seasonId, userId).first())?.total || 0);
+
+async function addMember(env, season, teamId, userId) {
+  await env.DB.prepare('UPDATE hrr_team_members SET active=0 WHERE user_id=? AND active=1').bind(userId).run();
+  const previous = await env.DB.prepare('SELECT id FROM hrr_team_members WHERE team_id=? AND user_id=? LIMIT 1').bind(teamId, userId).first();
+  if (previous) await env.DB.prepare('UPDATE hrr_team_members SET season_id=?,active=1,joined_at=? WHERE id=?').bind(season.id, now(), previous.id).run();
+  else await env.DB.prepare('INSERT INTO hrr_team_members (id,season_id,team_id,user_id,active,joined_at) VALUES (?,?,?,?,1,?)').bind(id('hrr_member'), season.id, teamId, userId, now()).run();
+}
+
+async function alertAdmins(env, user, reason) {
+  const title = reason === 'full' ? 'Отборът е пълен' : 'Вход с непознат имейл';
+  const body = `${user.display_name} · ${user.email}${reason === 'full' ? ' е в списъка, но отборът му вече има 2 участници.' : ' не е в списъка с участници. Свържи се, за да го насочиш към отбора му.'}`;
+  const admins = await env.DB.prepare("SELECT id FROM hrr_users WHERE role='admin'").all();
+  for (const admin of admins.results || []) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), admin.id, 'roster', title, body, now()).run();
+  const to = String(env.HRR_ROSTER_ALERT_EMAIL || '').split(',').map((email) => email.trim()).filter(Boolean);
+  if (!to.length || !env.RESEND_API_KEY || !env.EMAIL_FROM) return;
+  try {
+    await fetch('https://api.resend.com/emails', { method: 'POST', headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' }, body: JSON.stringify({ from: env.EMAIL_FROM, to, subject: `HR:Rush · ${title}`, text: `${body}\n\nhttps://sofiasummit.bg/events/hr-rushforpractice/misii/?portal=mentor` }) });
+  } catch (error) { console.warn('Roster alert email failed', error); }
+}
+
+// Students land in their team by the email they registered with; anyone else is flagged to the admins once per season.
+async function autoJoin(env, user) {
+  if (user.role !== 'student') return;
+  const season = await currentSeason(env); if (!season) return;
+  if (await env.DB.prepare('SELECT id FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1').bind(user.id, season.id).first()) return;
+  const roster = await env.DB.prepare('SELECT team_id FROM hrr_team_roster WHERE season_id=? AND email=?').bind(season.id, String(user.email || '').toLowerCase()).first();
+  if (roster && await activeMembers(env, roster.team_id, season.id, user.id) < TEAM_LIMIT) return addMember(env, season, roster.team_id, user.id);
+  if (user.roster_alert_season === season.id) return;
+  await env.DB.prepare('UPDATE hrr_users SET roster_alert_season=? WHERE id=?').bind(season.id, user.id).run();
+  await alertAdmins(env, user, roster ? 'full' : 'unknown');
+}
+
+async function syncTeams(request, env) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const sheetId = (clean((await request.json()).sheet, 400).match(/[-\w]{25,}/) || [])[0];
+  if (!season || !sheetId) return json({ error: 'Missing active season or teams sheet link' }, 400);
+  const created = []; let teams = 0, emails = 0;
+  for (const [university, short, gid] of ROSTER_SHEETS) {
+    const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`);
+    if (!response.ok) return json({ error: `Could not read sheet ${university}` }, 502);
+    for (const row of parseRoster(parseCsv(await response.text()))) {
+      const teamId = `hrr_team_${season.slug}_${short.toLowerCase()}_${row.number}`; teams += 1;
+      if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) {
+        const code = `${short}-${String(row.number).padStart(2, '0')}-${randomCode()}`;
+        await env.DB.prepare('INSERT INTO hrr_teams (id,season_id,name,university,city,join_code_hash,created_at) VALUES (?,?,?,?,?,?,?)').bind(teamId, season.id, `Екип ${row.number}`, university, '', await hash(code), now()).run();
+        created.push({ university, team: row.number, code });
+      }
+      for (const email of row.emails) {
+        await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
+        emails += 1;
+      }
+    }
+  }
+  return json({ ok: true, teams, emails, created });
+}
+
 async function me(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
+  await autoJoin(env, auth.user);
   const team = await env.DB.prepare('SELECT t.id,t.name,t.university,t.city FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 ORDER BY tm.joined_at DESC LIMIT 1').bind(auth.user.id).first();
   return json({ user: auth.user, team });
 }
@@ -57,14 +157,12 @@ async function ranking(env) {
 
 async function joinTeam(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
-  const body = await request.json(); const code = clean(body.code, 80); const season = await currentSeason(env);
+  const body = await request.json(); const code = normalizeCode(body.code); const season = await currentSeason(env);
   if (!season || !code) return json({ error: 'Missing team code' }, 400);
   const team = await env.DB.prepare('SELECT * FROM hrr_teams WHERE season_id=? AND join_code_hash=?').bind(season.id, await hash(code)).first();
   if (!team) return json({ error: 'Invalid team code' }, 404);
-  await env.DB.prepare('UPDATE hrr_team_members SET active=0 WHERE user_id=? AND active=1').bind(auth.user.id).run();
-  const previous = await env.DB.prepare('SELECT id FROM hrr_team_members WHERE team_id=? AND user_id=? LIMIT 1').bind(team.id, auth.user.id).first();
-  if (previous) await env.DB.prepare('UPDATE hrr_team_members SET season_id=?,active=1,joined_at=? WHERE id=?').bind(season.id, now(), previous.id).run();
-  else await env.DB.prepare('INSERT INTO hrr_team_members (id,season_id,team_id,user_id,active,joined_at) VALUES (?,?,?,?,1,?)').bind(id('hrr_member'), season.id, team.id, auth.user.id, now()).run();
+  if (await activeMembers(env, team.id, season.id, auth.user.id) >= TEAM_LIMIT) return json({ error: 'Отборът вече е пълен. Свържи се с организаторите.' }, 409);
+  await addMember(env, season, team.id, auth.user.id);
   return json({ ok: true, team });
 }
 
@@ -192,7 +290,7 @@ async function mentorDirectory(request, env) {
 
 async function createTeam(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
-  const season = await currentSeason(env); const body = await request.json(); const code = clean(body.joinCode, 80);
+  const season = await currentSeason(env); const body = await request.json(); const code = normalizeCode(body.joinCode);
   if (!season || !clean(body.name, 120) || !clean(body.university, 160) || !code) return json({ error: 'Name, university and join code are required' }, 400);
   const teamId = id('hrr_team');
   await env.DB.prepare('INSERT INTO hrr_teams (id,season_id,name,university,city,join_code_hash,created_at) VALUES (?,?,?,?,?,?,?)').bind(teamId, season.id, clean(body.name, 120), clean(body.university, 160), clean(body.city, 80), await hash(code), now()).run();
@@ -234,6 +332,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'DELETE' && /^\/api\/hrr\/mentor\/missions\/[^/]+$/.test(url.pathname)) return archiveMission(request, env, url.pathname.split('/').at(-1));
   if (request.method === 'GET' && url.pathname === '/api/hrr/admin/mentors') return mentorDirectory(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams/sync') return syncTeams(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/allowlist') return addMentor(request, env);
   return json({ error: 'Not found' }, 404);
 }
