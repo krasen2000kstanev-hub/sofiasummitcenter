@@ -1,7 +1,7 @@
 <!doctype html>
 <script src="../../analytics-consent.js" defer></script>
 <!-- GitHub Pages deploy marker: subdued bokeh background 2026-09-21 -->
-<html lang="bg">
+<html lang="bg" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -622,7 +622,37 @@
   </style>
 <style>
 .live-links-section{background:var(--mist-50);padding:clamp(64px,9vw,120px) 0}.live-links-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:34px}.live-link-card{display:flex;flex-direction:column;gap:14px;min-height:190px;padding:26px;border:1px solid var(--navy-200);background:var(--white);color:var(--navy-950);text-decoration:none;transition:transform .2s ease,box-shadow .2s ease}.live-link-card:hover{transform:translateY(-3px);box-shadow:0 16px 32px #20243d1c}.live-link-number{color:var(--cyan-deep);font:700 12px var(--font-display);letter-spacing:.12em}.live-link-card strong{font:800 clamp(1.25rem,2.5vw,2rem) var(--font-display)}.live-link-card span:last-child{margin-top:auto;color:var(--steel-deep);font-weight:700}@media(max-width:700px){.live-links-grid{grid-template-columns:1fr;gap:12px;margin-top:24px}.live-link-card{min-height:0;padding:20px}.live-link-card strong{font-size:1.2rem}}
-</style></head>
+</style><style id="hrr-dark-theme">
+html[data-theme=dark]{color-scheme:dark}
+html[data-theme=dark] body{background:#12152a;color:var(--navy-200)}
+html[data-theme=dark] header.scrolled{background:rgba(18,21,42,.92);border-color:rgba(255,255,255,.08);color:#fff}
+html[data-theme=dark] header.scrolled nav.main-nav a{color:rgba(255,255,255,.72)}
+html[data-theme=dark] header.scrolled nav.main-nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+html[data-theme=dark] header.scrolled .logo small{color:var(--navy-300)}
+html[data-theme=dark] header.scrolled .hamburger{border-color:rgba(255,255,255,.25);color:#fff}
+html[data-theme=dark] .btn-outline{color:#fff;border-color:rgba(255,255,255,.28)}
+html[data-theme=dark] .btn-outline:hover{background:#fff;color:var(--navy-950)}
+html[data-theme=dark] .btn-dark{background:#2a2f52}
+html[data-theme=dark] .btn-dark:hover{background:#343a5c}
+html[data-theme=dark] .stats-strip,html[data-theme=dark] .live-links-section{background:#171a32}
+html[data-theme=dark] .season-highlight{background:radial-gradient(circle at 8% 50%,rgba(18,201,219,.12),transparent 30%),#171a32}
+html[data-theme=dark] .bg-light,html[data-theme=dark] .bg-tint{background:rgba(18,21,42,.86);color:var(--navy-200)}
+html[data-theme=dark] .stats-row,html[data-theme=dark] .highlight-grid,html[data-theme=dark] .highlight-cell,html[data-theme=dark] .process-list,html[data-theme=dark] .process-item,html[data-theme=dark] .faq-item,html[data-theme=dark] .footer-bottom,html[data-theme=dark] .form-section-label,html[data-theme=dark] .logo-box{border-color:rgba(255,255,255,.1)}
+html[data-theme=dark] .stat .num,html[data-theme=dark] .partner-strip b,html[data-theme=dark] .bg-light .section-head h2,html[data-theme=dark] .bg-tint .section-head h2,html[data-theme=dark] .highlight-cell h4,html[data-theme=dark] .process-item h4,html[data-theme=dark] .whom-card h3,html[data-theme=dark] .mentor-body h4,html[data-theme=dark] .hr-quote-card strong,html[data-theme=dark] .story-person strong,html[data-theme=dark] .season-album-city h3,html[data-theme=dark] .faq-q .q,html[data-theme=dark] .contact-card h3,html[data-theme=dark] .form-success h3,html[data-theme=dark] .form-section-label,html[data-theme=dark] .live-link-card,html[data-theme=dark] .role-option,html[data-theme=dark] [style*="color:var(--navy-950)"]{color:#fff!important}
+html[data-theme=dark] .stats-row .lead-label,html[data-theme=dark] .stat .lbl,html[data-theme=dark] .bg-light .section-lede,html[data-theme=dark] .bg-tint .section-lede,html[data-theme=dark] .highlight-cell p,html[data-theme=dark] .process-item p,html[data-theme=dark] .season-num-label,html[data-theme=dark] .form-field label,html[data-theme=dark] .gdpr-consent,html[data-theme=dark] .gdpr-consent label,html[data-theme=dark] .form-success p,html[data-theme=dark] .whom-card p,html[data-theme=dark] .mentor-body p,html[data-theme=dark] .hr-quote-card .hr-quote-role,html[data-theme=dark] .story-person span,html[data-theme=dark] .story-carousel-counter,html[data-theme=dark] .faq-a p,html[data-theme=dark] .contact-card p,html[data-theme=dark] footer .logo small,html[data-theme=dark] .footer-top p,html[data-theme=dark] .footer-bottom .legal,html[data-theme=dark] .footer-bottom .meta,html[data-theme=dark] [style*="color:var(--navy-500)"]{color:var(--navy-300)!important}
+html[data-theme=dark] .hr-quote-card blockquote,html[data-theme=dark] .story-card blockquote,html[data-theme=dark] .season-album-links a,html[data-theme=dark] .faq-toggle,html[data-theme=dark] .footer-links a,html[data-theme=dark] .mentor-body .social-links a,html[data-theme=dark] .photo-carousel-counter,html[data-theme=dark] .highlight-cell .idx,html[data-theme=dark] .company-carousel-counter,html[data-theme=dark] .form-note,html[data-theme=dark] .partner-strip{color:var(--navy-200)}
+html[data-theme=dark] .apply-form-wrap,html[data-theme=dark] .whom-card,html[data-theme=dark] .mentor-card,html[data-theme=dark] .hr-quote-card,html[data-theme=dark] .contact-card,html[data-theme=dark] .season-album-city,html[data-theme=dark] .live-link-card,html[data-theme=dark] .story-card{background:#1c2038;border-color:rgba(255,255,255,.1);box-shadow:0 24px 48px -36px rgba(0,0,0,.6)}
+html[data-theme=dark] .company-carousel-controls button,html[data-theme=dark] .story-carousel-controls button,html[data-theme=dark] .photo-carousel-controls button{background:#1c2038;border-color:rgba(255,255,255,.14);color:#fff}
+html[data-theme=dark] .arrow-circle,html[data-theme=dark] .process-item .arrow-circle,html[data-theme=dark] .social-row a{border-color:rgba(255,255,255,.16);color:var(--navy-200)}
+html[data-theme=dark] .form-field input,html[data-theme=dark] .form-field select,html[data-theme=dark] .role-option,html[data-theme=dark] .contact-icon,html[data-theme=dark] .mentor-photo{background:#141830;border-color:rgba(255,255,255,.12);color:#fff}
+html[data-theme=dark] .form-field input:focus,html[data-theme=dark] .form-field select:focus{background:#1c2038}
+html[data-theme=dark] .story-avatar{background:#2a2f52;border-color:rgba(255,255,255,.15)}
+html[data-theme=dark] footer{background:#0f1225;border-color:rgba(255,255,255,.08);color:var(--navy-200)}
+html[data-theme=dark] [style*="color:var(--cyan-deep)"]{color:var(--cyan)!important}
+html[data-theme=dark] [style*="color:var(--coral-deep)"]{color:var(--coral-soft)!important}
+</style>
+<script src="hrr-theme.js?v=1"></script>
+</head>
 <body>
 <canvas id="ambientBokeh" class="ambient-bokeh" aria-hidden="true"></canvas>
 
