@@ -137,6 +137,21 @@ async function syncTeams(request, env) {
   return json({ ok: true, teams, emails, created });
 }
 
+// Manual fix for students who log in with an email that is not in the sheet: map that email to their team.
+async function addRosterEmail(request, env) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const body = await request.json();
+  const email = clean(body.email, 200).toLowerCase(); const short = (ROSTER_SHEETS.find(([, code]) => code === body.university) || [])[1]; const number = Number.parseInt(body.team, 10);
+  if (!season || !email.includes('@') || !short || !number) return json({ error: 'Нужни са имейл, университет и номер на екип.' }, 400);
+  const teamId = `hrr_team_${season.slug}_${short.toLowerCase()}_${number}`;
+  if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) return json({ error: 'Няма такъв екип в сезона.' }, 404);
+  await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
+  const user = await env.DB.prepare("SELECT * FROM hrr_users WHERE email=? AND role='student'").bind(email).first();
+  const joined = Boolean(user) && !await env.DB.prepare('SELECT id FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1').bind(user.id, season.id).first() && await activeMembers(env, teamId, season.id, user.id) < TEAM_LIMIT;
+  if (joined) await addMember(env, season, teamId, user.id);
+  return json({ ok: true, teamId, joined, members: await activeMembers(env, teamId, season.id, '') });
+}
+
 async function me(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   await autoJoin(env, auth.user);
@@ -350,6 +365,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'DELETE' && /^\/api\/hrr\/mentor\/missions\/[^/]+$/.test(url.pathname)) return archiveMission(request, env, url.pathname.split('/').at(-1));
   if (request.method === 'GET' && url.pathname === '/api/hrr/admin/mentors') return mentorDirectory(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/admin/roster') return addRosterEmail(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams/sync') return syncTeams(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/allowlist') return addMentor(request, env);
   return json({ error: 'Not found' }, 404);

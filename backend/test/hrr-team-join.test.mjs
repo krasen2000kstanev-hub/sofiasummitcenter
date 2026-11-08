@@ -50,3 +50,15 @@ test('both team members can join with the same code when their emails are not on
   assert.equal(team.body.members.length, 2);
   assert.equal((await call('teams/join', 'c', 'third@gmail.test', 'POST', { code })).status, 409);
 });
+
+test('admin maps an unlisted email to a team and the student lands there', async () => {
+  const season = db.prepare("SELECT id FROM hrr_seasons WHERE status='active'").get().id;
+  db.prepare('INSERT INTO hrr_teams (id,season_id,name,university,city,join_code_hash,created_at) VALUES (?,?,?,?,?,?,?)').run('hrr_team_season-9_su_11', season, 'Екип 11', 'СУ', '', 'x', 'now');
+  db.prepare("INSERT INTO hrr_mentor_allowlist (email,role,active,created_at) VALUES ('boss@test','admin',1,'now')").run();
+  assert.equal((await call('me', 'g', 'george@gmail.test')).status, 200);
+  assert.equal((await call('admin/roster', 'g', 'george@gmail.test', 'POST', { email: 'x@y.z', university: 'SU', team: 11 })).status, 403);
+  const added = await call('admin/roster', 'boss', 'boss@test', 'POST', { email: ' George@gmail.test ', university: 'SU', team: '11' });
+  assert.deepEqual([added.status, added.body.joined, added.body.members], [200, true, 1]);
+  assert.equal((await call('team', 'g', 'george@gmail.test')).body.team.id, 'hrr_team_season-9_su_11');
+  assert.equal((await call('admin/roster', 'boss', 'boss@test', 'POST', { email: 'a@b.c', university: 'SU', team: 99 })).status, 404);
+});
