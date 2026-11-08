@@ -55,3 +55,37 @@ body[data-portal="mentor"] #studentNav{display:none!important}body[data-portal="
 .mentor-submission a{display:inline-block;padding:10px 0}
 .admin-tools input,.admin-tools select{min-height:42px;max-width:100%}.admin-tools .panel-heading{flex-wrap:wrap;gap:10px}
 }
+
+/* Dark theme, toggled by ../hrr-theme.js */
+html[data-theme=dark]{--ink:#edf6ff;--muted:#91a9c3;--purple:#8b7dff;--purple-soft:#1d2350;--orange:#ff8a4c;--orange-soft:#3a2418;--green:#3ccf91;--green-soft:#10291f;--line:#213b59;--surface:#0d1c30;--page:#07111f;--shadow:0 8px 24px rgba(0,0,0,.35);color-scheme:dark}
+html[data-theme=dark] .sidebar,html[data-theme=dark] .topbar,html[data-theme=dark] .bell,html[data-theme=dark] .filter,html[data-theme=dark] .ghost-button,html[data-theme=dark] .modal-card,html[data-theme=dark] .mobile-menu,html[data-theme=dark] .auth-card,html[data-theme=dark] .journey-mission,html[data-theme=dark] .journey-schedule,html[data-theme=dark] .journey-list-heading select,html[data-theme=dark] .logout-button{background:var(--surface);color:var(--ink)}
+html[data-theme=dark] .filter,html[data-theme=dark] .ghost-button,html[data-theme=dark] .nav-item,html[data-theme=dark] .bell,html[data-theme=dark] .progress-meta b,html[data-theme=dark] .point-row em{color:var(--muted)}
+html[data-theme=dark] .filter:hover,html[data-theme=dark] .filter.active{background:var(--purple);color:#fff}
+html[data-theme=dark] .brand{color:var(--ink)}
+html[data-theme=dark] .season-card{background:#112944;color:var(--ink)}
+html[data-theme=dark] .season-card span,html[data-theme=dark] .page-intro time,html[data-theme=dark] .stat-card p,html[data-theme=dark] .journey-fact small{color:#6f8aa7}
+html[data-theme=dark] .profile-avatar{background:#3a2418;color:#ffb37f}
+html[data-theme=dark] .dashboard{background-image:none}
+html[data-theme=dark] .progress-card{background:linear-gradient(110deg,#0d1c30 65%,#1a1f45)}
+html[data-theme=dark] .progress-card:after{background:#1d2350}
+html[data-theme=dark] .progress-track{background:#17324d}
+html[data-theme=dark] .primary-button:hover{background:#7466f0}
+html[data-theme=dark] .mission-card:hover,html[data-theme=dark] .journey-mission:hover,html[data-theme=dark] .journey-mission:focus-visible,html[data-theme=dark] .journey-mission.selected{border-color:#5a50c8}
+html[data-theme=dark] .journey-mission:hover,html[data-theme=dark] .journey-mission:focus-visible,html[data-theme=dark] .journey-mission.selected{background:#121f3a}
+html[data-theme=dark] .member-avatar{background:#1d2350}
+html[data-theme=dark] .modal{background:rgba(2,9,20,.66)}
+html[data-theme=dark] .modal-card,html[data-theme=dark] .auth-card{box-shadow:0 24px 70px rgba(0,0,0,.5)}
+html[data-theme=dark] .auth-gate{background:radial-gradient(circle at 20% 10%,#1d2350,transparent 38%),var(--page)}
+html[data-theme=dark] .auth-message,html[data-theme=dark] .review-actions .danger,html[data-theme=dark] .ghost-button.danger,html[data-theme=dark] .journey-mission.rejected .journey-mission-copy small{color:#ff8b6b}
+html[data-theme=dark] .journey-map{background:linear-gradient(130deg,#0b1b2d,#111a38 60%,#1a1a2a)}
+html[data-theme=dark] .journey-road{stroke:#17324d}
+html[data-theme=dark] .journey-stop circle{fill:#0d1c30;stroke:#3f668d}
+html[data-theme=dark] .journey-stop.approved circle,html[data-theme=dark] .journey-stop.pending circle,html[data-theme=dark] .journey-stop.rejected circle,html[data-theme=dark] .journey-stop .stop-mark{stroke:#0d1c30}
+html[data-theme=dark] .journey-stop text{fill:var(--muted)}
+html[data-theme=dark] .journey-stop.approved text,html[data-theme=dark] .journey-stop.pending text,html[data-theme=dark] .journey-stop.rejected text{fill:#fff}
+html[data-theme=dark] .journey-legend i{background:#3f668d}
+html[data-theme=dark] .journey-detail .detail-status.rejected,html[data-theme=dark] .journey-mission.rejected .journey-mission-number,html[data-theme=dark] .status-pill.rejected{background:#3a1d1a;color:#ff8b6b}
+html[data-theme=dark] .journey-stop.locked .stop-mark{fill:#112944;stroke:#2d4f6e}
+html[data-theme=dark] .journey-stop.locked text{fill:#6d8baa}
+html[data-theme=dark] .journey-mission.locked .journey-mission-number,html[data-theme=dark] .detail-status.locked{background:#112944;color:#6d8baa}
+html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] textarea{background:#0b1b2d;color:var(--ink);border-color:#2a4969}
