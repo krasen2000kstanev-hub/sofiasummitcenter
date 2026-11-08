@@ -187,13 +187,16 @@ async function team(request, env) {
   return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) });
 }
 
+// Team missions are shared: a submission by either member counts as the whole team's.
+const teamOf = async (env, userId, seasonId) => (await env.DB.prepare('SELECT team_id FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1 LIMIT 1').bind(userId, seasonId).first())?.team_id || '';
+
 async function missions(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
   const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
     ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
-    : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND s.student_user_id=? ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, season.id).all();
+    : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
   return json({ missions: studentView ? (rows.results || []).map(maskMission) : rows.results || [] });
 }
 
@@ -228,11 +231,14 @@ async function review(request, env, submissionId) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const body = await request.json(); const status = clean(body.status, 20); const note = clean(body.note, 1000);
   if (!['approved', 'rejected'].includes(status)) return json({ error: 'Invalid review status' }, 400);
-  const submission = await env.DB.prepare(`SELECT s.*,m.title,m.points,m.mentor_user_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?`).bind(submissionId).first();
+  const submission = await env.DB.prepare(`SELECT s.*,m.title,m.points,m.scope,m.mentor_user_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?`).bind(submissionId).first();
   if (!submission || (auth.user.role !== 'admin' && submission.mentor_user_id !== auth.user.id)) return json({ error: 'Submission not found' }, 404);
   if (submission.status !== 'pending') return json({ error: 'Submission already reviewed' }, 409);
   await env.DB.prepare('UPDATE hrr_submissions SET status=?,reviewer_user_id=?,review_note=?,reviewed_at=? WHERE id=? AND status=\'pending\'').bind(status, auth.user.id, note, now(), submissionId).run();
-  await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), submission.student_user_id, status, status === 'approved' ? 'Мисията е одобрена' : 'Мисията е отхвърлена', `${submission.title}${note ? ` — ${note}` : ''}`, now()).run();
+  const recipients = submission.scope === 'team'
+    ? ((await env.DB.prepare('SELECT user_id FROM hrr_team_members WHERE team_id=? AND active=1').bind(submission.team_id).all()).results || []).map((row) => row.user_id)
+    : [submission.student_user_id];
+  for (const userId of new Set([submission.student_user_id, ...recipients])) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), userId, status, status === 'approved' ? 'Мисията е одобрена' : 'Мисията е отхвърлена', `${submission.title}${note ? ` — ${note}` : ''}`, now()).run();
   return json({ ok: true, status });
 }
 
@@ -256,7 +262,7 @@ async function history(request, env) {
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
-    WHERE s.student_user_id=? AND m.season_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id, season.id).all();
+    WHERE (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) AND m.season_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0);
   return json({ history: (rows.results || []).map(maskMission), approvedPoints: points });
 }
