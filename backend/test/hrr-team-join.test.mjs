@@ -62,3 +62,13 @@ test('admin maps an unlisted email to a team and the student lands there', async
   assert.equal((await call('team', 'g', 'george@gmail.test')).body.team.id, 'hrr_team_season-9_su_11');
   assert.equal((await call('admin/roster', 'boss', 'boss@test', 'POST', { email: 'a@b.c', university: 'SU', team: 99 })).status, 404);
 });
+
+test('admin assignment moves a student who joined the wrong team with a code', async () => {
+  const season = db.prepare("SELECT id FROM hrr_seasons WHERE status='active'").get().id;
+  db.prepare('INSERT INTO hrr_teams (id,season_id,name,university,city,join_code_hash,created_at) VALUES (?,?,?,?,?,?,?)').run('hrr_team_season-9_su_12', season, 'Екип 12', 'СУ', '', createHash('sha256').update('SU-12-WRNG').digest('hex'), 'now');
+  assert.equal((await call('teams/join', 'w', 'wrong@gmail.test', 'POST', { code: 'SU-12-WRNG' })).status, 200);
+  const moved = await call('admin/roster', 'boss', 'boss@test', 'POST', { email: 'wrong@gmail.test', university: 'SU', team: 11 });
+  assert.deepEqual([moved.body.joined, moved.body.previousTeam, moved.body.members], [true, 'СУ · Екип 12', 2]);
+  assert.equal((await call('team', 'w', 'wrong@gmail.test')).body.members.length, 2);
+  assert.equal((await call('admin/roster', 'boss', 'boss@test', 'POST', { email: 'wrong@gmail.test', university: 'SU', team: 11 })).body.already, true);
+});

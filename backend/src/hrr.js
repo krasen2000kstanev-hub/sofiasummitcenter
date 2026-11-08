@@ -147,9 +147,11 @@ async function addRosterEmail(request, env) {
   if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) return json({ error: 'Няма такъв екип в сезона.' }, 404);
   await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
   const user = await env.DB.prepare("SELECT * FROM hrr_users WHERE email=? AND role='student'").bind(email).first();
-  const joined = Boolean(user) && !await env.DB.prepare('SELECT id FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1').bind(user.id, season.id).first() && await activeMembers(env, teamId, season.id, user.id) < TEAM_LIMIT;
+  // Admin decision wins: move the student out of whatever team they joined (e.g. with a wrong code).
+  const previous = user && await env.DB.prepare('SELECT t.id,t.name,t.university FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.season_id=? AND tm.active=1').bind(user.id, season.id).first();
+  const joined = Boolean(user) && previous?.id !== teamId && await activeMembers(env, teamId, season.id, user.id) < TEAM_LIMIT;
   if (joined) await addMember(env, season, teamId, user.id);
-  return json({ ok: true, teamId, joined, members: await activeMembers(env, teamId, season.id, '') });
+  return json({ ok: true, teamId, joined, already: previous?.id === teamId, previousTeam: previous && previous.id !== teamId ? `${previous.university} · ${previous.name}` : '', members: await activeMembers(env, teamId, season.id, '') });
 }
 
 async function me(request, env) {
