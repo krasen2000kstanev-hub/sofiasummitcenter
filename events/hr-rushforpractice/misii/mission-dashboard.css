@@ -48,3 +48,10 @@ body[data-portal="mentor"] #studentNav{display:none!important}body[data-portal="
 }
 .journey-layout>*,.journey-section{min-width:0}
 @media(max-width:760px){.join-panel{margin-bottom:10px}.hero-grid{margin-top:0}.hero-grid .stat-card span{display:none}.hero-grid .stat-card p{margin-bottom:2px}}
+/* Mentor/admin on phone: no sideways scroll, review queue first, thumb-sized links and inputs. */
+.mentor-columns>*{min-width:0}.mentor-submission{overflow-wrap:anywhere}
+@media(max-width:760px){
+.mentor-panel:not([hidden]){display:flex;flex-direction:column}.mentor-panel .page-intro{order:-2}.mentor-review{order:-1;margin:0 0 18px;display:flex;flex-direction:column}.mentor-review>.panel-heading{order:-2}#mentorSubmissions{order:-1;margin-bottom:8px}.mission-create>*,.mission-create .date-range,.mission-create .mission-field{flex:1 1 100%}
+.mentor-submission a{display:inline-block;padding:10px 0}
+.admin-tools input,.admin-tools select{min-height:42px;max-width:100%}.admin-tools .panel-heading{flex-wrap:wrap;gap:10px}
+}
