@@ -26,3 +26,25 @@ body[data-portal="mentor"] #studentNav{display:none!important}body[data-portal="
 .secret-box{margin:0 0 14px;padding:16px;border:1px dashed var(--purple);border-radius:14px;background:var(--purple-soft)}.secret-box .journey-mentor{margin-top:10px}
 .journey-stop.locked .stop-mark{fill:#eef0f5;stroke:#c9cfdc;stroke-dasharray:3 3}.journey-stop.locked text{fill:#9aa3b5}.journey-mission.locked{opacity:.65}.journey-mission.locked .journey-mission-number{background:#eef0f5;color:#9aa3b5}.detail-status.locked{background:#eef0f5;color:#71809a}
 .roster-add{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.roster-add p{flex-basis:100%;margin:0}.roster-add input,.roster-add select{padding:8px 10px;border:1px solid #d6dbe6;border-radius:10px;font:inherit}.roster-add input[type=email]{flex:1 1 200px}.roster-add input[type=number]{width:90px}
+/* Above the fold: greeting, next mission, progress and points fit the first screen on laptop and phone. */
+.dashboard{padding-top:22px}
+.page-intro{margin-bottom:16px}.page-intro h1{font-size:26px}.page-intro .intro-copy{margin:4px 0 0;font-size:14px}
+.join-panel{padding:16px 20px;margin-bottom:14px}.join-form .primary-button{white-space:nowrap}.join-panel h2{font-size:17px;margin-bottom:4px}
+.hero-grid{grid-template-columns:1.3fr 1.1fr minmax(170px,.55fr);gap:14px;margin-bottom:24px}
+.hero-grid .stats-grid{grid-template-columns:1fr;gap:14px;margin:0;max-width:none}
+.hero-grid .stat-card{padding:16px 18px;display:flex;flex-direction:column;justify-content:center}.hero-grid .stat-card p{margin-bottom:6px}.hero-grid .stat-card strong{font-size:26px}.hero-grid .stat-card span{margin-top:2px}
+.progress-card{padding:22px 24px}.progress-card h2{font-size:21px}.progress-card p:not(.overline){margin-bottom:16px}
+.next-card{padding:20px 22px}.next-card h2{font-size:18px;margin:12px 0 6px}.next-card p{margin-bottom:14px}
+@media(max-width:1100px){.hero-grid{grid-template-columns:1fr 1fr}.hero-grid .stats-grid{grid-column:1/-1;grid-template-columns:1fr 1fr}}
+@media(max-width:760px){
+.topbar{height:58px}
+.dashboard{padding:14px 14px 40px}
+.page-intro{margin-bottom:12px}.page-intro .eyebrow{font-size:10px;margin-bottom:4px}.page-intro h1{font-size:22px}.page-intro .intro-copy,.page-intro time{display:none}
+.join-panel{padding:14px}.join-panel p{font-size:12px}.join-form{margin-top:10px;display:flex;gap:8px}.join-form input{min-width:0;flex:1;padding:11px}.join-form .primary-button{width:auto;white-space:nowrap}
+.hero-grid{grid-template-columns:1fr 1fr;gap:10px}
+.hero-grid .next-card{order:-1;grid-column:1/-1;padding:16px}.next-card h2{font-size:16px;margin:10px 0 4px}.next-card p{font-size:13px;margin-bottom:12px}
+.hero-grid .progress-card{grid-column:1/-1;padding:16px}.progress-card:after{display:none}.progress-card .overline{display:none}.progress-card h2{font-size:17px;margin-bottom:4px}.progress-card p:not(.overline){font-size:13px;margin-bottom:10px}
+.hero-grid .stats-grid{grid-column:1/-1;grid-template-columns:1fr 1fr;gap:10px}.hero-grid .stat-card{padding:12px 14px}.hero-grid .stat-card p{font-size:10px}.hero-grid .stat-card strong{font-size:22px}
+}
+.journey-layout>*,.journey-section{min-width:0}
+@media(max-width:760px){.join-panel{margin-bottom:10px}.hero-grid{margin-top:0}.hero-grid .stat-card span{display:none}.hero-grid .stat-card p{margin-bottom:2px}}
