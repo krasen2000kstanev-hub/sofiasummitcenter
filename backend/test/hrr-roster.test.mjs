@@ -59,8 +59,8 @@ test('missionSheetUpdates writes F only for ranked teams whose mission points ch
     ['', 'НБУ', 'Екип 1', '', '', ''],
   ];
   const points = new Map([['НБУ::Екип 1', 6], ['СУ::Екип 4', 5], ['УНСС::Екип 9', 0]]);
-  assert.deepEqual(missionSheetUpdates(rows, points), [
-    { range: "'Обща класация'!F2", values: [[6]] },
-    { range: "'Обща класация'!F4", values: [[0]] },
+  assert.deepEqual(missionSheetUpdates(rows, points, 'Обща класация на екипи'), [
+    { range: "'Обща класация на екипи'!F2", values: [[6]] },
+    { range: "'Обща класация на екипи'!F4", values: [[0]] },
   ]);
 });

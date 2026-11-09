@@ -193,16 +193,16 @@ function missionPointsByTeam(env, season) {
     WHERE t.season_id=? GROUP BY t.id ORDER BY missions_points DESC,t.name ASC`).bind(season.id, season.id, season.id).all();
 }
 
-const RANKING_TAB = 'Обща класация';
+const RANKING_GID = 0; // „Обща класация на екипи“; found by gid so renaming the tab does not break the sync
 
 // Rows of „Обща класация“ (A rank, B university, C team, F mission points) → cell updates for teams whose F differs.
-export function missionSheetUpdates(rows, pointsByTeam) {
+export function missionSheetUpdates(rows, pointsByTeam, tab) {
   const updates = [];
   rows.forEach((row, index) => {
     if (!/^\d+$/.test(String(row[0] || '').trim())) return;
     const points = pointsByTeam.get(`${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`);
     if (points === undefined || Number(row[5] || 0) === points) return;
-    updates.push({ range: `'${RANKING_TAB}'!F${index + 1}`, values: [[points]] });
+    updates.push({ range: `'${tab}'!F${index + 1}`, values: [[points]] });
   });
   return updates;
 }
@@ -213,12 +213,16 @@ export async function syncMissionPointsToSheet(env, sheetId) {
   const pointsByTeam = new Map(((await missionPointsByTeam(env, season)).results || []).map((r) => [`${r.university}::${r.team_name}`, Number(r.missions_points || 0)]));
   const token = await googleAccessToken(env);
   const base = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}`;
-  const read = await fetch(`${base}/values/${encodeURIComponent(`'${RANKING_TAB}'!A1:F400`)}`, { headers: { authorization: `Bearer ${token}` } });
-  if (!read.ok) return { error: `Could not read ${RANKING_TAB} (${read.status})` };
-  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam);
+  const meta = await fetch(`${base}?fields=sheets.properties(sheetId,title)`, { headers: { authorization: `Bearer ${token}` } });
+  if (!meta.ok) return { error: `Could not read sheet tabs (${meta.status})` };
+  const tab = ((await meta.json()).sheets || []).find((s) => s.properties?.sheetId === RANKING_GID)?.properties.title;
+  if (!tab) return { error: 'Ranking tab (gid 0) not found' };
+  const read = await fetch(`${base}/values/${encodeURIComponent(`'${tab}'!A1:F400`)}`, { headers: { authorization: `Bearer ${token}` } });
+  if (!read.ok) return { error: `Could not read ${tab} (${read.status})` };
+  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam, tab);
   if (!data.length) return { ok: true, updated: 0 };
   const write = await fetch(`${base}/values:batchUpdate`, { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
-  return write.ok ? { ok: true, updated: data.length } : { error: `Could not write ${RANKING_TAB} (${write.status})` };
+  return write.ok ? { ok: true, updated: data.length } : { error: `Could not write ${tab} (${write.status})` };
 }
 
 async function joinTeam(request, env) {
