@@ -62,7 +62,7 @@ function base64url(bytes) {
   return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-async function googleAccessToken(env) {
+export async function googleAccessToken(env) {
   const account = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}');
   if (!account.client_email || !account.private_key) throw new Error('Google Sheets backend credential is not configured');
   const issuedAt = Math.floor(Date.now() / 1000);

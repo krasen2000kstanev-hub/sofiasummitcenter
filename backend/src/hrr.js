@@ -1,4 +1,5 @@
 import { hrrUser, isStudentPreviewUser } from './hrr-auth.js';
+import { googleAccessToken } from './hrr-applications.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', ...headers } });
 const clean = (value, max = 500) => String(value ?? '').trim().slice(0, max);
@@ -115,12 +116,20 @@ async function autoJoin(env, user) {
 
 async function syncTeams(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
-  const season = await currentSeason(env); const sheetId = (clean((await request.json()).sheet, 400).match(/[-\w]{25,}/) || [])[0];
-  if (!season || !sheetId) return json({ error: 'Missing active season or teams sheet link' }, 400);
-  const created = []; let teams = 0, emails = 0;
+  const sheetId = (clean((await request.json()).sheet, 400).match(/[-\w]{25,}/) || [])[0];
+  const result = await syncRoster(env, sheetId);
+  return json(result, result.status || 200);
+}
+
+// Reads every university tab and writes only new or changed emails, so the 5-minute cron stays cheap on D1 writes.
+export async function syncRoster(env, sheetId) {
+  const season = await currentSeason(env);
+  if (!season || !sheetId) return { error: 'Missing active season or teams sheet link', status: 400 };
+  const known = new Map(((await env.DB.prepare('SELECT email,team_id FROM hrr_team_roster WHERE season_id=?').bind(season.id).all()).results || []).map((r) => [r.email, r.team_id]));
+  const created = []; let teams = 0, emails = 0, changed = 0;
   for (const [university, short, gid] of ROSTER_SHEETS) {
     const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`);
-    if (!response.ok) return json({ error: `Could not read sheet ${university}` }, 502);
+    if (!response.ok) return { error: `Could not read sheet ${university}`, status: 502 };
     for (const row of parseRoster(parseCsv(await response.text()))) {
       const teamId = `hrr_team_${season.slug}_${short.toLowerCase()}_${row.number}`; teams += 1;
       if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) {
@@ -129,12 +138,14 @@ async function syncTeams(request, env) {
         created.push({ university, team: row.number, code });
       }
       for (const email of row.emails) {
-        await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
         emails += 1;
+        if (known.get(email) === teamId) continue;
+        await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
+        known.set(email, teamId); changed += 1;
       }
     }
   }
-  return json({ ok: true, teams, emails, created });
+  return { ok: true, teams, emails, changed, created };
 }
 
 // Manual fix for students who log in with an email that is not in the sheet: map that email to their team.
@@ -164,7 +175,12 @@ async function me(request, env) {
 async function ranking(env) {
   const season = await currentSeason(env);
   if (!season) return json({ season: null, teams: [], updatedAt: now() });
-  const rows = await env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
+  const rows = await missionPointsByTeam(env, season);
+  return json({ season: season.slug, teams: (rows.results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })), updatedAt: now() });
+}
+
+function missionPointsByTeam(env, season) {
+  return env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
       COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END),0) missions_points,
       COALESCE(SUM(CASE WHEN a.scope='team' THEN 1 ELSE a.completed_count END),0) missions_completed
     FROM hrr_teams t
@@ -175,7 +191,34 @@ async function ranking(env) {
       GROUP BY s.team_id,s.mission_id,m.scope,m.points
     ) a ON a.team_id=t.id
     WHERE t.season_id=? GROUP BY t.id ORDER BY missions_points DESC,t.name ASC`).bind(season.id, season.id, season.id).all();
-  return json({ season: season.slug, teams: (rows.results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })), updatedAt: now() });
+}
+
+const RANKING_TAB = 'Обща класация';
+
+// Rows of „Обща класация“ (A rank, B university, C team, F mission points) → cell updates for teams whose F differs.
+export function missionSheetUpdates(rows, pointsByTeam) {
+  const updates = [];
+  rows.forEach((row, index) => {
+    if (!/^\d+$/.test(String(row[0] || '').trim())) return;
+    const points = pointsByTeam.get(`${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`);
+    if (points === undefined || Number(row[5] || 0) === points) return;
+    updates.push({ range: `'${RANKING_TAB}'!F${index + 1}`, values: [[points]] });
+  });
+  return updates;
+}
+
+// Approved mission points from the site → column F of the season sheet, so the sheet total and the public ranking include them.
+export async function syncMissionPointsToSheet(env, sheetId) {
+  const season = await currentSeason(env); if (!season || !sheetId) return { skipped: true };
+  const pointsByTeam = new Map(((await missionPointsByTeam(env, season)).results || []).map((r) => [`${r.university}::${r.team_name}`, Number(r.missions_points || 0)]));
+  const token = await googleAccessToken(env);
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}`;
+  const read = await fetch(`${base}/values/${encodeURIComponent(`'${RANKING_TAB}'!A1:F400`)}`, { headers: { authorization: `Bearer ${token}` } });
+  if (!read.ok) return { error: `Could not read ${RANKING_TAB} (${read.status})` };
+  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam);
+  if (!data.length) return { ok: true, updated: 0 };
+  const write = await fetch(`${base}/values:batchUpdate`, { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
+  return write.ok ? { ok: true, updated: data.length } : { error: `Could not write ${RANKING_TAB} (${write.status})` };
 }
 
 async function joinTeam(request, env) {
