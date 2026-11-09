@@ -89,3 +89,9 @@ html[data-theme=dark] .journey-stop.locked .stop-mark{fill:#112944;stroke:#2d4f6
 html[data-theme=dark] .journey-stop.locked text{fill:#6d8baa}
 html[data-theme=dark] .journey-mission.locked .journey-mission-number,html[data-theme=dark] .detail-status.locked{background:#112944;color:#6d8baa}
 html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] textarea{background:#0b1b2d;color:var(--ink);border-color:#2a4969}
+/* Mentor columns: keep long mission rows and their buttons inside their own panel */
+.mentor-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.mentor-columns>*{min-width:0}
+.mentor-submission>div:first-child{flex:1;min-width:0}
+.mission-actions{flex:none;flex-direction:column;align-items:stretch}
+@media(max-width:760px){.mentor-columns{grid-template-columns:1fr}.mission-actions{flex-direction:row;flex-wrap:wrap;margin-top:10px}}
