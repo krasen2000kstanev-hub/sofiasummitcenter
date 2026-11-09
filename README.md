@@ -121,3 +121,12 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - The season process cards are numbered sequentially 01–04.
 - Company and university applications use matching organization labels and include a required position field; the company CTA links to the form and preselects the company role.
 - Removed the decorative circle from the final call-to-action section.
+
+## HR:Rush season 9 ranking and themes — November 2026
+
+- `events/hr-rushforpractice/ranking/` reads season 9 live from Google Sheet `1KQmI2hdv8pNTzA2eTnZAaU8whP-NJep3k2CSGB0dKRY` (gviz JSON). Tabs: „Обща класация“ gid 0, „Компании“ gid 1451737775, university rosters НБУ 434191220, СУ 1017411608, УНСС 1743708126, УЗФ 530263534, УниБИТ 1480888565. No season 8 data remains in the page.
+- Team columns A–N: rank, university, team, company, activity, missions, Pleggi profiles, found candidates, easy/medium/hard found (I/J/K), interviews, hired, total. Only rows with a numeric rank are teams; duplicates are removed by `university::team`. Companies are rows of the „Компании“ tab that have a representative.
+- Team cards show students with emails (from the university tabs) and the company representative with email; company cards show the representative and every team that works with the company. Phones from the sheet are never shown.
+- Company names match case-insensitively, ignore trailing spaces, treat „Pleggi“ as „Плеги“, and joint teams such as „Плеги / Глово“ count for both companies.
+- On phones the team/company modal scrolls itself and locks the page behind it.
+- Light/dark mode: `events/hr-rushforpractice/hrr-theme.js` adds a ☀/☾ button to the landing page, missions and ranking. Each page keeps its default in `<html data-theme>` (landing and missions light, ranking dark); the visitor's choice is saved in `localStorage` key `hrr-theme` and shared across the three pages. Theme CSS lives in `#hrr-dark-theme` (landing), the end of `misii/mission-dashboard.css`, and `#hrr-light-theme` (ranking).
