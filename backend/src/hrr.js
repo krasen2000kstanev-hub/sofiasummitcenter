@@ -328,6 +328,19 @@ async function submissionImage(request, env, submissionId) {
   return json({ image: row.evidence_image });
 }
 
+// Mentor comment on a pending submission without deciding it yet; the student is notified and sees it on the mission.
+async function feedback(request, env, submissionId) {
+  const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
+  const note = clean((await request.json()).note, 1000);
+  if (!note) return json({ error: 'Напиши обратна връзка.' }, 400);
+  const submission = await env.DB.prepare('SELECT s.*,m.title,m.mentor_user_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
+  if (!submission || (auth.user.role !== 'admin' && submission.mentor_user_id !== auth.user.id)) return json({ error: 'Submission not found' }, 404);
+  if (submission.status !== 'pending') return json({ error: 'Submission already reviewed' }, 409);
+  await env.DB.prepare('UPDATE hrr_submissions SET review_note=?,reviewer_user_id=? WHERE id=?').bind(note, auth.user.id, submissionId).run();
+  await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), submission.student_user_id, 'feedback', 'Обратна връзка от ментора', `${submission.title} — ${note}`, now()).run();
+  return json({ ok: true });
+}
+
 async function review(request, env, submissionId) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const body = await request.json(); const status = clean(body.status, 20); const note = clean(body.note, 1000); const bonus = status === 'approved' ? bonusPoints(body.bonusPoints) : 0;
@@ -443,6 +456,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/image$/.test(url.pathname)) return submissionImage(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/review$/.test(url.pathname)) return review(request, env, url.pathname.split('/')[5]);
+  if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/feedback$/.test(url.pathname)) return feedback(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
