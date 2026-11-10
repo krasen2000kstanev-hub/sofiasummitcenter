@@ -181,17 +181,55 @@ async function grantMissions(request, env) {
 async function addRosterEmail(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
   const season = await currentSeason(env); const body = await request.json();
-  const email = clean(body.email, 200).toLowerCase(); const short = (ROSTER_SHEETS.find(([, code]) => code === body.university) || [])[1]; const number = Number.parseInt(body.team, 10);
-  if (!season || !email.includes('@') || !short || !number) return json({ error: 'Нужни са имейл, университет и номер на екип.' }, 400);
+  const result = await assignRoster(env, season, body.email, body.university, body.team);
+  return json(result, result.status || 200);
+}
+
+// Map an email to a season team and, if that student already signed in, put them in it (admin decision wins).
+async function assignRoster(env, season, rawEmail, university, team) {
+  const email = clean(rawEmail, 200).toLowerCase(); const short = (ROSTER_SHEETS.find(([, code]) => code === university) || [])[1]; const number = Number.parseInt(team, 10);
+  if (!season || !email.includes('@') || !short || !number) return { error: 'Нужни са имейл, университет и номер на екип.', status: 400 };
   const teamId = `hrr_team_${season.slug}_${short.toLowerCase()}_${number}`;
-  if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) return json({ error: 'Няма такъв екип в сезона.' }, 404);
+  if (!await env.DB.prepare('SELECT id FROM hrr_teams WHERE id=?').bind(teamId).first()) return { error: 'Няма такъв екип в сезона.', status: 404 };
   await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
   const user = await env.DB.prepare("SELECT * FROM hrr_users WHERE email=? AND role='student'").bind(email).first();
   // Admin decision wins: move the student out of whatever team they joined (e.g. with a wrong code).
   const previous = user && await env.DB.prepare('SELECT t.id,t.name,t.university FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.season_id=? AND tm.active=1').bind(user.id, season.id).first();
   const joined = Boolean(user) && previous?.id !== teamId && await activeMembers(env, teamId, season.id, user.id) < TEAM_LIMIT;
   if (joined) await addMember(env, season, teamId, user.id);
-  return json({ ok: true, teamId, joined, already: previous?.id === teamId, previousTeam: previous && previous.id !== teamId ? `${previous.university} · ${previous.name}` : '', members: await activeMembers(env, teamId, season.id, '') });
+  return { ok: true, teamId, joined, already: previous?.id === teamId, previousTeam: previous && previous.id !== teamId ? `${previous.university} · ${previous.name}` : '', members: await activeMembers(env, teamId, season.id, '') };
+}
+
+export const ROSTER_UNIVERSITIES = ROSTER_SHEETS.map(([name, code]) => ({ name, code }));
+
+// Student without a team says who they are; the matching roster alert reopens so the admin sees it.
+async function submitRosterRequest(request, env) {
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const body = await request.json();
+  const fullName = clean(body.fullName, 120); const university = ROSTER_UNIVERSITIES.find((u) => u.code === body.university)?.code; const number = Number.parseInt(body.team, 10);
+  if (!season || fullName.length < 3 || !university || !(number > 0)) return json({ error: 'Попълни име и фамилия, университет и номер на екипа.' }, 400);
+  const email = String(auth.user.email || '').toLowerCase();
+  await env.DB.prepare("INSERT INTO hrr_roster_requests (season_id,user_id,id,email,full_name,university,team_number,status,created_at) VALUES (?,?,?,?,?,?,?,'pending',?) ON CONFLICT(season_id,user_id) DO UPDATE SET email=excluded.email,full_name=excluded.full_name,university=excluded.university,team_number=excluded.team_number,status='pending',created_at=excluded.created_at,resolved_at=NULL").bind(season.id, auth.user.id, id('hrr_request'), email, fullName, university, number, now()).run();
+  await env.DB.prepare("UPDATE hrr_notifications SET resolved_at=NULL,read_at=NULL WHERE type='roster' AND body LIKE ?").bind(`% · ${email} %`).run();
+  return json({ ok: true });
+}
+
+async function myRosterRequest(request, env) {
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
+  const season = await currentSeason(env);
+  const row = season && await env.DB.prepare('SELECT full_name,university,team_number,status,created_at FROM hrr_roster_requests WHERE season_id=? AND user_id=?').bind(season.id, auth.user.id).first();
+  return json({ request: row || null, universities: ROSTER_UNIVERSITIES });
+}
+
+async function approveRosterRequest(request, env, requestId) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env);
+  const row = await env.DB.prepare('SELECT * FROM hrr_roster_requests WHERE id=?').bind(requestId).first();
+  if (!row) return json({ error: 'Заявката не е намерена.' }, 404);
+  const result = await assignRoster(env, season, row.email, row.university, row.team_number);
+  if (result.error) return json(result, result.status || 400);
+  await env.DB.prepare("UPDATE hrr_roster_requests SET status='approved',resolved_at=? WHERE id=?").bind(now(), requestId).run();
+  return json(result);
 }
 
 async function me(request, env) {
@@ -376,7 +414,7 @@ async function resolveNotification(request, env, noteId) {
 
 export const rosterContactEmail = (email) => ({
   subject: 'HR:Rush for Practice — нужни са ни твоите данни',
-  text: `Здравей!\n\nОпита се да влезеш в платформата на HR:Rush for Practice с имейл ${email}, но той не е в списъка с участници.\n\nЗа да те свържем с отбора ти, отговори на този имейл с:\n1. Име и фамилия\n2. Университет\n3. Номер на екипа\n\nЩом получим отговора ти, ще те добавим и ще можеш да влизаш с този имейл.\n\nПоздрави,\nЕкипът на HR:Rush for Practice`
+  text: `Здравей!\n\nОпита се да влезеш в платформата на HR:Rush for Practice с имейл ${email}, но той не е в списъка с участници.\n\nЗа да те свържем с отбора ти, влез отново с този имейл тук:\nhttps://sofiasummit.bg/events/hr-rushforpractice/misii/\n\nи попълни краткия формуляр:\n1. Име и фамилия\n2. Университет\n3. Номер на екипа\n\nЩом го получим, ще те добавим и ще можеш да влизаш с този имейл. Ако не можеш да влезеш, просто отговори на този имейл със същите данни.\n\nПоздрави,\nЕкипът на HR:Rush for Practice`
 });
 
 // Admin emails the person behind a roster alert; replies go to that admin. All admin copies of the alert are marked.
@@ -401,9 +439,11 @@ async function notifications(request, env, roles = ['student']) {
   if (season && list.some((n) => n.type === 'roster')) {
     const roster = new Set(((await env.DB.prepare('SELECT email FROM hrr_team_roster WHERE season_id=?').bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
     const placed = new Set(((await env.DB.prepare("SELECT u.email FROM hrr_users u WHERE u.role IN ('admin','mentor') OR u.id IN (SELECT user_id FROM hrr_team_members WHERE season_id=? AND active=1)").bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
+    const requests = new Map(((await env.DB.prepare("SELECT id,email,full_name,university,team_number,created_at FROM hrr_roster_requests WHERE season_id=? AND status='pending'").bind(season.id).all()).results || []).map((r) => [String(r.email).toLowerCase(), r]));
     for (const n of list) {
       if (n.type !== 'roster') continue;
       const email = rosterAlertEmail(n.body);
+      n.request = requests.get(email) || null;
       n.resolved = Boolean(n.resolved_at) || (Boolean(email) && (placed.has(email) || (n.title !== 'Отборът е пълен' && roster.has(email)) || isBlockedEmail(env, email)));
     }
   }
@@ -525,6 +565,9 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/admin/mentors') return mentorDirectory(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/roster') return addRosterEmail(request, env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/roster-request') return submitRosterRequest(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/hrr/roster-request') return myRosterRequest(request, env);
+  if (request.method === 'POST' && /^\/api\/hrr\/admin\/roster-requests\/[^/]+\/approve$/.test(url.pathname)) return approveRosterRequest(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/missions/grant') return grantMissions(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams/sync') return syncTeams(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/allowlist') return addMentor(request, env);

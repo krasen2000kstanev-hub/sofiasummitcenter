@@ -152,3 +152,10 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .mission-create label input:first-child{min-width:0}
 .modal-card select{padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface)}
 @media(max-width:760px){#mentorNotificationList .news-item>span{flex:1 1 calc(100% - 30px)}.note-actions{padding-left:22px}}
+/* Student tells who they are; admin adds with one click */
+.roster-request{display:grid;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);max-width:520px}
+.roster-request p{margin:0}
+.roster-request input,.roster-request select{padding:11px;border:1px solid var(--line);border-radius:11px;font:inherit;color:var(--ink);background:var(--surface);min-width:0;width:100%;box-sizing:border-box}
+.roster-request-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--green-soft);color:var(--ink);font-size:13px}
+.roster-request-note b{display:inline}
+.roster-request-note .primary-button{padding:8px 12px;font-size:13px;width:auto}
