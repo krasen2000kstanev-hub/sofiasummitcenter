@@ -18,7 +18,7 @@ test('parseRoster reads the main team block and stops before side lists', () => 
 
 test('maskMission hides secret and bonus content from students', async () => {
   const { maskMission } = await import('../src/hrr.js');
-  assert.deepEqual(maskMission({ kind: 'secret', title: 'Истинско', description: 'Тайно', points: 5 }), { kind: 'secret', title: 'Тайна мисия', description: '', points: 5 });
+  assert.deepEqual(maskMission({ kind: 'secret', title: 'Истинско', description: 'Тайно', points: 5 }), { kind: 'secret', title: 'Тайна мисия', description: '', points: 5, has_image: 0 });
   assert.equal(maskMission({ kind: 'bonus', title: 'X', description: 'Y' }).title, 'Бонус мисия');
   assert.equal(maskMission({ kind: 'regular', title: 'X', description: 'Y' }).description, 'Y');
 });

@@ -120,3 +120,13 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .news-item.resolved i{background:var(--green)}
 .resolved-notes{margin-top:10px}
 .resolved-notes summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;padding:10px 0}
+/* Mission picture */
+.mission-image img{display:block;max-width:100%;max-height:360px;margin:10px 0;border-radius:14px;border:1px solid var(--line);object-fit:contain}
+.mission-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+/* Mentor preview of the student mission card */
+.mission-preview{border:1px dashed var(--purple);border-radius:16px;padding:16px;margin:4px 0 12px;background:var(--page)}
+.preview-label{margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--purple)}
+#missionPreviewButton{width:100%;margin-bottom:10px}
+#missionEditRemoveWrap{display:flex!important;flex-direction:row;align-items:center;gap:8px}
+#missionEditRemoveWrap[hidden]{display:none!important}
+#missionEditRemoveWrap input{width:auto;margin:0}

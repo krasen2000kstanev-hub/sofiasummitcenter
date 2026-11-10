@@ -42,7 +42,7 @@ export const isEvidenceImage = (value) => typeof value === 'string' && value.len
 export const bonusPoints = (value) => { const n = Math.round(Number(value) || 0); return Math.min(1000, Math.max(0, n)); };
 const missionKind = (value, fallback = 'regular') => ['regular', 'secret', 'bonus'].includes(value) ? value : fallback;
 // Students never receive the real title/description of secret and bonus missions; they reveal a contact instead.
-export const maskMission = (row) => (row.kind === 'secret' || row.kind === 'bonus') ? { ...row, title: row.kind === 'secret' ? 'Тайна мисия' : 'Бонус мисия', description: '' } : row;
+export const maskMission = (row) => (row.kind === 'secret' || row.kind === 'bonus') ? { ...row, title: row.kind === 'secret' ? 'Тайна мисия' : 'Бонус мисия', description: '', has_image: 0 } : row;
 // ponytail: one roster sheet per season, gids hardcoded; move to a table if the sheets change often
 const ROSTER_SHEETS = [['НБУ', 'NBU', '434191220'], ['УНСС', 'UNSS', '1743708126'], ['СУ', 'SU', '1017411608'], ['УЗФ', 'UZF', '530263534'], ['УниБИТ', 'UNIBIT', '1480888565']];
 const normalizeCode = (value) => clean(value, 80).toUpperCase().replace(/\s+/g, '');
@@ -288,8 +288,8 @@ async function missions(request, env) {
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
   const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
-    ? await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
-    : await env.DB.prepare(`SELECT m.*,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
+    ? await env.DB.prepare(`SELECT m.id,m.season_id,m.mentor_user_id,m.mission_number,m.title,m.description,m.category,m.points,m.deadline,m.start_date,m.end_date,m.scope,m.status,m.created_at,m.kind,(m.image<>'') has_image,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
+    : await env.DB.prepare(`SELECT m.id,m.season_id,m.mentor_user_id,m.mission_number,m.title,m.description,m.category,m.points,m.deadline,m.start_date,m.end_date,m.scope,m.status,m.created_at,m.kind,(m.image<>'') has_image,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
   return json({ missions: studentView ? (rows.results || []).map(maskMission) : rows.results || [] });
 }
 
@@ -401,8 +401,10 @@ async function createMission(request, env) {
   const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20);
   const missionNumber = Number(body.missionNumber);
   if (!season || !Number.isInteger(missionNumber) || missionNumber < 0 || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Mission number, title, points and a valid date range are required' }, 400);
+  if (body.image && !isEvidenceImage(body.image)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
   const missionId = id('hrr_mission');
   await env.DB.prepare('INSERT INTO hrr_missions (id,season_id,mentor_user_id,mission_number,title,description,category,points,deadline,start_date,end_date,scope,status,created_at,kind) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(missionId, season.id, auth.user.id, missionNumber, clean(body.title, 160), clean(body.description, 4000), 'general', Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : 'team', 'active', now(), missionKind(body.kind)).run();
+  if (body.image) await env.DB.prepare('UPDATE hrr_missions SET image=? WHERE id=?').bind(body.image, missionId).run();
   return json({ ok: true, missionId }, 201);
 }
 
@@ -412,6 +414,7 @@ async function updateMission(request, env, missionId) {
   if (!mission || (auth.user.role !== 'admin' && mission.mentor_user_id !== auth.user.id)) return json({ error: 'Mission not found' }, 404);
   const body = await request.json(); const startDate = clean(body.startDate, 20); const endDate = clean(body.endDate, 20); const missionNumber = Number(body.missionNumber ?? mission.mission_number);
   if (!Number.isInteger(missionNumber) || missionNumber < 0 || !clean(body.title, 160) || !Number.isFinite(Number(body.points)) || (startDate && endDate && startDate > endDate)) return json({ error: 'Mission number, title, points and a valid date range are required' }, 400);
+  if (body.image && !isEvidenceImage(body.image)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
   let mentorUserId = mission.mentor_user_id;
   if (auth.user.role === 'admin' && body.mentorUserId) {
     const mentor = await env.DB.prepare("SELECT id FROM hrr_users WHERE id=? AND role IN ('mentor','admin')").bind(clean(body.mentorUserId, 100)).first();
@@ -419,7 +422,17 @@ async function updateMission(request, env, missionId) {
     mentorUserId = mentor.id;
   }
   await env.DB.prepare('UPDATE hrr_missions SET mentor_user_id=?,mission_number=?,title=?,description=?,points=?,deadline=?,start_date=?,end_date=?,scope=?,kind=? WHERE id=?').bind(mentorUserId, missionNumber, clean(body.title, 160), clean(body.description, 4000), Math.max(0, Number(body.points)), endDate, startDate, endDate, ['individual','team'].includes(body.scope) ? body.scope : mission.scope || 'team', missionKind(body.kind, mission.kind || 'regular'), missionId).run();
+  if (body.image || body.removeImage) await env.DB.prepare('UPDATE hrr_missions SET image=? WHERE id=?').bind(body.image || '', missionId).run();
   return json({ ok: true, missionId });
+}
+
+// Mission picture on demand, so the mission list stays small; hidden missions keep their picture hidden from students.
+async function missionImage(request, env, missionId) {
+  const auth = await requireUser(request, env); if (auth.response) return auth.response;
+  const row = await env.DB.prepare('SELECT image,kind FROM hrr_missions WHERE id=?').bind(missionId).first();
+  const studentView = auth.user.role === 'student' || request.headers.get('x-hrr-view') === 'student';
+  if (!row || !row.image || (studentView && (row.kind === 'secret' || row.kind === 'bonus'))) return json({ error: 'Image not found' }, 404);
+  return json({ image: row.image });
 }
 
 async function archiveMission(request, env, missionId) {
@@ -466,6 +479,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'POST' && url.pathname === '/api/hrr/teams/join') return joinTeam(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/team') return team(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/missions') return missions(request, env);
+  if (request.method === 'GET' && /^\/api\/hrr\/missions\/[^/]+\/image$/.test(url.pathname)) return missionImage(request, env, url.pathname.split('/')[4]);
   if (request.method === 'POST' && /^\/api\/hrr\/missions\/[^/]+\/submissions$/.test(url.pathname)) return submit(request, env, url.pathname.split('/')[4]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/image$/.test(url.pathname)) return submissionImage(request, env, url.pathname.split('/')[5]);
