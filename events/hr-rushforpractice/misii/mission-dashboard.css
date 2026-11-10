@@ -95,3 +95,9 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .mentor-submission>div:first-child{flex:1;min-width:0}
 .mission-actions{flex:none;flex-direction:column;align-items:stretch}
 @media(max-width:760px){.mentor-columns{grid-template-columns:1fr}.mission-actions{flex-direction:row;flex-wrap:wrap;margin-top:10px}}
+/* Photo evidence and bonus points on review */
+.evidence-image{display:block;max-width:100%;max-height:420px;margin-top:10px;border-radius:12px;border:1px solid var(--line)}
+.evidence-image-button{margin-top:10px}
+.bonus-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.bonus-field input{width:96px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface)}
+.review-actions{align-items:flex-end;flex-wrap:wrap}

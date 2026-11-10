@@ -72,3 +72,15 @@ test('isBlockedEmail matches organizer-blocked addresses case-insensitively', as
   assert.equal(isBlockedEmail(env, 'z.raponqrova@pgzknezha.com'), false);
   assert.equal(isBlockedEmail({}, 'any@x.bg'), false);
 });
+
+test('photo evidence must be a small image data URL and bonus points are clamped', async () => {
+  const { isEvidenceImage, bonusPoints } = await import('../src/hrr.js');
+  assert.equal(isEvidenceImage('data:image/jpeg;base64,/9j/4AAQSkZJRg=='), true);
+  assert.equal(isEvidenceImage('data:text/html;base64,PHNjcmlwdD4='), false);
+  assert.equal(isEvidenceImage('https://example.com/a.jpg'), false);
+  assert.equal(isEvidenceImage('data:image/png;base64,' + 'A'.repeat(1_400_000)), false);
+  assert.equal(bonusPoints('3'), 3);
+  assert.equal(bonusPoints(-5), 0);
+  assert.equal(bonusPoints('abc'), 0);
+  assert.equal(bonusPoints(5000), 1000);
+});
