@@ -133,3 +133,22 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 /* Manual tick-off for roster alerts */
 #mentorNotificationList .news-item{align-items:center}
 .resolve-button{flex:none;margin-left:auto;padding:8px 12px;font-size:13px}
+/* Roster alert actions: email the person, tick off */
+.note-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-left:auto;flex:none}
+.note-actions .resolve-button{margin:0}
+.note-actions .contacted{font-size:11px;color:var(--green);text-align:center}
+@media(max-width:760px){#mentorNotificationList .news-item{flex-wrap:wrap}#mentorNotificationList .news-item>span{min-width:0;flex:1 1 0}.note-actions{flex-direction:row;flex-wrap:wrap;align-items:center;margin-left:0;width:100%;min-width:0}.note-actions .contacted{flex-basis:100%;text-align:left}}
+/* Phone: modals and previews never wider than the screen; long links wrap */
+.modal-card{max-width:min(480px,100%);min-width:0}
+.modal-card form,.modal-card form>*,.mission-preview,.mission-preview *{min-width:0;max-width:100%}
+.modal-card input,.modal-card select,.modal-card textarea{width:100%;box-sizing:border-box}
+#missionEditRemoveWrap input{width:auto}
+.detail-description,.mentor-submission p,.mentor-submission small,.news-item small{overflow-wrap:anywhere}
+.journey-facts{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.date-range{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.modal{padding:10px;align-items:start;overflow-y:auto}.modal-card{padding:20px 16px}.mission-preview{padding:12px}.review-actions{min-width:0}}
+.date-range>*,.date-range input{min-width:0;width:100%;box-sizing:border-box}
+/* the first-child min-width also hit the date inputs inside labels */
+.mission-create label input:first-child{min-width:0}
+.modal-card select{padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface)}
+@media(max-width:760px){#mentorNotificationList .news-item>span{flex:1 1 calc(100% - 30px)}.note-actions{padding-left:22px}}

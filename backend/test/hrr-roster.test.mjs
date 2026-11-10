@@ -98,3 +98,10 @@ test('rosterAlertEmail reads the email out of a roster alert body', async () => 
   assert.equal(rosterAlertEmail('a@b.bg · a@b.bg е в списъка, но отборът му вече има 2 участници.'), 'a@b.bg');
   assert.equal(rosterAlertEmail('no separator'), '');
 });
+
+test('rosterContactEmail asks for name, university and team number', async () => {
+  const { rosterContactEmail } = await import('../src/hrr.js');
+  const mail = rosterContactEmail('a@b.bg');
+  assert.match(mail.text, /a@b\.bg/);
+  for (const part of ['Име и фамилия', 'Университет', 'Номер на екипа']) assert.ok(mail.text.includes(part));
+});

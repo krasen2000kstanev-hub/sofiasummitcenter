@@ -374,6 +374,25 @@ async function resolveNotification(request, env, noteId) {
   return json({ ok: true });
 }
 
+export const rosterContactEmail = (email) => ({
+  subject: 'HR:Rush for Practice — нужни са ни твоите данни',
+  text: `Здравей!\n\nОпита се да влезеш в платформата на HR:Rush for Practice с имейл ${email}, но той не е в списъка с участници.\n\nЗа да те свържем с отбора ти, отговори на този имейл с:\n1. Име и фамилия\n2. Университет\n3. Номер на екипа\n\nЩом получим отговора ти, ще те добавим и ще можеш да влизаш с този имейл.\n\nПоздрави,\nЕкипът на HR:Rush for Practice`
+});
+
+// Admin emails the person behind a roster alert; replies go to that admin. All admin copies of the alert are marked.
+async function contactRosterEmail(request, env, noteId) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const note = await env.DB.prepare("SELECT body FROM hrr_notifications WHERE id=? AND user_id=? AND type='roster'").bind(noteId, auth.user.id).first();
+  const email = note && rosterAlertEmail(note.body);
+  if (!email || !email.includes('@')) return json({ error: 'Notification not found' }, 404);
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return json({ error: 'Имейл услугата не е настроена.' }, 503);
+  const message = rosterContactEmail(email);
+  const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' }, body: JSON.stringify({ from: env.EMAIL_FROM, to: [email], reply_to: auth.user.email, subject: message.subject, text: message.text }) });
+  if (!response.ok) return json({ error: `Имейлът не беше изпратен (${response.status}).` }, 502);
+  await env.DB.prepare("UPDATE hrr_notifications SET contacted_at=? WHERE type='roster' AND body=?").bind(now(), note.body).run();
+  return json({ ok: true, email });
+}
+
 async function notifications(request, env, roles = ['student']) {
   const auth = roles.length === 1 && roles[0] === 'student' ? await requireStudent(request, env) : await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
@@ -497,6 +516,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
   if (request.method === 'POST' && /^\/api\/hrr\/notifications\/[^/]+\/resolve$/.test(url.pathname)) return resolveNotification(request, env, url.pathname.split('/')[4]);
+  if (request.method === 'POST' && /^\/api\/hrr\/notifications\/[^/]+\/contact$/.test(url.pathname)) return contactRosterEmail(request, env, url.pathname.split('/')[4]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);
