@@ -101,3 +101,9 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .bonus-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
 .bonus-field input{width:96px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface)}
 .review-actions{align-items:flex-end;flex-wrap:wrap}
+/* QA 2026-11-10: comfortable tap target for the mentor entry link */
+#portalSwitch{display:inline-block;padding:12px 8px}
+/* Mentor feedback on approve or reject */
+.note-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);flex:1 1 100%}
+.note-field textarea{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface);resize:vertical}
+.mentor-submission p.review-note{color:var(--ink)}

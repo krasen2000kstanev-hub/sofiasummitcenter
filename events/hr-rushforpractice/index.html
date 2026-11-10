@@ -5,6 +5,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="HR:Rush for Practice — практическо HR състезание за студенти с реални компании, ментори, мисии и жива класация. Кандидатствай за Сезон 9.">
 <title>HR:RUSH FOR PRACTICE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -652,6 +653,17 @@ html[data-theme=dark] [style*="color:var(--cyan-deep)"]{color:var(--cyan)!import
 html[data-theme=dark] [style*="color:var(--coral-deep)"]{color:var(--coral-soft)!important}
 </style>
 <script src="hrr-theme.js?v=1"></script>
+<style id="qa-fixes">
+/* QA 2026-11-10: phone form overflow, header readable at the top, readable small labels */
+.form-grid>*,.role-picker>*,.form-field,.form-field input,.form-field select{min-width:0;max-width:100%}
+.role-option{white-space:normal}
+header:not(.scrolled){background:var(--navy-950)}
+.uni-name{font-size:11px}
+.logo-grid>*{min-width:0}
+.logo-box img{max-width:100%;height:auto}
+.uni-name{white-space:normal;text-align:center;overflow-wrap:anywhere}
+@media(max-width:600px){.logo small{font-size:9px}.uni-name{font-size:11px}}
+</style>
 </head>
 <body>
 <canvas id="ambientBokeh" class="ambient-bokeh" aria-hidden="true"></canvas>
@@ -747,7 +759,7 @@ html[data-theme=dark] [style*="color:var(--coral-deep)"]{color:var(--coral-soft)
       </div>
 
       <div class="cube-hud">
-        <div class="pct" id="cubePct">000%</div>
+        <div class="pct" id="cubePct">0%</div>
         <div class="bar"><div class="bar-fill" id="cubeBarFill"></div></div>
         <div class="scene" id="cubeScene">8 сезона зад нас</div>
       </div>
@@ -1602,7 +1614,7 @@ html[data-theme=dark] [style*="color:var(--coral-deep)"]{color:var(--coral-soft)
       wrap.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
 
       var activeIdx = Math.min(Math.round(segPos), segments);
-      if(pctEl) pctEl.textContent = String(Math.round(rotateProgress * 100)).padStart(3, '0') + '%';
+      if(pctEl) pctEl.textContent = Math.round(rotateProgress * 100) + '%';
       if(barFill) barFill.style.width = (rotateProgress * 100) + '%';
       if(sceneEl) sceneEl.textContent = names[activeIdx];
       if(capN) capN.textContent = (activeIdx + 1) + ' / ' + stops.length;
