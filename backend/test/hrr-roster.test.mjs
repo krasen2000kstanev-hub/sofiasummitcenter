@@ -84,3 +84,10 @@ test('photo evidence must be a small image data URL and bonus points are clamped
   assert.equal(bonusPoints('abc'), 0);
   assert.equal(bonusPoints(5000), 1000);
 });
+
+test('missionNumbers parses a free-form list of mission numbers', async () => {
+  const { missionNumbers } = await import('../src/hrr.js');
+  assert.deepEqual(missionNumbers('1, 2'), [1, 2]);
+  assert.deepEqual(missionNumbers('0;1 1  x -3'), [0, 1]);
+  assert.deepEqual(missionNumbers(''), []);
+});

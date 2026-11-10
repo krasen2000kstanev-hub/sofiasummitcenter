@@ -151,6 +151,32 @@ export async function syncRoster(env, sheetId) {
   return { ok: true, teams, emails, changed, created };
 }
 
+export const missionNumbers = (value) => [...new Set(String(value || '').split(/[\s,;]+/).map((n) => Number.parseInt(n, 10)).filter((n) => Number.isInteger(n) && n >= 0))];
+
+// Organizer marks missions as done for a student (e.g. completed before they could log in). Creates approved submissions.
+async function grantMissions(request, env) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const body = await request.json();
+  const email = clean(body.email, 200).toLowerCase(); const numbers = missionNumbers(body.missions);
+  if (!season || !email.includes('@') || !numbers.length) return json({ error: 'Нужни са имейл и номера на мисии (напр. 1, 2).' }, 400);
+  const user = await env.DB.prepare("SELECT * FROM hrr_users WHERE email=? AND role='student'").bind(email).first();
+  if (!user) return json({ error: 'Студентът още не е влизал с този имейл. Нека влезе веднъж и опитай пак.' }, 404);
+  const teamId = await teamOf(env, user.id, season.id);
+  if (!teamId) return json({ error: 'Студентът още не е в отбор. Първо го добави към екипа му.' }, 400);
+  const granted = [], skipped = [], missing = [];
+  for (const number of numbers) {
+    const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE season_id=? AND mission_number=? AND status='active' LIMIT 1").bind(season.id, number).first();
+    if (!mission) { missing.push(number); continue; }
+    const existing = await env.DB.prepare("SELECT id,status FROM hrr_submissions WHERE mission_id=? AND status IN ('pending','approved') AND (student_user_id=? OR (?='team' AND team_id=?)) LIMIT 1").bind(mission.id, user.id, mission.scope, teamId).first();
+    if (existing?.status === 'approved') { skipped.push(`№${number}`); continue; }
+    if (existing) await env.DB.prepare("UPDATE hrr_submissions SET status='approved',reviewer_user_id=?,review_note=?,reviewed_at=? WHERE id=?").bind(auth.user.id, 'Отбелязано от организатор', now(), existing.id).run();
+    else await env.DB.prepare("INSERT INTO hrr_submissions (id,mission_id,team_id,student_user_id,evidence_text,status,reviewer_user_id,review_note,created_at,reviewed_at) VALUES (?,?,?,?,?,'approved',?,?,?,?)").bind(id('hrr_submission'), mission.id, teamId, user.id, 'Отбелязано ръчно от организатор', auth.user.id, 'Отбелязано от организатор', now(), now()).run();
+    await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), user.id, 'approved', 'Мисията е одобрена', mission.title, now()).run();
+    granted.push(`№${number} ${mission.title}`);
+  }
+  return json({ ok: true, granted, skipped, missing });
+}
+
 // Manual fix for students who log in with an email that is not in the sheet: map that email to their team.
 async function addRosterEmail(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
@@ -427,6 +453,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/admin/mentors') return mentorDirectory(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/roster') return addRosterEmail(request, env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/admin/missions/grant') return grantMissions(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams/sync') return syncTeams(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/allowlist') return addMentor(request, env);
   return json({ error: 'Not found' }, 404);
