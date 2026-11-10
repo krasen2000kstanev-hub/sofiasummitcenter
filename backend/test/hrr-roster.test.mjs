@@ -64,3 +64,11 @@ test('missionSheetUpdates writes F only for ranked teams whose mission points ch
     { range: "'Обща класация на екипи'!F4", values: [[0]] },
   ]);
 });
+
+test('isBlockedEmail matches organizer-blocked addresses case-insensitively', async () => {
+  const { isBlockedEmail } = await import('../src/hrr-auth.js');
+  const env = { HRR_BLOCKED_EMAILS: 'z.raponqrova@pgzknezha.bg, other@x.bg' };
+  assert.equal(isBlockedEmail(env, 'Z.Raponqrova@PGZKnezha.bg'), true);
+  assert.equal(isBlockedEmail(env, 'z.raponqrova@pgzknezha.com'), false);
+  assert.equal(isBlockedEmail({}, 'any@x.bg'), false);
+});

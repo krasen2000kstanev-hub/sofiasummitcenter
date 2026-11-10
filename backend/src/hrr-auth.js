@@ -37,12 +37,16 @@ export async function verifyHrrAccessToken(token, env) {
   return payload;
 }
 
+// Organizer-blocked addresses (e.g. a duplicate account of a student), comma-separated in HRR_BLOCKED_EMAILS.
+export const isBlockedEmail = (env, email) => String(env.HRR_BLOCKED_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean).includes(String(email).trim().toLowerCase());
+
 export async function hrrUser(request, env) {
   const header = request.headers.get('Authorization') || '';
   if (!header.startsWith('Bearer ')) return null;
   const claims = await verifyHrrAccessToken(header.slice(7), env);
   const email = String(claims.email || claims['cognito:username'] || claims.username || '').trim().toLowerCase();
   if (!email) throw new Error('Token has no email');
+  if (isBlockedEmail(env, email)) throw new Error('Този имейл не е разрешен за HR:Rush. Влез с имейла, с който си в екипа.');
   const allowlist = await env.DB.prepare('SELECT role FROM hrr_mentor_allowlist WHERE email=? AND active=1').bind(email).first();
   const subject = claims.sub || claims.username;
   const existing = await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=? LIMIT 1').bind(subject, email).first();
