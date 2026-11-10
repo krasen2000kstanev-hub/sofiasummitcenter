@@ -1,4 +1,4 @@
-import { hrrUser, isStudentPreviewUser } from './hrr-auth.js';
+import { hrrUser, isStudentPreviewUser, isBlockedEmail } from './hrr-auth.js';
 import { googleAccessToken } from './hrr-applications.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', ...headers } });
@@ -362,10 +362,24 @@ async function markNotificationsRead(request, env) {
   return json({ ok: true });
 }
 
+// Roster alert bodies read "<name> · <email> не е в списъка…"; the email decides whether the alert is still open.
+export const rosterAlertEmail = (body) => (String(body || '').split(' · ')[1] || '').trim().split(/\s/)[0].toLowerCase();
+
 async function notifications(request, env, roles = ['student']) {
   const auth = roles.length === 1 && roles[0] === 'student' ? await requireStudent(request, env) : await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
-  return json({ notifications: rows.results || [] });
+  const list = rows.results || []; const season = await currentSeason(env);
+  // An alert is resolved once the organizer gave that email a team (roster or membership), made it staff, or blocked it.
+  if (season && list.some((n) => n.type === 'roster')) {
+    const roster = new Set(((await env.DB.prepare('SELECT email FROM hrr_team_roster WHERE season_id=?').bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
+    const placed = new Set(((await env.DB.prepare("SELECT u.email FROM hrr_users u WHERE u.role IN ('admin','mentor') OR u.id IN (SELECT user_id FROM hrr_team_members WHERE season_id=? AND active=1)").bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
+    for (const n of list) {
+      if (n.type !== 'roster') continue;
+      const email = rosterAlertEmail(n.body);
+      n.resolved = Boolean(email) && (placed.has(email) || (n.title !== 'Отборът е пълен' && roster.has(email)) || isBlockedEmail(env, email));
+    }
+  }
+  return json({ notifications: list });
 }
 
 async function history(request, env) {

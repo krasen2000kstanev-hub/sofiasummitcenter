@@ -91,3 +91,10 @@ test('missionNumbers parses a free-form list of mission numbers', async () => {
   assert.deepEqual(missionNumbers('0;1 1  x -3'), [0, 1]);
   assert.deepEqual(missionNumbers(''), []);
 });
+
+test('rosterAlertEmail reads the email out of a roster alert body', async () => {
+  const { rosterAlertEmail } = await import('../src/hrr.js');
+  assert.equal(rosterAlertEmail('Sahooo · Sahooo3@abv.bg не е в списъка с участници. Свържи се.'), 'sahooo3@abv.bg');
+  assert.equal(rosterAlertEmail('a@b.bg · a@b.bg е в списъка, но отборът му вече има 2 участници.'), 'a@b.bg');
+  assert.equal(rosterAlertEmail('no separator'), '');
+});

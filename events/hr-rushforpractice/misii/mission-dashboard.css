@@ -115,3 +115,8 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .submission-group{margin:22px 0 2px;font-size:15px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
 .submission-group small{font-size:12px;font-weight:600;color:var(--muted)}
 @media(max-width:760px){.submission-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.submission-filters::-webkit-scrollbar{display:none}}
+/* Roster alerts the organizer already handled */
+.news-item.resolved b{color:var(--green)}
+.news-item.resolved i{background:var(--green)}
+.resolved-notes{margin-top:10px}
+.resolved-notes summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;padding:10px 0}
