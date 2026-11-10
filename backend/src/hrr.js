@@ -365,6 +365,15 @@ async function markNotificationsRead(request, env) {
 // Roster alert bodies read "<name> · <email> не е в списъка…"; the email decides whether the alert is still open.
 export const rosterAlertEmail = (body) => (String(body || '').split(' · ')[1] || '').trim().split(/\s/)[0].toLowerCase();
 
+// Tick off a roster alert by hand; every admin got the same alert text, so all copies are resolved together.
+async function resolveNotification(request, env, noteId) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const note = await env.DB.prepare("SELECT body FROM hrr_notifications WHERE id=? AND user_id=? AND type='roster'").bind(noteId, auth.user.id).first();
+  if (!note) return json({ error: 'Notification not found' }, 404);
+  await env.DB.prepare("UPDATE hrr_notifications SET resolved_at=?,read_at=COALESCE(read_at,?) WHERE type='roster' AND body=?").bind(now(), now(), note.body).run();
+  return json({ ok: true });
+}
+
 async function notifications(request, env, roles = ['student']) {
   const auth = roles.length === 1 && roles[0] === 'student' ? await requireStudent(request, env) : await requireUser(request, env, roles); if (auth.response) return auth.response;
   const rows = await env.DB.prepare('SELECT * FROM hrr_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(auth.user.id).all();
@@ -376,7 +385,7 @@ async function notifications(request, env, roles = ['student']) {
     for (const n of list) {
       if (n.type !== 'roster') continue;
       const email = rosterAlertEmail(n.body);
-      n.resolved = Boolean(email) && (placed.has(email) || (n.title !== 'Отборът е пълен' && roster.has(email)) || isBlockedEmail(env, email));
+      n.resolved = Boolean(n.resolved_at) || (Boolean(email) && (placed.has(email) || (n.title !== 'Отборът е пълен' && roster.has(email)) || isBlockedEmail(env, email)));
     }
   }
   return json({ notifications: list });
@@ -487,6 +496,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/feedback$/.test(url.pathname)) return feedback(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
+  if (request.method === 'POST' && /^\/api\/hrr\/notifications\/[^/]+\/resolve$/.test(url.pathname)) return resolveNotification(request, env, url.pathname.split('/')[4]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);

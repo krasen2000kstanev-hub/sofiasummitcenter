@@ -130,3 +130,6 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 #missionEditRemoveWrap{display:flex!important;flex-direction:row;align-items:center;gap:8px}
 #missionEditRemoveWrap[hidden]{display:none!important}
 #missionEditRemoveWrap input{width:auto;margin:0}
+/* Manual tick-off for roster alerts */
+#mentorNotificationList .news-item{align-items:center}
+.resolve-button{flex:none;margin-left:auto;padding:8px 12px;font-size:13px}
