@@ -73,8 +73,8 @@ export function parseRoster(rows) {
     const number = Number.parseInt(row[0], 10); const name = String(row[1] || '').trim();
     if (!name || !number || number <= previous) break;
     previous = number;
-    const emails = [row[2], row[5]].map((email) => String(email || '').replace(/^mailto:/i, '').trim().toLowerCase()).filter((email) => email.includes('@'));
-    teams.push({ number, emails });
+    const people = [[row[1], row[2]], [row[4], row[5]]].map(([who, email]) => [String(email || '').replace(/^mailto:/i, '').trim().toLowerCase(), String(who || '').trim()]).filter(([email]) => email.includes('@'));
+    teams.push({ number, emails: people.map(([email]) => email), names: Object.fromEntries(people.filter(([, who]) => who && !who.includes('@'))) });
   }
   return teams;
 }
@@ -129,6 +129,8 @@ export async function syncRoster(env, sheetId) {
   const season = await currentSeason(env);
   if (!season || !sheetId) return { error: 'Missing active season or teams sheet link', status: 400 };
   const known = new Map(((await env.DB.prepare('SELECT email,team_id FROM hrr_team_roster WHERE season_id=?').bind(season.id).all()).results || []).map((r) => [r.email, r.team_id]));
+  // Students show up by the name in the sheet, not by their email; only changed names are written.
+  const shown = new Map(((await env.DB.prepare("SELECT email,display_name FROM hrr_users WHERE role='student'").all()).results || []).map((r) => [String(r.email).toLowerCase(), r.display_name]));
   const created = []; let teams = 0, emails = 0, changed = 0;
   for (const [university, short, gid] of ROSTER_SHEETS) {
     const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`);
@@ -142,6 +144,8 @@ export async function syncRoster(env, sheetId) {
       }
       for (const email of row.emails) {
         emails += 1;
+        const name = row.names?.[email];
+        if (name && shown.has(email) && shown.get(email) !== name) { await env.DB.prepare("UPDATE hrr_users SET display_name=? WHERE lower(email)=? AND role='student'").bind(name, email).run(); shown.set(email, name); }
         if (known.get(email) === teamId) continue;
         await env.DB.prepare('INSERT INTO hrr_team_roster (season_id,email,team_id) VALUES (?,?,?) ON CONFLICT(season_id,email) DO UPDATE SET team_id=excluded.team_id').bind(season.id, email, teamId).run();
         known.set(email, teamId); changed += 1;
@@ -229,6 +233,7 @@ async function approveRosterRequest(request, env, requestId) {
   const result = await assignRoster(env, season, row.email, row.university, row.team_number);
   if (result.error) return json(result, result.status || 400);
   await env.DB.prepare("UPDATE hrr_roster_requests SET status='approved',resolved_at=? WHERE id=?").bind(now(), requestId).run();
+  await env.DB.prepare("UPDATE hrr_users SET display_name=? WHERE id=? AND role='student'").bind(row.full_name, row.user_id).run();
   return json(result);
 }
 
@@ -236,7 +241,7 @@ async function me(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   await autoJoin(env, auth.user);
   const team = await env.DB.prepare('SELECT t.id,t.name,t.university,t.city FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 ORDER BY tm.joined_at DESC LIMIT 1').bind(auth.user.id).first();
-  return json({ user: auth.user, team });
+  return json({ user: auth.user, team, canPreview: isStudentPreviewUser(auth.user) });
 }
 
 async function ranking(env) {
@@ -338,7 +343,7 @@ async function submit(request, env, missionId) {
   const membership = mission && await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1 LIMIT 1').bind(auth.user.id, mission.season_id).first();
   const body = await request.json(); const evidenceUrl = clean(body.evidenceUrl, 1000); const evidenceImage = body.evidenceImage || '';
   if (evidenceImage && !isEvidenceImage(evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
-  if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000) && !evidenceImage)) return json({ error: 'Mission, team and evidence are required' }, 400);
+  if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000) && !evidenceImage)) return json({ error: 'Добави линк, описание или снимка.' }, 400);
   if (evidenceUrl && !isSafeUrl(evidenceUrl)) return json({ error: 'Линкът трябва да започва с http:// или https://' }, 400);
   const today = sofiaToday(), end = mission.end_date || mission.deadline;
   if (mission.start_date && mission.start_date > today) return json({ error: 'Мисията още не е започнала.' }, 400);
@@ -351,6 +356,21 @@ async function submit(request, env, missionId) {
   return json({ ok: true, submissionId }, 201);
 }
 
+// The author can fix a submission while it is still waiting for the mentor.
+async function updateSubmission(request, env, submissionId) {
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
+  const row = await env.DB.prepare('SELECT * FROM hrr_submissions WHERE id=?').bind(submissionId).first();
+  if (!row || row.student_user_id !== auth.user.id) return json({ error: 'Изпращането не е намерено.' }, 404);
+  if (row.status !== 'pending') return json({ error: 'Мисията вече е прегледана и не може да се променя.' }, 409);
+  const body = await request.json(); const evidenceUrl = clean(body.evidenceUrl, 1000); const evidenceText = clean(body.evidenceText, 4000);
+  const image = body.removeImage ? '' : (body.evidenceImage || row.evidence_image || '');
+  if (body.evidenceImage && !isEvidenceImage(body.evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
+  if (evidenceUrl && !isSafeUrl(evidenceUrl)) return json({ error: 'Линкът трябва да започва с http:// или https://' }, 400);
+  if (!evidenceUrl && !evidenceText && !image) return json({ error: 'Добави линк, описание или снимка.' }, 400);
+  await env.DB.prepare('UPDATE hrr_submissions SET evidence_url=?,evidence_text=?,evidence_image=? WHERE id=?').bind(evidenceUrl, evidenceText, image, submissionId).run();
+  return json({ ok: true });
+}
+
 async function mentorSubmissions(request, env) {
   const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.team_id,s.student_user_id,s.evidence_url,s.evidence_text,s.status,s.review_note,s.bonus_points,s.created_at,s.reviewed_at,s.evidence_image<>'' has_image,m.title mission_title,m.points,t.name team_name,u.display_name student_name,u.email student_email
@@ -360,9 +380,10 @@ async function mentorSubmissions(request, env) {
 }
 
 async function submissionImage(request, env, submissionId) {
-  const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
-  const row = await env.DB.prepare('SELECT s.evidence_image,m.mentor_user_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
-  if (!row || !row.evidence_image || (auth.user.role !== 'admin' && row.mentor_user_id !== auth.user.id)) return json({ error: 'Image not found' }, 404);
+  const auth = await requireUser(request, env); if (auth.response) return auth.response;
+  const row = await env.DB.prepare('SELECT s.evidence_image,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
+  const allowed = row && (auth.user.role === 'admin' || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
+  if (!row || !row.evidence_image || !allowed) return json({ error: 'Image not found' }, 404);
   return json({ image: row.evidence_image });
 }
 
@@ -453,7 +474,7 @@ async function notifications(request, env, roles = ['student']) {
 async function history(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ history: [], approvedPoints: 0 });
-  const rows = await env.DB.prepare(`SELECT s.id,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
+  const rows = await env.DB.prepare(`SELECT s.id,s.id submission_id,s.student_user_id,s.evidence_url,s.evidence_text,(s.evidence_image<>'') has_evidence_image,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
       m.mission_number,m.kind,m.title,m.description,m.category,m.points + s.bonus_points points,s.bonus_points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
@@ -550,6 +571,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && /^\/api\/hrr\/missions\/[^/]+\/image$/.test(url.pathname)) return missionImage(request, env, url.pathname.split('/')[4]);
   if (request.method === 'POST' && /^\/api\/hrr\/missions\/[^/]+\/submissions$/.test(url.pathname)) return submit(request, env, url.pathname.split('/')[4]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
+  if (request.method === 'PATCH' && /^\/api\/hrr\/submissions\/[^/]+$/.test(url.pathname)) return updateSubmission(request, env, url.pathname.split('/').at(-1));
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/image$/.test(url.pathname)) return submissionImage(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/review$/.test(url.pathname)) return review(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/feedback$/.test(url.pathname)) return feedback(request, env, url.pathname.split('/')[5]);

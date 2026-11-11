@@ -159,3 +159,22 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
 .roster-request-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--green-soft);color:var(--ink);font-size:13px}
 .roster-request-note b{display:inline}
 .roster-request-note .primary-button{padding:8px 12px;font-size:13px;width:auto}
+/* Student feedback fixes, 11 Nov 2026 */
+.sidebar-close{display:none}
+.bell{display:grid;place-items:center}
+.bell svg{display:block}
+.bell-wrap{position:relative}
+.bell-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:min(340px,calc(100vw - 24px));max-height:70vh;overflow:auto;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 18px 50px rgba(10,20,40,.22)}
+.bell-title{margin:0 0 6px;font-weight:800}
+.own-submission a{color:var(--purple);overflow-wrap:anywhere}
+.own-submission .primary-button{margin-top:10px}
+.detail-description a{color:var(--purple);overflow-wrap:anywhere}
+@media(max-width:760px){
+  .sidebar-close{display:grid;place-items:center;position:absolute;top:12px;right:12px;width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-size:24px;line-height:1;cursor:pointer}
+  .sidebar{position:fixed}
+  body.menu-open::after{content:"";position:fixed;inset:0;background:rgba(10,16,30,.45);z-index:15}
+  .sidebar.open{z-index:20}
+  .status-pill,.journey-label,.journey-detail .detail-status,.journey-fact small,.journey-mentor-avatar,.journey-mentor small,.journey-mission-number,.journey-mission>strong,.journey-socials>small,.journey-socials a,.journey-mission-copy small,.page-intro .eyebrow,.hero-grid .stat-card p{font-size:12px}
+  .member-avatar,.date-range label,.journey-counts span,.journey-legend,.journey-fact b,.journey-mentor a,.journey-mission b,.journey-schedule p,.journey-schedule>span,.team-summary span,.mission-field{font-size:12.5px}
+}
+@media(max-width:760px){.bell-panel{position:fixed;left:12px;right:12px;top:64px;width:auto}}

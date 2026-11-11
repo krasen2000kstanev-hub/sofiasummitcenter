@@ -11,8 +11,8 @@ test('parseRoster reads the main team block and stops before side lists', () => 
   const rows = parseCsv(csv);
   assert.equal(rows[1][9], 'Касиер, София');
   assert.deepEqual(parseRoster(rows), [
-    { number: 1, emails: ['ana@mail.bg', 'ivo@mail.bg'] },
-    { number: 2, emails: ['maya@mail.bg'] },
+    { number: 1, emails: ['ana@mail.bg', 'ivo@mail.bg'], names: { 'ana@mail.bg': 'Ана', 'ivo@mail.bg': 'Иво' } },
+    { number: 2, emails: ['maya@mail.bg'], names: { 'maya@mail.bg': 'Мая' } },
   ]);
 });
 
@@ -39,7 +39,7 @@ test('syncRoster writes only new or moved emails, so the cron can run every 5 mi
     first: async () => (/hrr_seasons/.test(sql) ? { id: 's9', slug: 's9' } : /FROM hrr_teams/.test(sql) ? { id: args[0] } : null),
     all: async () => ({ results: [...roster].map(([email, team_id]) => ({ email, team_id })) }),
     run: async () => { writes.push(args); },
-  }), first: async () => ({ id: 's9', slug: 's9' }) }) };
+  }), first: async () => ({ id: 's9', slug: 's9' }), all: async () => ({ results: [] }) }) };
   const realFetch = globalThis.fetch;
   globalThis.fetch = async (url) => new Response(url.includes('gid=434191220') ? 'Екип №,Име 1,Имейл,Тел,Име 2,Имейл,Тел\n1,Ана,ana@mail.bg,1,Иво,ivo@mail.bg,2\n' :'Екип №\n');
   try {
