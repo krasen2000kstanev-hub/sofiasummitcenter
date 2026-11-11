@@ -178,3 +178,26 @@ html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] t
   .member-avatar,.date-range label,.journey-counts span,.journey-legend,.journey-fact b,.journey-mentor a,.journey-mission b,.journey-schedule p,.journey-schedule>span,.team-summary span,.mission-field{font-size:12.5px}
 }
 @media(max-width:760px){.bell-panel{position:fixed;left:12px;right:12px;top:64px;width:auto}}
+/* One HR:Rush look across landing, ranking and missions: wordmark + teal accent */
+:root{--purple:#0b7f8c;--purple-soft:#e2f5f7}
+.brand-word{display:inline-block;font-weight:900;font-size:22px;letter-spacing:-.03em;color:var(--ink);white-space:nowrap;text-decoration:none}
+.brand-word b{color:#12c9db}
+.auth-card .brand-word{font-size:26px;margin-bottom:22px}
+.brand{padding:0 10px}
+.primary-button:hover{background:#096b76}
+.mission-card:hover,.journey-mission:hover,.journey-mission:focus-visible,.journey-mission.selected{border-color:#9fdde4}
+.journey-mission:hover,.journey-mission:focus-visible,.journey-mission.selected{background:#f2fbfc}
+.progress-card{background:linear-gradient(110deg,#fff 65%,#eefafb)}
+.progress-card:after{background:#d9f3f6}
+.auth-gate{background:radial-gradient(circle at 20% 10%,#d9f3f6,transparent 38%),var(--page)}
+.season-card{background:#e8f7f9}
+.member-avatar{background:#d9f3f6}
+html[data-theme=dark]{--purple:#55e7ff;--purple-soft:#10304a}
+html[data-theme=dark] .primary-button,html[data-theme=dark] .filter:hover,html[data-theme=dark] .filter.active,html[data-theme=dark] .brand-mark{color:#07111f}
+html[data-theme=dark] .primary-button:hover{background:#8af0ff}
+html[data-theme=dark] .mission-card:hover,html[data-theme=dark] .journey-mission:hover,html[data-theme=dark] .journey-mission:focus-visible,html[data-theme=dark] .journey-mission.selected{border-color:#2b6f86}
+html[data-theme=dark] .progress-card{background:linear-gradient(110deg,#0d1c30 65%,#0f2c40)}
+html[data-theme=dark] .progress-card:after,html[data-theme=dark] .member-avatar{background:#10304a}
+html[data-theme=dark] .auth-gate{background:radial-gradient(circle at 20% 10%,#10304a,transparent 38%),var(--page)}
+html[data-theme=dark] .season-card{background:#112944}
+html[data-theme=dark] .filter.active .chip-count{background:rgba(7,17,31,.15);color:#07111f}
