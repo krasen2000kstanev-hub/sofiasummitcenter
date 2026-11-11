@@ -130,3 +130,17 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - Company names match case-insensitively, ignore trailing spaces, treat „Pleggi“ as „Плеги“, and joint teams such as „Плеги / Глово“ count for both companies.
 - On phones the team/company modal scrolls itself and locks the page behind it.
 - Light/dark mode: `events/hr-rushforpractice/hrr-theme.js` adds a ☀/☾ button to the landing page, missions and ranking. Each page keeps its default in `<html data-theme>` (landing and missions light, ranking dark); the visitor's choice is saved in `localStorage` key `hrr-theme` and shared across the three pages. Theme CSS lives in `#hrr-dark-theme` (landing), the end of `misii/mission-dashboard.css`, and `#hrr-light-theme` (ranking).
+
+## HR:Rush platform automation and admin tools — November 2026
+
+**Sheet sync (Worker cron, every 5 minutes).** `HRR_ROSTER_SHEET_ID` in `backend/wrangler.toml` points at the season sheet. The cron (`syncRoster`) reads the university tabs (НБУ, СУ, УНСС, УЗФ, УниБИТ) into `hrr_team_roster`, writing only new or moved emails, and sets each student's display name from the sheet. `syncMissionPointsToSheet` writes each team's approved mission points (including mentor bonus) into column F of the ranking tab, found by gid 0. The sheet must stay shared as Editor with `hrr-applications-writer@hr-rush-for-practice.iam.gserviceaccount.com`. Column F is filled by the site; do not edit it by hand.
+
+**Sign-in.** The access token is kept in `localStorage` (`hrr_access_token`), so it survives new tabs; the ranking page uses it for „Моят екип“. `HRR_BLOCKED_EMAILS` (comma list in `wrangler.toml`) refuses sign-in for listed addresses. Student preview for staff is decided by the server (`/api/hrr/me` → `canPreview`), not by emails in the page.
+
+**Missions.** Students can attach a photo (compressed in the browser to ≤1 MB, stored as a data URL), see what they sent and edit it while it is pending (`PATCH /api/hrr/submissions/:id`). Mentors review per mission (segmented queue), can send feedback without deciding, add bonus points on approval, and attach a picture to a mission with a „Виж като студент“ preview. Admins can mark missions as done for a student („Отбележи като изпълнени“).
+
+**Unknown sign-ins.** Roster alerts tick themselves off once the email has a team, is staff or is blocked; admins can also tick one off by hand, email the person (`Пиши имейл`, via Resend, replies go to the admin), and add students who filled the in-app form („Нямаш код?“ → `hrr_roster_requests`) with one click („Добави в екипа“).
+
+**Migrations added:** 0022 (submission image, bonus), 0023 (mission image), 0024 (notification resolved), 0025 (notification contacted), 0026 (roster requests). They run automatically in `.github/workflows/deploy-worker.yml`.
+
+**Look.** Landing, missions and ranking share the HR:Rush wordmark and teal accent; light/dark switch sits in the header on missions and ranking.
