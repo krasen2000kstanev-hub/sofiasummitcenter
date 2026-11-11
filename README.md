@@ -144,3 +144,7 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 **Migrations added:** 0022 (submission image, bonus), 0023 (mission image), 0024 (notification resolved), 0025 (notification contacted), 0026 (roster requests). They run automatically in `.github/workflows/deploy-worker.yml`.
 
 **Look.** Landing, missions and ranking share the HR:Rush wordmark and teal accent; light/dark switch sits in the header on missions and ranking.
+
+**Panel navigation (11 Nov 2026).** The missions page has a ☰ on every width: on desktop it collapses/expands the sidebar (remembered in `localStorage` key `hrr-sidebar`), on phones it opens the drawer. The top bar is sticky, the mentor menu links to every section (Отбори и студенти, Изпълнения за проверка, Всички мисии, Известия, Нова мисия) and a ↑ button appears after scrolling. Below 1100 px the mentor columns stack.
+
+**Sheet note.** Every team needs its own numbered row in „Обща класация на екипи“ for points to be written and for it to show in the ranking (СУ Екип 21 was added as №138 on 11 Nov).
