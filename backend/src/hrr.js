@@ -37,6 +37,9 @@ const TEAM_LIMIT = 2;
 // Mission dates are calendar days in Sofia; compare as YYYY-MM-DD strings.
 export const sofiaToday = (date = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sofia' }).format(date);
 export const isSafeUrl = (value) => /^https?:\/\//i.test(String(value || ''));
+// Up to 10 evidence links per submission, stored one per line in evidence_url.
+export const parseEvidenceUrls = (value) => String(value || '').split(/\s+/).map((url) => url.trim()).filter(Boolean).slice(0, 10);
+const evidenceUrlsError = (urls) => urls.some((url) => url.length > 1000 || !isSafeUrl(url)) ? 'Всеки линк трябва да започва с http:// или https://' : '';
 // Photo evidence arrives as a browser-compressed data URL; ~1 MB keeps it well under the D1 row limit.
 export const isEvidenceImage = (value) => typeof value === 'string' && value.length <= 1_400_000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value);
 export const bonusPoints = (value) => { const n = Math.round(Number(value) || 0); return Math.min(1000, Math.max(0, n)); };
@@ -341,10 +344,10 @@ async function submit(request, env, missionId) {
   const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE id=? AND status='active'").bind(missionId).first();
   // Only a team from the mission's own season counts, so old-season memberships cannot swallow points.
   const membership = mission && await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1 LIMIT 1').bind(auth.user.id, mission.season_id).first();
-  const body = await request.json(); const evidenceUrl = clean(body.evidenceUrl, 1000); const evidenceImage = body.evidenceImage || '';
+  const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const evidenceImage = body.evidenceImage || '';
   if (evidenceImage && !isEvidenceImage(evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
   if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000) && !evidenceImage)) return json({ error: 'Добави линк, описание или снимка.' }, 400);
-  if (evidenceUrl && !isSafeUrl(evidenceUrl)) return json({ error: 'Линкът трябва да започва с http:// или https://' }, 400);
+  if (evidenceUrlsError(urls)) return json({ error: evidenceUrlsError(urls) }, 400);
   const today = sofiaToday(), end = mission.end_date || mission.deadline;
   if (mission.start_date && mission.start_date > today) return json({ error: 'Мисията още не е започнала.' }, 400);
   if (end && end < today) return json({ error: 'Срокът на мисията е изтекъл.' }, 400);
@@ -362,10 +365,10 @@ async function updateSubmission(request, env, submissionId) {
   const row = await env.DB.prepare('SELECT * FROM hrr_submissions WHERE id=?').bind(submissionId).first();
   if (!row || row.student_user_id !== auth.user.id) return json({ error: 'Изпращането не е намерено.' }, 404);
   if (row.status !== 'pending') return json({ error: 'Мисията вече е прегледана и не може да се променя.' }, 409);
-  const body = await request.json(); const evidenceUrl = clean(body.evidenceUrl, 1000); const evidenceText = clean(body.evidenceText, 4000);
+  const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const evidenceText = clean(body.evidenceText, 4000);
   const image = body.removeImage ? '' : (body.evidenceImage || row.evidence_image || '');
   if (body.evidenceImage && !isEvidenceImage(body.evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
-  if (evidenceUrl && !isSafeUrl(evidenceUrl)) return json({ error: 'Линкът трябва да започва с http:// или https://' }, 400);
+  if (evidenceUrlsError(urls)) return json({ error: evidenceUrlsError(urls) }, 400);
   if (!evidenceUrl && !evidenceText && !image) return json({ error: 'Добави линк, описание или снимка.' }, 400);
   await env.DB.prepare('UPDATE hrr_submissions SET evidence_url=?,evidence_text=?,evidence_image=? WHERE id=?').bind(evidenceUrl, evidenceText, image, submissionId).run();
   return json({ ok: true });

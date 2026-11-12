@@ -105,3 +105,10 @@ test('rosterContactEmail asks for name, university and team number', async () =>
   assert.match(mail.text, /a@b\.bg/);
   for (const part of ['Име и фамилия', 'Университет', 'Номер на екипа']) assert.ok(mail.text.includes(part));
 });
+
+test('parseEvidenceUrls keeps up to 10 links, one per line', async () => {
+  const { parseEvidenceUrls } = await import('../src/hrr.js');
+  assert.deepEqual(parseEvidenceUrls(' https://a.bg \nhttps://b.bg  https://c.bg\n\n'), ['https://a.bg', 'https://b.bg', 'https://c.bg']);
+  assert.equal(parseEvidenceUrls(Array.from({ length: 14 }, (_, i) => `https://x${i}.bg`).join('\n')).length, 10);
+  assert.deepEqual(parseEvidenceUrls(''), []);
+});

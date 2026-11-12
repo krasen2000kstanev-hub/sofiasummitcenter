@@ -217,3 +217,10 @@ body.sidebar-collapsed .page-shell{margin-left:0}
 .journey-stop{cursor:pointer}
 #journeyDetail{scroll-margin-top:96px}
 @media(max-width:760px){.journey-route{min-width:0}.journey-map{overflow:hidden;margin:0}#journeyDetail{scroll-margin-top:72px}}
+/* Several evidence links */
+.evidence-links{display:grid;gap:8px}
+.evidence-links-label{font-size:13px;font-weight:700;color:var(--muted)}
+#evidenceUrls{display:grid;gap:8px}
+.evidence-url{width:100%;box-sizing:border-box;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface)}
+.add-link{justify-self:start;padding:8px 12px;font-size:13px}
+.mentor-submission a + a{margin-left:12px}
