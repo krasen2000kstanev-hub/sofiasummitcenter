@@ -301,7 +301,16 @@ async function me(request, env) {
   return json({ user: auth.user, team, canPreview: isStudentPreviewUser(auth.user) });
 }
 
+// ponytail: per-isolate memory cache (Cache API is a no-op on workers.dev); points lag up to 5 min
+let rankingCache = { at: 0, body: null };
 async function ranking(env) {
+  if (rankingCache.body && Date.now() - rankingCache.at < 300_000) return new Response(rankingCache.body, { headers: { 'content-type': 'application/json; charset=utf-8' } });
+  const response = await rankingFromDb(env);
+  if (response.ok) rankingCache = { at: Date.now(), body: await response.clone().text() };
+  return response;
+}
+
+async function rankingFromDb(env) {
   const season = await currentSeason(env);
   if (!season) return json({ season: null, teams: [], updatedAt: now() });
   const rows = await missionPointsByTeam(env, season);
