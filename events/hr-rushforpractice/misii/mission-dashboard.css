@@ -263,3 +263,9 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 .ranking-link:hover{border-color:var(--purple)}
 @media(max-width:760px){.ranking-link-text{display:none}.ranking-link{padding:0 10px}}
 @media(max-width:760px){.topbar{gap:6px;padding:0 10px}.topbar .mobile-menu,.topbar .bell,.ranking-link,.hrr-theme-toggle.in-slot{width:38px;height:38px;padding:0;justify-content:center}.profile-avatar{width:36px;height:36px;font-size:13px}.logout-button{padding:8px 9px;font-size:13px}}
+/* Team Google Drive folder */
+[data-drive][hidden]{display:none!important}
+.drive-box{display:grid;gap:8px;margin:0 0 16px}
+.drive-box .primary-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;justify-self:start}
+.drive-box small{color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:760px){.drive-box .primary-button{justify-self:stretch}}

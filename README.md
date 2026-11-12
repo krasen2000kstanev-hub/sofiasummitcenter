@@ -157,3 +157,11 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - **Roles:** the panel allowlist accepts `mentor`, `admin` and `viewer` (read-only, e.g. a university teacher). A viewer is stored as `student` in `hrr_users` and gets `viewer` in memory; the server refuses every change for viewers. Admins grant access by email in „Достъп до панела по имейл“.
 - **Navigation:** ☰ on every width, sticky top bar, section links, ↑ button, and a „🏆 Класация“ shortcut; the phone mission route shows 3 stops per row and every stop opens the mission detail.
 - **Migrations added:** 0027 (documents, edited_at), 0028 (bonus awards), 0029 (viewer role in allowlist), 0030 (submission comments).
+
+## HR:Rush team folders in Google Drive (12 Nov 2026)
+
+- Each team gets edit access to only its own folder, "Студенти от Сезон 9 / <УНИ> / Екип N - <УНИ>". The folder holds the team's table and a "CV-та" subfolder.
+- Sharing is done by `backend/apps-script/hrr-drive-sync.gs`, which runs in Apps Script as the Drive owner every 10 minutes. It posts the folders it finds to `POST /api/hrr/drive/sync`. The Worker accepts only an OAuth token that Drive confirms belongs to `HRR_DRIVE_OWNER`. The Worker stores `hrr_teams.drive_folder_id` (migration 0032) and returns the login emails of each team's active members.
+- The script shares as the owner. This lets "editors can't share" stay on for every folder and table; a service account cannot share in that state. The script removes only the people it added itself.
+- In the platform, students see "📁 Отвори папката на екипа" in "Моят отбор" and in the menu. Admins see "📁 Всички папки" (`HRR_DRIVE_ROOT_ID`). Links use `?authuser=<login email>`.
+- `HRR_DRIVE_ONLY` in `wrangler.toml` limits the sync to pilot team ids. Leave it empty to include all teams.

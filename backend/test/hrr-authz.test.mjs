@@ -147,3 +147,10 @@ test('Google ID tokens sign in directly; wrong audience or unverified email is r
   await assert.rejects(verifyHrrAccessToken(google({ email_verified: false }), env), /потвърден/);
   await assert.rejects(verifyHrrAccessToken(google({ exp: 1 }), env), /Expired/);
 });
+
+test('drive sync answers only the Drive owner', async () => {
+  const call = (env, headers = {}) => handleHrr(new Request('https://api.test/api/hrr/drive/sync', { method: 'POST', headers, body: '{"folders":[]}' }), env, new URL('https://api.test/api/hrr/drive/sync'));
+  assert.equal((await call(envFor('admin'))).status, 403);
+  assert.equal((await call({ ...envFor('admin'), HRR_DRIVE_OWNER: 'owner@example.test' })).status, 403);
+  assert.equal((await call({ ...envFor('admin'), HRR_DRIVE_OWNER: 'owner@example.test' }, { authorization: 'Bearer someone-else' })).status, 403);
+});

@@ -294,11 +294,38 @@ async function approveRosterRequest(request, env, requestId) {
   return json(result);
 }
 
+
+// The Drive owner's Apps Script posts the team folders it found and gets back who should edit each one.
+// It shares as the owner, so team folders keep "editors can't share" on; the service account could not share them.
+async function driveSync(request, env) {
+  const owner = String(env.HRR_DRIVE_OWNER || '').toLowerCase();
+  const token = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  if (!owner || !token) return json({ error: 'Forbidden' }, 403);
+  const about = await fetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)', { headers: { authorization: `Bearer ${token}` } }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  if (String(about.user?.emailAddress || '').toLowerCase() !== owner) return json({ error: 'Forbidden' }, 403);
+  const season = await currentSeason(env); if (!season) return json({ teams: {}, missing: [] });
+  const shorts = new Map(ROSTER_SHEETS.map(([university, short]) => [university, short.toLowerCase()]));
+  const only = new Set(String(env.HRR_DRIVE_ONLY || '').split(',').map((s) => s.trim()).filter(Boolean));
+  const found = new Map();
+  for (const folder of (await request.json()).folders || []) {
+    const number = Number((String(folder.name).match(/Екип\s*(\d+)/i) || [])[1]); const short = shorts.get(String(folder.university || '').trim());
+    if (!number || !short) continue;
+    const teamId = `hrr_team_${season.slug}_${short}_${number}`;
+    if (!only.size || only.has(teamId)) found.set(teamId, String(folder.id));
+  }
+  const teams = (await env.DB.prepare('SELECT id,name,university,drive_folder_id FROM hrr_teams WHERE season_id=?').bind(season.id).all()).results || [];
+  if (found.size) for (const team of teams) { const folder = found.get(team.id) || null; if (folder !== (team.drive_folder_id || null)) await env.DB.prepare('UPDATE hrr_teams SET drive_folder_id=? WHERE id=?').bind(folder, team.id).run(); }
+  const result = Object.fromEntries([...found.values()].map((folder) => [folder, []]));
+  const members = (await env.DB.prepare('SELECT tm.team_id,lower(u.email) email FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id WHERE tm.season_id=? AND tm.active=1').bind(season.id).all()).results || [];
+  for (const member of members) if (found.has(member.team_id) && member.email) result[found.get(member.team_id)].push(member.email);
+  return json({ teams: result, missing: only.size ? [] : teams.filter((team) => !found.has(team.id)).map((team) => `${team.name} - ${team.university}`) });
+}
+
 async function me(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   await autoJoin(env, auth.user);
-  const team = await env.DB.prepare('SELECT t.id,t.name,t.university,t.city FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 ORDER BY tm.joined_at DESC LIMIT 1').bind(auth.user.id).first();
-  return json({ user: auth.user, team, canPreview: isStudentPreviewUser(auth.user) });
+  const team = await env.DB.prepare('SELECT t.id,t.name,t.university,t.city,t.drive_folder_id FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.active=1 ORDER BY tm.joined_at DESC LIMIT 1').bind(auth.user.id).first();
+  return json({ user: auth.user, team, canPreview: isStudentPreviewUser(auth.user), driveRoot: auth.user.role === 'admin' ? env.HRR_DRIVE_ROOT_ID || null : null });
 }
 
 // ponytail: per-isolate memory cache (Cache API is a no-op on workers.dev); points lag up to 5 min
@@ -668,6 +695,7 @@ async function addMentor(request, env) {
 export async function handleHrr(request, env, url) {
   if (!url.pathname.startsWith('/api/hrr/')) return null;
   if (request.method === 'GET' && url.pathname === '/api/hrr/ranking') return ranking(env);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/drive/sync') return driveSync(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/auth/token') {
     const body = await request.json();
     const tokenUrl = `${String(env.HRR_COGNITO_DOMAIN || '').replace(/\/$/, '')}/oauth2/token`;
