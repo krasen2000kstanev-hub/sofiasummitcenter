@@ -63,7 +63,7 @@ async function emailStudents(env, userIds, subject, text, replyTo) {
 }
 export const reviewEmail = (title, status, note, points) => ({
   subject: status === 'approved' ? `HR:Rush — мисията „${title}“ е одобрена` : status === 'rejected' ? `HR:Rush — мисията „${title}“ е върната за корекция` : `HR:Rush — обратна връзка за „${title}“`,
-  text: `Здравей!\n\n${status === 'approved' ? `Мисията „${title}“ е одобрена${points ? ` и получаваш ${points} т.` : ''}.` : status === 'rejected' ? `Мисията „${title}“ е върната за корекция.` : `Менторът остави обратна връзка за мисията „${title}“. Тя още чака проверка и можеш да промениш изпращането си.`}${note ? `\n\nОбратна връзка от ментора:\n${note}` : ''}\n\nВиж я в платформата:\n${PLATFORM_URL}\n\nПоздрави,\nЕкипът на HR:Rush for Practice`
+  text: `Здравей!\n\n${status === 'approved' ? `Мисията „${title}“ е одобрена${points ? ` и получаваш ${points} т.` : ''}.` : status === 'rejected' ? `Мисията „${title}“ е върната за корекция.` : `Менторът остави обратна връзка за мисията „${title}“. Тя още чака проверка и можеш да промениш изпращането си.`}${note ? `\n\nОбратна връзка от ментора:\n${note}` : ''}\n\nМожеш да отговориш на ментора директно в платформата, в детайлите на мисията:\n${PLATFORM_URL}\n\nПоздрави,\nЕкипът на HR:Rush for Practice`
 });
 const evidenceUrlsError = (urls) => urls.some((url) => url.length > 1000 || !isSafeUrl(url)) ? 'Всеки линк трябва да започва с http:// или https://' : '';
 // Photo evidence arrives as a browser-compressed data URL; ~1 MB keeps it well under the D1 row limit.
@@ -438,12 +438,31 @@ async function updateSubmission(request, env, submissionId) {
   return json({ ok: true });
 }
 
+
+// Thread on a submission: mentor feedback and student replies, attached to list rows by submission id.
+const COMMENT_COLUMNS = 'c.submission_id,c.author_role,c.body,c.created_at,u.display_name';
+const groupComments = (rows) => (rows || []).reduce((map, c) => map.set(c.submission_id, [...(map.get(c.submission_id) || []), c]), new Map());
+const addComment = (env, submissionId, userId, role, body) => env.DB.prepare('INSERT INTO hrr_submission_comments (id,submission_id,user_id,author_role,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_comment'), submissionId, userId, role, body, now()).run();
+
+async function replyToMentor(request, env, submissionId) {
+  const auth = await requireStudent(request, env); if (auth.response) return auth.response;
+  const body = clean((await request.json()).body, 1000);
+  if (!body) return json({ error: 'Напиши отговор.' }, 400);
+  const row = await env.DB.prepare('SELECT s.student_user_id,s.team_id,m.scope,m.title,m.mentor_user_id,m.season_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
+  const allowed = row && (row.student_user_id === auth.user.id || (row.scope === 'team' && (await teamOf(env, auth.user.id, row.season_id)) === row.team_id));
+  if (!allowed) return json({ error: 'Изпращането не е намерено.' }, 404);
+  await addComment(env, submissionId, auth.user.id, 'student', body);
+  if (row.mentor_user_id) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), row.mentor_user_id, 'reply', 'Отговор от студент', `${auth.user.display_name} за „${row.title}“: ${body}`, now()).run();
+  return json({ ok: true });
+}
+
 async function mentorSubmissions(request, env) {
   const auth = await requireUser(request, env, ['mentor', 'admin', 'viewer']); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.mission_id,s.team_id,s.student_user_id,s.evidence_url,s.evidence_text,s.status,s.review_note,s.bonus_points,s.created_at,s.reviewed_at,s.evidence_image<>'' has_image,m.title mission_title,m.points,t.name team_name,u.display_name student_name,u.email student_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id JOIN hrr_teams t ON t.id=s.team_id JOIN hrr_users u ON u.id=s.student_user_id
     WHERE (m.mentor_user_id=? OR ? IN ('admin','viewer')) ORDER BY CASE s.status WHEN 'pending' THEN 0 ELSE 1 END,s.created_at DESC`).bind(auth.user.id, auth.user.role).all();
-  return json({ submissions: rows.results || [] });
+  const comments = groupComments((await env.DB.prepare(`SELECT ${COMMENT_COLUMNS} FROM hrr_submission_comments c LEFT JOIN hrr_users u ON u.id=c.user_id JOIN hrr_submissions s ON s.id=c.submission_id JOIN hrr_missions m ON m.id=s.mission_id WHERE (m.mentor_user_id=? OR ? IN ('admin','viewer')) ORDER BY c.created_at`).bind(auth.user.id, auth.user.role).all()).results);
+  return json({ submissions: (rows.results || []).map((row) => ({ ...row, comments: comments.get(row.id) || [] })) });
 }
 
 async function submissionDocument(request, env, submissionId) {
@@ -471,6 +490,7 @@ async function feedback(request, env, submissionId) {
   if (!submission || (auth.user.role !== 'admin' && submission.mentor_user_id !== auth.user.id)) return json({ error: 'Submission not found' }, 404);
   if (submission.status !== 'pending') return json({ error: 'Submission already reviewed' }, 409);
   await env.DB.prepare('UPDATE hrr_submissions SET review_note=?,reviewer_user_id=? WHERE id=?').bind(note, auth.user.id, submissionId).run();
+  await addComment(env, submissionId, auth.user.id, 'mentor', note);
   await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), submission.student_user_id, 'feedback', 'Обратна връзка от ментора', `${submission.title} — ${note}`, now()).run();
   const mail = reviewEmail(submission.title, 'feedback', note, 0);
   await emailStudents(env, [submission.student_user_id], mail.subject, mail.text, auth.user.email);
@@ -485,6 +505,7 @@ async function review(request, env, submissionId) {
   if (!submission || (auth.user.role !== 'admin' && submission.mentor_user_id !== auth.user.id)) return json({ error: 'Submission not found' }, 404);
   if (submission.status !== 'pending') return json({ error: 'Submission already reviewed' }, 409);
   await env.DB.prepare('UPDATE hrr_submissions SET status=?,reviewer_user_id=?,review_note=?,bonus_points=?,reviewed_at=? WHERE id=? AND status=\'pending\'').bind(status, auth.user.id, note, bonus, now(), submissionId).run();
+  if (note) await addComment(env, submissionId, auth.user.id, 'mentor', note);
   const recipients = submission.scope === 'team'
     ? ((await env.DB.prepare('SELECT user_id FROM hrr_team_members WHERE team_id=? AND active=1').bind(submission.team_id).all()).results || []).map((row) => row.user_id)
     : [submission.student_user_id];
@@ -562,7 +583,8 @@ async function history(request, env) {
   const myTeam = await teamOf(env, auth.user.id, season.id);
   const bonuses = ((await env.DB.prepare('SELECT points,reason,created_at,user_id FROM hrr_bonus_awards WHERE season_id=? AND (user_id=? OR (user_id IS NULL AND team_id=?)) ORDER BY created_at DESC').bind(season.id, auth.user.id, myTeam).all()).results || []);
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0) + bonuses.reduce((total, row) => total + Number(row.points || 0), 0);
-  return json({ history: (rows.results || []).map(maskMission), bonuses, approvedPoints: points });
+  const comments = groupComments((await env.DB.prepare(`SELECT ${COMMENT_COLUMNS} FROM hrr_submission_comments c LEFT JOIN hrr_users u ON u.id=c.user_id WHERE c.submission_id IN (SELECT s.id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) AND m.season_id=?) ORDER BY c.created_at`).bind(auth.user.id, myTeam, season.id).all()).results);
+  return json({ history: (rows.results || []).map(maskMission).map((row) => ({ ...row, comments: comments.get(row.id) || [] })), bonuses, approvedPoints: points });
 }
 
 async function createMission(request, env) {
@@ -652,6 +674,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && /^\/api\/hrr\/missions\/[^/]+\/image$/.test(url.pathname)) return missionImage(request, env, url.pathname.split('/')[4]);
   if (request.method === 'POST' && /^\/api\/hrr\/missions\/[^/]+\/submissions$/.test(url.pathname)) return submit(request, env, url.pathname.split('/')[4]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/submissions') return mentorSubmissions(request, env);
+  if (request.method === 'POST' && /^\/api\/hrr\/submissions\/[^/]+\/comments$/.test(url.pathname)) return replyToMentor(request, env, url.pathname.split('/')[4]);
   if (request.method === 'PATCH' && /^\/api\/hrr\/submissions\/[^/]+$/.test(url.pathname)) return updateSubmission(request, env, url.pathname.split('/').at(-1));
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/image$/.test(url.pathname)) return submissionImage(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/document$/.test(url.pathname)) return submissionDocument(request, env, url.pathname.split('/')[5]);

@@ -127,3 +127,9 @@ test('a viewer (teacher) can read the mentor panel but cannot change anything', 
   }
   assert.equal((await request('team', 'viewer')).status, 403);
 });
+
+test('replying to a mentor needs a student; mentors and teachers cannot post as students', async () => {
+  assert.equal((await request('submissions/s1/comments', 'mentor', 'POST')).status, 403);
+  assert.equal((await request('submissions/s1/comments', 'viewer', 'POST')).status, 403);
+  assert.equal((await request('submissions/s1/comments', 'student', 'POST', envFor('student'), {}, JSON.stringify({ body: '' }))).status, 400);
+});
