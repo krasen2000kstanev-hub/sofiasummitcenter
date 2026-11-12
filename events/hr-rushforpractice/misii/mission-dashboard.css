@@ -213,3 +213,7 @@ body.sidebar-collapsed .page-shell{margin-left:0}
 .page-top:hover{transform:translateY(-2px)}
 @media(max-width:760px){body.sidebar-collapsed .sidebar{transform:translateX(-100%)}.page-top{right:14px;bottom:16px;width:42px;height:42px}#mentorPanel [id],#studentWorkspace [id]{scroll-margin-top:72px}}
 @media(max-width:1100px){.mentor-columns{grid-template-columns:minmax(0,1fr)}#mentorNotificationList .news-item{flex-wrap:wrap}#mentorNotificationList .news-item>span{flex:1 1 calc(100% - 30px)}.note-actions{flex-direction:row;flex-wrap:wrap;align-items:center;margin-left:0;width:100%;padding-left:22px}.note-actions .contacted{flex-basis:100%;text-align:left}}
+/* Route fits the phone and every stop is a clear tap target */
+.journey-stop{cursor:pointer}
+#journeyDetail{scroll-margin-top:96px}
+@media(max-width:760px){.journey-route{min-width:0}.journey-map{overflow:hidden;margin:0}#journeyDetail{scroll-margin-top:72px}}
