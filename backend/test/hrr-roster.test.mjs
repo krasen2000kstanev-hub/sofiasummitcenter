@@ -112,3 +112,15 @@ test('parseEvidenceUrls keeps up to 10 links, one per line', async () => {
   assert.equal(parseEvidenceUrls(Array.from({ length: 14 }, (_, i) => `https://x${i}.bg`).join('\n')).length, 10);
   assert.deepEqual(parseEvidenceUrls(''), []);
 });
+
+test('evidence documents: office/pdf/txt data URLs only, and review emails read well', async () => {
+  const { isEvidenceDocument, reviewEmail } = await import('../src/hrr.js');
+  assert.equal(isEvidenceDocument({ name: 'a.pdf', data: 'data:application/pdf;base64,JVBERi0=' }), true);
+  assert.equal(isEvidenceDocument({ name: 'a.docx', data: 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,UEs=' }), true);
+  assert.equal(isEvidenceDocument({ name: 'a.html', data: 'data:text/html;base64,PGI+' }), false);
+  assert.equal(isEvidenceDocument({ name: '', data: 'data:application/pdf;base64,JVBERi0=' }), false);
+  assert.match(reviewEmail('Pleggi', 'approved', 'Браво', 3).subject, /одобрена/);
+  assert.match(reviewEmail('Pleggi', 'approved', 'Браво', 3).text, /3 т\..*Браво/s);
+  assert.match(reviewEmail('Pleggi', 'rejected', '', 0).subject, /корекция/);
+  assert.match(reviewEmail('Pleggi', 'feedback', 'Добави линк', 0).text, /Добави линк/);
+});
