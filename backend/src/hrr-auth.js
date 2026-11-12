@@ -1,4 +1,6 @@
-let jwksCache = null;
+const jwksCache = new Map();
+const GOOGLE_ISSUERS = new Set(['https://accounts.google.com', 'accounts.google.com']);
+const GOOGLE_JWKS = 'https://www.googleapis.com/oauth2/v3/certs';
 const STUDENT_PREVIEW_EMAILS = new Set(['krasen.k.stanev@gmail.com', 'krasen2000.k.stanev@gmail.com']);
 
 export const isStudentPreviewUser = (user) => STUDENT_PREVIEW_EMAILS.has(String(user?.email || '').trim().toLowerCase());
@@ -11,25 +13,37 @@ const base64UrlToBytes = (value) => {
 
 const decodePart = (value) => JSON.parse(new TextDecoder().decode(base64UrlToBytes(value)));
 
-async function getJwks(issuer) {
-  if (jwksCache?.issuer === issuer && jwksCache.expiresAt > Date.now()) return jwksCache.keys;
-  const response = await fetch(`${issuer.replace(/\/$/, '')}/.well-known/jwks.json`);
-  if (!response.ok) throw new Error('Cognito JWKS unavailable');
+async function getJwks(url) {
+  const cached = jwksCache.get(url);
+  if (cached?.expiresAt > Date.now()) return cached.keys;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Signing keys unavailable');
   const keys = (await response.json()).keys || [];
-  jwksCache = { issuer, keys, expiresAt: Date.now() + 3600000 };
+  jwksCache.set(url, { keys, expiresAt: Date.now() + 3600000 });
   return keys;
 }
 
+// Google ID token (direct sign-in, no AWS) or, during the switch-over, a Cognito token.
+// ponytail: the Cognito branch only covers sessions opened before the switch; drop it and the HRR_COGNITO_* vars once those expire.
 export async function verifyHrrAccessToken(token, env) {
   const [encodedHeader, encodedPayload, encodedSignature] = String(token || '').split('.');
   if (!encodedHeader || !encodedPayload || !encodedSignature) throw new Error('Invalid token');
   const header = decodePart(encodedHeader);
   const payload = decodePart(encodedPayload);
-  const issuer = String(env.HRR_COGNITO_ISSUER || '').replace(/\/$/, '');
-  if (!issuer || payload.iss !== issuer || payload.exp * 1000 <= Date.now()) throw new Error('Expired or invalid token');
-  const audienceOk = payload.token_use === 'access' ? payload.client_id === env.HRR_COGNITO_CLIENT_ID : payload.token_use === 'id' && payload.aud === env.HRR_COGNITO_CLIENT_ID;
-  if (!audienceOk) throw new Error('Wrong token audience');
-  const jwk = (await getJwks(issuer)).find((key) => key.kid === header.kid);
+  if (!(payload.exp * 1000 > Date.now())) throw new Error('Expired or invalid token');
+  let jwksUrl;
+  if (GOOGLE_ISSUERS.has(payload.iss)) {
+    if (!env.HRR_GOOGLE_CLIENT_ID || payload.aud !== env.HRR_GOOGLE_CLIENT_ID) throw new Error('Wrong token audience');
+    if (payload.email_verified !== true && payload.email_verified !== 'true') throw new Error('Google имейлът не е потвърден.');
+    jwksUrl = GOOGLE_JWKS;
+  } else {
+    const issuer = String(env.HRR_COGNITO_ISSUER || '').replace(/\/$/, '');
+    if (!issuer || payload.iss !== issuer) throw new Error('Expired or invalid token');
+    const audienceOk = payload.token_use === 'access' ? payload.client_id === env.HRR_COGNITO_CLIENT_ID : payload.token_use === 'id' && payload.aud === env.HRR_COGNITO_CLIENT_ID;
+    if (!audienceOk) throw new Error('Wrong token audience');
+    jwksUrl = `${issuer}/.well-known/jwks.json`;
+  }
+  const jwk = (await getJwks(jwksUrl)).find((key) => key.kid === header.kid);
   if (!jwk) throw new Error('Unknown signing key');
   const cryptoKey = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
   const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', cryptoKey, base64UrlToBytes(encodedSignature), new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`));

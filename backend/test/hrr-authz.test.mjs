@@ -133,3 +133,17 @@ test('replying to a mentor needs a student; mentors and teachers cannot post as 
   assert.equal((await request('submissions/s1/comments', 'viewer', 'POST')).status, 403);
   assert.equal((await request('submissions/s1/comments', 'student', 'POST', envFor('student'), {}, JSON.stringify({ body: '' }))).status, 400);
 });
+
+test('Google ID tokens sign in directly; wrong audience or unverified email is refused', async () => {
+  const { verifyHrrAccessToken } = await import('../src/hrr-auth.js');
+  const google = (claims) => {
+    const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
+    const content = `${encode({ alg: 'RS256', kid: jwk.kid })}.${encode({ iss: 'https://accounts.google.com', aud: 'google-client', exp: Math.floor(Date.now() / 1000) + 300, sub: '1234', email: 's@example.test', email_verified: true, ...claims })}`;
+    return `${content}.${sign('RSA-SHA256', Buffer.from(content), privateKey).toString('base64url')}`;
+  };
+  const env = { HRR_GOOGLE_CLIENT_ID: 'google-client' };
+  assert.equal((await verifyHrrAccessToken(google({}), env)).email, 's@example.test');
+  await assert.rejects(verifyHrrAccessToken(google({ aud: 'team-hub-client' }), env), /audience/);
+  await assert.rejects(verifyHrrAccessToken(google({ email_verified: false }), env), /потвърден/);
+  await assert.rejects(verifyHrrAccessToken(google({ exp: 1 }), env), /Expired/);
+});
