@@ -51,11 +51,15 @@ export async function hrrUser(request, env) {
   const subject = claims.sub || claims.username;
   const existing = await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=? LIMIT 1').bind(subject, email).first();
   const role = allowlist?.role || 'student';
+  // ponytail: hrr_users.role only allows student/mentor/admin, so a viewer is stored as 'student' and gets 'viewer' in memory; rebuild hrr_users if more roles appear.
+  const storedRole = role === 'viewer' ? 'student' : role;
   const timestamp = new Date().toISOString();
   if (existing) {
-    await env.DB.prepare('UPDATE hrr_users SET cognito_sub=?, email=?, display_name=?, role=?, updated_at=? WHERE id=?').bind(subject, email, claims.name || existing.display_name || email, role, timestamp, existing.id).run();
+    await env.DB.prepare('UPDATE hrr_users SET cognito_sub=?, email=?, display_name=?, role=?, updated_at=? WHERE id=?').bind(subject, email, claims.name || existing.display_name || email, storedRole, timestamp, existing.id).run();
   } else {
-    await env.DB.prepare('INSERT INTO hrr_users (id,cognito_sub,email,display_name,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(`hrr_user_${crypto.randomUUID()}`, subject, email, claims.name || email, role, timestamp, timestamp).run();
+    await env.DB.prepare('INSERT INTO hrr_users (id,cognito_sub,email,display_name,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(`hrr_user_${crypto.randomUUID()}`, subject, email, claims.name || email, storedRole, timestamp, timestamp).run();
   }
-  return await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=?').bind(subject).first();
+  const user = await env.DB.prepare('SELECT * FROM hrr_users WHERE cognito_sub=?').bind(subject).first();
+  if (user && role === 'viewer') user.role = 'viewer';
+  return user;
 }

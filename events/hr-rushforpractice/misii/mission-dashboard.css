@@ -227,3 +227,25 @@ body.sidebar-collapsed .page-shell{margin-left:0}
 /* Evidence document and edited mark */
 .mentor-submission small.edited-mark{display:inline-block;margin-top:8px;padding:3px 9px;border-radius:99px;background:var(--orange-soft);color:var(--orange);font-weight:700}
 .evidence-image-button + .evidence-image-button{margin-left:8px}
+/* Admin bonus points */
+.bonus-award{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.bonus-award>p{flex-basis:100%;margin:0}
+.bonus-award select,.bonus-award input{padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface);min-width:0}
+#bonusTeam{width:110px}
+#bonusForm{flex-basis:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#bonusForm[hidden]{display:none}
+#bonusReason{flex:1 1 240px}
+#bonusPoints{width:150px}
+.bonus-team-name{flex-basis:100%;margin:0;font-weight:800}
+.bonus-history{flex-basis:100%;display:grid;gap:3px}
+.bonus-history small{color:var(--muted);font-size:12px}
+.bonus-award .auth-message{flex-basis:100%}
+@media(max-width:760px){.bonus-award select,.bonus-award input,#bonusPoints,#bonusTeam{flex:1 1 100%;width:100%}.bonus-award .ghost-button,.bonus-award .primary-button{flex:1 1 100%}}
+/* Read-only viewer (teacher): the server refuses changes; the page hides the controls too */
+body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-mission],body[data-role=viewer] [data-delete-mission],body[data-role=viewer] .review-actions,body[data-role=viewer] #adminTools,body[data-role=viewer] .note-actions,body[data-role=viewer] [data-approve-request],body[data-role=viewer] #mentorNav a[href="#adminTools"],body[data-role=viewer] #mentorNav a[href="#missionCreateForm"]{display:none!important}
+.access-grant{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.access-grant>p{flex-basis:100%;margin:0}
+.access-grant input,.access-grant select{padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:var(--surface);min-width:0}
+.access-grant input{flex:1 1 220px}
+.access-grant .auth-message{flex-basis:100%}
+@media(max-width:760px){.access-grant select,.access-grant .ghost-button{flex:1 1 100%}}

@@ -210,6 +210,34 @@ async function grantMissions(request, env) {
   return json({ ok: true, granted, skipped, missing });
 }
 
+// Admin bonus: pick a team by university + number, then the whole team or one member by name.
+async function teamLookup(request, env, url) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const code = url.searchParams.get('university'); const number = Number.parseInt(url.searchParams.get('team'), 10);
+  const short = (ROSTER_SHEETS.find(([, c]) => c === code) || [])[1];
+  if (!season || !short || !(number > 0)) return json({ error: 'Избери университет и номер на екип.' }, 400);
+  const team = await env.DB.prepare('SELECT id,name,university FROM hrr_teams WHERE id=?').bind(`hrr_team_${season.slug}_${short.toLowerCase()}_${number}`).first();
+  if (!team) return json({ error: 'Няма такъв екип в сезона.' }, 404);
+  const members = ((await env.DB.prepare('SELECT u.id,u.display_name FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id WHERE tm.team_id=? AND tm.season_id=? AND tm.active=1 ORDER BY u.display_name').bind(team.id, season.id).all()).results) || [];
+  const awards = ((await env.DB.prepare('SELECT b.points,b.reason,b.created_at,u.display_name FROM hrr_bonus_awards b LEFT JOIN hrr_users u ON u.id=b.user_id WHERE b.team_id=? ORDER BY b.created_at DESC LIMIT 10').bind(team.id).all()).results) || [];
+  return json({ team, members, awards });
+}
+
+async function awardBonus(request, env) {
+  const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
+  const season = await currentSeason(env); const body = await request.json();
+  const points = Math.round(Number(body.points)); const reason = clean(body.reason, 200); const teamId = clean(body.teamId, 120); const userId = clean(body.userId, 120);
+  if (!season || !Number.isFinite(points) || !points || Math.abs(points) > 1000) return json({ error: 'Въведи точки между -1000 и 1000 (без 0).' }, 400);
+  if (!reason) return json({ error: 'Напиши причина за бонуса.' }, 400);
+  const team = await env.DB.prepare('SELECT id,name,university FROM hrr_teams WHERE id=? AND season_id=?').bind(teamId, season.id).first();
+  if (!team) return json({ error: 'Няма такъв екип в сезона.' }, 404);
+  if (userId && !await env.DB.prepare('SELECT 1 FROM hrr_team_members WHERE team_id=? AND user_id=? AND season_id=? AND active=1').bind(team.id, userId, season.id).first()) return json({ error: 'Този човек не е в екипа.' }, 400);
+  await env.DB.prepare('INSERT INTO hrr_bonus_awards (id,season_id,team_id,user_id,points,reason,created_by,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(id('hrr_bonus'), season.id, team.id, userId || null, points, reason, auth.user.id, now()).run();
+  const recipients = userId ? [userId] : (((await env.DB.prepare('SELECT user_id FROM hrr_team_members WHERE team_id=? AND season_id=? AND active=1').bind(team.id, season.id).all()).results) || []).map((r) => r.user_id);
+  for (const recipient of recipients) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), recipient, 'bonus', points > 0 ? `Бонус +${points} т.` : `Корекция ${points} т.`, reason, now()).run();
+  return json({ ok: true, team: `${team.university} · ${team.name}`, points });
+}
+
 // Manual fix for students who log in with an email that is not in the sheet: map that email to their team.
 async function addRosterEmail(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
@@ -282,7 +310,7 @@ async function ranking(env) {
 
 function missionPointsByTeam(env, season) {
   return env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
-      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) missions_points,
+      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) + COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id),0) missions_points,
       COALESCE(SUM(CASE WHEN a.scope='team' THEN 1 ELSE a.completed_count END),0) missions_completed
     FROM hrr_teams t
     LEFT JOIN (
@@ -342,14 +370,15 @@ async function team(request, env) {
   const season = await currentSeason(env);
   const membership = await env.DB.prepare('SELECT t.* FROM hrr_team_members tm JOIN hrr_teams t ON t.id=tm.team_id WHERE tm.user_id=? AND tm.season_id=? AND tm.active=1 LIMIT 1').bind(auth.user.id, season?.id || '').first();
   if (!membership) return json({ team: null, members: [] });
-  const members = await env.DB.prepare(`SELECT u.id,u.display_name,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points + s.bonus_points ELSE 0 END),0) points
+  const members = await env.DB.prepare(`SELECT u.id,u.display_name,COALESCE(SUM(CASE WHEN s.status='approved' AND m.scope='individual' THEN m.points + s.bonus_points ELSE 0 END),0) + COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.user_id=u.id AND b.team_id=tm.team_id),0) points
     FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id LEFT JOIN hrr_submissions s ON s.student_user_id=u.id LEFT JOIN hrr_missions m ON m.id=s.mission_id AND m.season_id=?
     WHERE tm.team_id=? AND tm.season_id=? AND tm.active=1 GROUP BY u.id ORDER BY points DESC`).bind(season.id, membership.id, season.id).all();
   const teamPoints = await env.DB.prepare(`SELECT COALESCE(SUM(points),0) points FROM (
     SELECT m.points + SUM(s.bonus_points) points FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     WHERE s.team_id=? AND s.status='approved' AND m.scope='team' AND m.season_id=? GROUP BY s.mission_id,m.points
   ) approved_team_missions`).bind(membership.id, season.id).first();
-  return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) });
+  const teamBonus = await env.DB.prepare('SELECT COALESCE(SUM(points),0) points FROM hrr_bonus_awards WHERE team_id=? AND user_id IS NULL').bind(membership.id).first();
+  return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) + Number(teamBonus?.points || 0) });
 }
 
 // Team missions are shared: a submission by either member counts as the whole team's.
@@ -359,7 +388,7 @@ async function missions(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ missions: [] });
   const studentView = auth.user.role === 'student' || (request.headers.get('x-hrr-view') === 'student' && isStudentPreviewUser(auth.user));
-  const rows = !studentView && (auth.user.role === 'mentor' || auth.user.role === 'admin')
+  const rows = !studentView && ['mentor', 'admin', 'viewer'].includes(auth.user.role)
     ? await env.DB.prepare(`SELECT m.id,m.season_id,m.mentor_user_id,m.mission_number,m.title,m.description,m.category,m.points,m.deadline,m.start_date,m.end_date,m.scope,m.status,m.created_at,m.kind,(m.image<>'') has_image,u.display_name mentor_name,u.email mentor_email,COUNT(s.id) submissions_pending FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id LEFT JOIN hrr_submissions s ON s.mission_id=m.id AND s.status='pending' WHERE m.season_id=? AND m.status='active' GROUP BY m.id ORDER BY m.created_at DESC`).bind(season.id).all()
     : await env.DB.prepare(`SELECT m.id,m.season_id,m.mentor_user_id,m.mission_number,m.title,m.description,m.category,m.points,m.deadline,m.start_date,m.end_date,m.scope,m.status,m.created_at,m.kind,(m.image<>'') has_image,u.display_name mentor_name,u.email mentor_email,COALESCE((SELECT status FROM hrr_submissions s WHERE s.mission_id=m.id AND (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) ORDER BY s.created_at DESC LIMIT 1),'not_started') my_status FROM hrr_missions m LEFT JOIN hrr_users u ON u.id=m.mentor_user_id WHERE m.season_id=? AND m.status='active' ORDER BY m.created_at DESC`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
   return json({ missions: studentView ? (rows.results || []).map(maskMission) : rows.results || [] });
@@ -410,17 +439,17 @@ async function updateSubmission(request, env, submissionId) {
 }
 
 async function mentorSubmissions(request, env) {
-  const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
+  const auth = await requireUser(request, env, ['mentor', 'admin', 'viewer']); if (auth.response) return auth.response;
   const rows = await env.DB.prepare(`SELECT s.id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.mission_id,s.team_id,s.student_user_id,s.evidence_url,s.evidence_text,s.status,s.review_note,s.bonus_points,s.created_at,s.reviewed_at,s.evidence_image<>'' has_image,m.title mission_title,m.points,t.name team_name,u.display_name student_name,u.email student_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id JOIN hrr_teams t ON t.id=s.team_id JOIN hrr_users u ON u.id=s.student_user_id
-    WHERE (m.mentor_user_id=? OR ?='admin') ORDER BY CASE s.status WHEN 'pending' THEN 0 ELSE 1 END,s.created_at DESC`).bind(auth.user.id, auth.user.role).all();
+    WHERE (m.mentor_user_id=? OR ? IN ('admin','viewer')) ORDER BY CASE s.status WHEN 'pending' THEN 0 ELSE 1 END,s.created_at DESC`).bind(auth.user.id, auth.user.role).all();
   return json({ submissions: rows.results || [] });
 }
 
 async function submissionDocument(request, env, submissionId) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const row = await env.DB.prepare('SELECT f.name,f.data,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submission_files f JOIN hrr_submissions s ON s.id=f.submission_id JOIN hrr_missions m ON m.id=s.mission_id WHERE f.submission_id=?').bind(submissionId).first();
-  const allowed = row && (auth.user.role === 'admin' || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
+  const allowed = row && (['admin', 'viewer'].includes(auth.user.role) || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
   if (!allowed) return json({ error: 'Document not found' }, 404);
   return json({ name: row.name, data: row.data });
 }
@@ -428,7 +457,7 @@ async function submissionDocument(request, env, submissionId) {
 async function submissionImage(request, env, submissionId) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   const row = await env.DB.prepare('SELECT s.evidence_image,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
-  const allowed = row && (auth.user.role === 'admin' || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
+  const allowed = row && (['admin', 'viewer'].includes(auth.user.role) || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
   if (!row || !row.evidence_image || !allowed) return json({ error: 'Image not found' }, 404);
   return json({ image: row.evidence_image });
 }
@@ -509,7 +538,7 @@ async function notifications(request, env, roles = ['student']) {
   // An alert is resolved once the organizer gave that email a team (roster or membership), made it staff, or blocked it.
   if (season && list.some((n) => n.type === 'roster')) {
     const roster = new Set(((await env.DB.prepare('SELECT email FROM hrr_team_roster WHERE season_id=?').bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
-    const placed = new Set(((await env.DB.prepare("SELECT u.email FROM hrr_users u WHERE u.role IN ('admin','mentor') OR u.id IN (SELECT user_id FROM hrr_team_members WHERE season_id=? AND active=1)").bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
+    const placed = new Set(((await env.DB.prepare("SELECT u.email FROM hrr_users u WHERE u.role IN ('admin','mentor') OR u.id IN (SELECT user_id FROM hrr_team_members WHERE season_id=? AND active=1) UNION SELECT email FROM hrr_mentor_allowlist WHERE active=1").bind(season.id).all()).results || []).map((r) => String(r.email).toLowerCase()));
     const requests = new Map(((await env.DB.prepare("SELECT id,email,full_name,university,team_number,created_at FROM hrr_roster_requests WHERE season_id=? AND status='pending'").bind(season.id).all()).results || []).map((r) => [String(r.email).toLowerCase(), r]));
     for (const n of list) {
       if (n.type !== 'roster') continue;
@@ -530,8 +559,10 @@ async function history(request, env) {
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
     WHERE (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) AND m.season_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
-  const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0);
-  return json({ history: (rows.results || []).map(maskMission), approvedPoints: points });
+  const myTeam = await teamOf(env, auth.user.id, season.id);
+  const bonuses = ((await env.DB.prepare('SELECT points,reason,created_at,user_id FROM hrr_bonus_awards WHERE season_id=? AND (user_id=? OR (user_id IS NULL AND team_id=?)) ORDER BY created_at DESC').bind(season.id, auth.user.id, myTeam).all()).results || []);
+  const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0) + bonuses.reduce((total, row) => total + Number(row.points || 0), 0);
+  return json({ history: (rows.results || []).map(maskMission), bonuses, approvedPoints: points });
 }
 
 async function createMission(request, env) {
@@ -597,7 +628,7 @@ async function createTeam(request, env) {
 
 async function addMentor(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
-  const body = await request.json(); const email = clean(body.email, 240).toLowerCase(); const role = body.role === 'admin' ? 'admin' : 'mentor';
+  const body = await request.json(); const email = clean(body.email, 240).toLowerCase(); const role = ['admin', 'viewer'].includes(body.role) ? body.role : 'mentor';
   if (!email || !email.includes('@')) return json({ error: 'Valid email is required' }, 400);
   await env.DB.prepare('INSERT INTO hrr_mentor_allowlist (email,role,active,created_at) VALUES (?,?,1,?) ON CONFLICT(email) DO UPDATE SET role=excluded.role,active=1').bind(email, role, now()).run();
   return json({ ok: true, email, role }, 201);
@@ -630,7 +661,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
   if (request.method === 'POST' && /^\/api\/hrr\/notifications\/[^/]+\/resolve$/.test(url.pathname)) return resolveNotification(request, env, url.pathname.split('/')[4]);
   if (request.method === 'POST' && /^\/api\/hrr\/notifications\/[^/]+\/contact$/.test(url.pathname)) return contactRosterEmail(request, env, url.pathname.split('/')[4]);
-  if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin']);
+  if (request.method === 'GET' && url.pathname === '/api/hrr/mentor/notifications') return notifications(request, env, ['mentor', 'admin', 'viewer']);
   if (request.method === 'GET' && url.pathname === '/api/hrr/history') return history(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/mentor/missions') return createMission(request, env);
   if (request.method === 'PATCH' && /^\/api\/hrr\/mentor\/missions\/[^/]+$/.test(url.pathname)) return updateMission(request, env, url.pathname.split('/').at(-1));
@@ -638,6 +669,8 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && url.pathname === '/api/hrr/admin/mentors') return mentorDirectory(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/teams') return createTeam(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/admin/roster') return addRosterEmail(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/hrr/admin/team-lookup') return teamLookup(request, env, url);
+  if (request.method === 'POST' && url.pathname === '/api/hrr/admin/bonus') return awardBonus(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/roster-request') return submitRosterRequest(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/roster-request') return myRosterRequest(request, env);
   if (request.method === 'POST' && /^\/api\/hrr\/admin\/roster-requests\/[^/]+\/approve$/.test(url.pathname)) return approveRosterRequest(request, env, url.pathname.split('/')[5]);

@@ -29,7 +29,7 @@ function envFor(role, queryResults = {}, email = `${role}@example.test`) {
           bind(...values) { params = values; return this; },
           async first() {
             if (sql.includes('FROM hrr_seasons')) return { id: 'season-8' };
-            if (sql.startsWith('SELECT role FROM hrr_mentor_allowlist')) return ['mentor', 'admin'].includes(role) ? { role } : null;
+            if (sql.startsWith('SELECT role FROM hrr_mentor_allowlist')) return ['mentor', 'admin', 'viewer'].includes(role) ? { role } : null;
             if (sql.startsWith('SELECT * FROM hrr_users WHERE cognito_sub=? OR email=?')) return user;
             if (sql.startsWith('SELECT * FROM hrr_users WHERE cognito_sub=?')) return user;
             if (sql.startsWith('SELECT * FROM hrr_missions WHERE id=?')) return queryResults.mission || null;
@@ -116,4 +116,14 @@ test('student history includes mission metadata and the latest mentor feedback t
   assert.equal(body.history[0].mission_number, expected.mission_number);
   assert.equal(body.history[0].start_date, expected.start_date);
   assert.equal(body.history[0].end_date, expected.end_date);
+});
+
+test('a viewer (teacher) can read the mentor panel but cannot change anything', async () => {
+  assert.equal((await request('mentor/submissions', 'viewer')).status, 200);
+  assert.equal((await request('mentor/notifications', 'viewer')).status, 200);
+  assert.equal((await request('missions', 'viewer')).status, 200);
+  for (const [path, method] of [['mentor/missions', 'POST'], ['mentor/missions/m1', 'PATCH'], ['mentor/missions/m1', 'DELETE'], ['mentor/submissions/s1/review', 'POST'], ['mentor/submissions/s1/feedback', 'POST'], ['admin/bonus', 'POST'], ['admin/roster', 'POST'], ['admin/allowlist', 'POST'], ['admin/missions/grant', 'POST']]) {
+    assert.equal((await request(path, 'viewer', method)).status, 403, `${method} ${path}`);
+  }
+  assert.equal((await request('team', 'viewer')).status, 403);
 });
