@@ -148,3 +148,12 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 **Panel navigation (11 Nov 2026).** The missions page has a ☰ on every width: on desktop it collapses/expands the sidebar (remembered in `localStorage` key `hrr-sidebar`), on phones it opens the drawer. The top bar is sticky, the mentor menu links to every section (Отбори и студенти, Изпълнения за проверка, Всички мисии, Известия, Нова мисия) and a ↑ button appears after scrolling. Below 1100 px the mentor columns stack.
 
 **Sheet note.** Every team needs its own numbered row in „Обща класация на екипи“ for points to be written and for it to show in the ranking (СУ Екип 21 was added as №138 on 11 Nov).
+
+## HR:Rush missions — evidence, feedback, bonuses and roles (12 Nov 2026)
+
+- **Evidence:** up to 10 links (stored one per line in `evidence_url`), an optional photo and one document (PDF/Office/TXT ≤1 MB, table `hrr_submission_files`, download via `GET /api/hrr/mentor/submissions/:id/document`). Students edit a pending submission; mentors then see „✎ Редактирано“ (`edited_at`) and get a notification.
+- **Conversation:** mentor feedback („Изпрати“), approve/reject notes and student replies form a thread per submission (`hrr_submission_comments`, `POST /api/hrr/submissions/:id/comments`). Feedback, approval and rejection are also emailed to the students via Resend; the email points to replying in the platform (reply-to is the reviewing mentor).
+- **Bonus points:** admins load a team (university + number) and give points to the whole team or to one member by name (`hrr_bonus_awards`, `GET /api/hrr/admin/team-lookup`, `POST /api/hrr/admin/bonus`). Bonuses count in profile, team points, sheet column F and the ranking; negative values correct mistakes.
+- **Roles:** the panel allowlist accepts `mentor`, `admin` and `viewer` (read-only, e.g. a university teacher). A viewer is stored as `student` in `hrr_users` and gets `viewer` in memory; the server refuses every change for viewers. Admins grant access by email in „Достъп до панела по имейл“.
+- **Navigation:** ☰ on every width, sticky top bar, section links, ↑ button, and a „🏆 Класация“ shortcut; the phone mission route shows 3 stops per row and every stop opens the mission detail.
+- **Migrations added:** 0027 (documents, edited_at), 0028 (bonus awards), 0029 (viewer role in allowlist), 0030 (submission comments).
