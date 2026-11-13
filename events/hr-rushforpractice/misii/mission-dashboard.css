@@ -282,5 +282,6 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 /* Bigger evidence photos on laptops; tap to open full screen */
 .evidence-image{cursor:zoom-in}
 @media(min-width:761px){.evidence-gallery{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.evidence-gallery .evidence-image{max-height:380px;object-fit:contain;background:var(--page)}}
-.photo-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,14,28,.88);display:grid;place-items:center;padding:16px;cursor:zoom-out}
-.photo-zoom img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.photo-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,14,28,.88);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;overscroll-behavior:contain;touch-action:none}
+.photo-zoom img{max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+html.zoom-open,html.zoom-open body{overflow:hidden}
