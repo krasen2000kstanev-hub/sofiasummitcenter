@@ -289,3 +289,7 @@ html.zoom-open,html.zoom-open body{overflow:hidden}
 .photo-zoom-close:hover,.photo-zoom-close:focus-visible{background:rgba(255,255,255,.18)}
 .team-bundle{scroll-margin-top:96px}
 .mentor-submission small.sent-at{display:block;margin-top:3px;color:var(--muted)}
+/* Photos sit at their own width (no dark bars) and can be hidden again */
+.evidence-gallery{margin-top:10px}
+.evidence-gallery[hidden]{display:none}
+.evidence-gallery .evidence-image{width:auto;max-width:100%;justify-self:start}
