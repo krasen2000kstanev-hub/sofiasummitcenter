@@ -285,3 +285,5 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 .photo-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,14,28,.88);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;overscroll-behavior:contain;touch-action:none}
 .photo-zoom img{max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 html.zoom-open,html.zoom-open body{overflow:hidden}
+.photo-zoom-close{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:51;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(10,14,28,.75);color:#fff;font-size:30px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.photo-zoom-close:hover,.photo-zoom-close:focus-visible{background:rgba(255,255,255,.18)}
