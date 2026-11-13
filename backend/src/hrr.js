@@ -40,14 +40,31 @@ export const isSafeUrl = (value) => /^https?:\/\//i.test(String(value || ''));
 // Up to 10 evidence links per submission, stored one per line in evidence_url.
 export const parseEvidenceUrls = (value) => String(value || '').split(/\s+/).map((url) => url.trim()).filter(Boolean).slice(0, 10);
 
-// Evidence document: PDF, Word, Excel, PowerPoint or TXT as a data URL up to ~1 MB, stored in its own row.
+// Evidence document: PDF, Word, Excel, PowerPoint or TXT up to 4 MB (data URL ~5.6 MB), stored in ~1 MB parts.
 const DOC_PATTERN = /^data:(application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.[a-z.]+|application\/vnd\.ms-excel|application\/vnd\.ms-powerpoint|text\/plain);base64,[A-Za-z0-9+/=]+$/;
-export const isEvidenceDocument = (doc) => Boolean(doc) && typeof doc.data === 'string' && doc.data.length <= 1_400_000 && DOC_PATTERN.test(doc.data) && Boolean(String(doc.name || '').trim());
-async function saveDocument(env, submissionId, doc) {
-  await env.DB.prepare('INSERT INTO hrr_submission_files (submission_id,name,mime,data,created_at) VALUES (?,?,?,?,?) ON CONFLICT(submission_id) DO UPDATE SET name=excluded.name,mime=excluded.mime,data=excluded.data,created_at=excluded.created_at')
-    .bind(submissionId, clean(doc.name, 160), doc.data.slice(5, doc.data.indexOf(';')), doc.data, now()).run();
+export const isEvidenceDocument = (doc) => Boolean(doc) && typeof doc.data === 'string' && doc.data.length <= 5_700_000 && DOC_PATTERN.test(doc.data) && Boolean(String(doc.name || '').trim());
+const PART = 1_000_000;
+async function deleteDocument(env, submissionId) {
+  await env.DB.prepare('DELETE FROM hrr_submission_file_parts WHERE submission_id=?').bind(submissionId).run();
+  await env.DB.prepare('DELETE FROM hrr_submission_files WHERE submission_id=?').bind(submissionId).run();
 }
-const DOC_ERROR = 'Документът трябва да е PDF, Word, Excel, PowerPoint или TXT до 1 MB.';
+async function saveDocument(env, submissionId, doc) {
+  await deleteDocument(env, submissionId);
+  await env.DB.prepare('INSERT INTO hrr_submission_files (submission_id,name,mime,data,created_at) VALUES (?,?,?,?,?)')
+    .bind(submissionId, clean(doc.name, 160), doc.data.slice(5, doc.data.indexOf(';')), '', now()).run();
+  for (let part = 0; part * PART < doc.data.length; part += 1) await env.DB.prepare('INSERT INTO hrr_submission_file_parts (submission_id,part,data) VALUES (?,?,?)').bind(submissionId, part, doc.data.slice(part * PART, (part + 1) * PART)).run();
+}
+// Up to 5 photos per submission, one row each.
+export const MAX_EVIDENCE_IMAGES = 5;
+const IMAGE_ERROR = `Снимките трябва да са JPG, PNG или WEBP, до ${MAX_EVIDENCE_IMAGES} броя и до 1 MB всяка.`;
+export const evidenceImages = (body) => (Array.isArray(body.evidenceImages) ? body.evidenceImages : (body.evidenceImage ? [body.evidenceImage] : [])).filter(Boolean);
+export const evidenceImagesValid = (images) => images.length <= MAX_EVIDENCE_IMAGES && images.every((image) => isEvidenceImage(image));
+async function saveImages(env, submissionId, images) {
+  await env.DB.prepare('DELETE FROM hrr_submission_images WHERE submission_id=?').bind(submissionId).run();
+  for (const [position, data] of images.entries()) await env.DB.prepare('INSERT INTO hrr_submission_images (submission_id,position,data) VALUES (?,?,?)').bind(submissionId, position, data).run();
+}
+const IMAGE_COUNT = '(SELECT COUNT(*) FROM hrr_submission_images i WHERE i.submission_id=s.id)';
+const DOC_ERROR = 'Документът трябва да е PDF, Word, Excel, PowerPoint или TXT до 4 MB.';
 const PLATFORM_URL = 'https://sofiasummit.bg/events/hr-rushforpractice/misii/';
 
 // Email the students behind a submission; a failed email never blocks the review.
@@ -441,11 +458,11 @@ async function submit(request, env, missionId) {
   const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE id=? AND status='active'").bind(missionId).first();
   // Only a team from the mission's own season counts, so old-season memberships cannot swallow points.
   const membership = mission && await env.DB.prepare('SELECT * FROM hrr_team_members WHERE user_id=? AND season_id=? AND active=1 LIMIT 1').bind(auth.user.id, mission.season_id).first();
-  const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const evidenceImage = body.evidenceImage || '';
-  if (evidenceImage && !isEvidenceImage(evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
+  const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const images = evidenceImages(body);
+  if (!evidenceImagesValid(images)) return json({ error: IMAGE_ERROR }, 400);
   const evidenceDocument = body.evidenceDocument || null;
   if (evidenceDocument && !isEvidenceDocument(evidenceDocument)) return json({ error: DOC_ERROR }, 400);
-  if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000) && !evidenceImage && !evidenceDocument)) return json({ error: 'Добави линк, описание, снимка или документ.' }, 400);
+  if (!mission || !membership || (!evidenceUrl && !clean(body.evidenceText, 4000) && !images.length && !evidenceDocument)) return json({ error: 'Добави линк, описание, снимка или документ.' }, 400);
   if (evidenceUrlsError(urls)) return json({ error: evidenceUrlsError(urls) }, 400);
   const today = sofiaToday(), end = mission.end_date || mission.deadline;
   if (mission.start_date && mission.start_date > today) return json({ error: 'Мисията още не е започнала.' }, 400);
@@ -453,7 +470,8 @@ async function submit(request, env, missionId) {
   const existing = await env.DB.prepare("SELECT student_user_id FROM hrr_submissions WHERE mission_id=? AND status IN ('pending','approved') AND (student_user_id=? OR (?='team' AND team_id=?)) LIMIT 1").bind(missionId, auth.user.id, mission.scope, membership.team_id).first();
   if (existing) return json({ error: existing.student_user_id === auth.user.id ? 'Submission already exists' : 'Отборът ти вече е предал тази мисия.' }, 409);
   const submissionId = id('hrr_submission');
-  await env.DB.prepare('INSERT INTO hrr_submissions (id,mission_id,team_id,student_user_id,evidence_url,evidence_text,evidence_image,status,created_at) VALUES (?,?,?,?,?,?,?,?,?)').bind(submissionId, missionId, membership.team_id, auth.user.id, evidenceUrl, clean(body.evidenceText, 4000), evidenceImage, 'pending', now()).run();
+  await env.DB.prepare('INSERT INTO hrr_submissions (id,mission_id,team_id,student_user_id,evidence_url,evidence_text,evidence_image,status,created_at) VALUES (?,?,?,?,?,?,?,?,?)').bind(submissionId, missionId, membership.team_id, auth.user.id, evidenceUrl, clean(body.evidenceText, 4000), '', 'pending', now()).run();
+  if (images.length) await saveImages(env, submissionId, images);
   if (evidenceDocument) await saveDocument(env, submissionId, evidenceDocument);
   await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), mission.mentor_user_id, 'submission', 'Ново изпълнение на мисия', `${auth.user.display_name} изпрати доказателство за „${mission.title}“.`, now()).run();
   return json({ ok: true, submissionId }, 201);
@@ -466,15 +484,17 @@ async function updateSubmission(request, env, submissionId) {
   if (!row || row.student_user_id !== auth.user.id) return json({ error: 'Изпращането не е намерено.' }, 404);
   if (row.status !== 'pending') return json({ error: 'Мисията вече е прегледана и не може да се променя.' }, 409);
   const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const evidenceText = clean(body.evidenceText, 4000);
-  const image = body.removeImage ? '' : (body.evidenceImage || row.evidence_image || '');
-  if (body.evidenceImage && !isEvidenceImage(body.evidenceImage)) return json({ error: 'Снимката трябва да е JPG, PNG или WEBP до 1 MB.' }, 400);
+  const images = evidenceImages(body);
+  if (!evidenceImagesValid(images)) return json({ error: IMAGE_ERROR }, 400);
+  const hasImage = images.length > 0 || (!body.removeImage && Boolean(await env.DB.prepare('SELECT 1 FROM hrr_submission_images WHERE submission_id=?').bind(submissionId).first()));
   if (evidenceUrlsError(urls)) return json({ error: evidenceUrlsError(urls) }, 400);
   if (body.evidenceDocument && !isEvidenceDocument(body.evidenceDocument)) return json({ error: DOC_ERROR }, 400);
   const hasDocument = body.evidenceDocument ? true : (!body.removeDocument && Boolean(await env.DB.prepare('SELECT 1 FROM hrr_submission_files WHERE submission_id=?').bind(submissionId).first()));
-  if (!evidenceUrl && !evidenceText && !image && !hasDocument) return json({ error: 'Добави линк, описание, снимка или документ.' }, 400);
-  await env.DB.prepare('UPDATE hrr_submissions SET evidence_url=?,evidence_text=?,evidence_image=?,edited_at=? WHERE id=?').bind(evidenceUrl, evidenceText, image, now(), submissionId).run();
+  if (!evidenceUrl && !evidenceText && !hasImage && !hasDocument) return json({ error: 'Добави линк, описание, снимка или документ.' }, 400);
+  await env.DB.prepare('UPDATE hrr_submissions SET evidence_url=?,evidence_text=?,edited_at=? WHERE id=?').bind(evidenceUrl, evidenceText, now(), submissionId).run();
+  if (images.length || body.removeImage) await saveImages(env, submissionId, images);
   if (body.evidenceDocument) await saveDocument(env, submissionId, body.evidenceDocument);
-  else if (body.removeDocument) await env.DB.prepare('DELETE FROM hrr_submission_files WHERE submission_id=?').bind(submissionId).run();
+  else if (body.removeDocument) await deleteDocument(env, submissionId);
   const mission = await env.DB.prepare('SELECT title,mentor_user_id FROM hrr_missions WHERE id=?').bind(row.mission_id).first();
   if (mission?.mentor_user_id) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), mission.mentor_user_id, 'submission_edit', 'Редактирано изпълнение', `${auth.user.display_name} промени доказателството за „${mission.title}“.`, now()).run();
   return json({ ok: true });
@@ -500,7 +520,7 @@ async function replyToMentor(request, env, submissionId) {
 
 async function mentorSubmissions(request, env) {
   const auth = await requireUser(request, env, ['mentor', 'admin', 'viewer']); if (auth.response) return auth.response;
-  const rows = await env.DB.prepare(`SELECT s.id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.mission_id,s.team_id,s.student_user_id,s.evidence_url,s.evidence_text,s.status,s.review_note,s.bonus_points,s.created_at,s.reviewed_at,s.evidence_image<>'' has_image,m.title mission_title,m.points,t.name team_name,u.display_name student_name,u.email student_email
+  const rows = await env.DB.prepare(`SELECT s.id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.mission_id,s.team_id,s.student_user_id,s.evidence_url,s.evidence_text,s.status,s.review_note,s.bonus_points,s.created_at,s.reviewed_at,${IMAGE_COUNT} has_image,m.title mission_title,m.points,t.name team_name,u.display_name student_name,u.email student_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id JOIN hrr_teams t ON t.id=s.team_id JOIN hrr_users u ON u.id=s.student_user_id
     WHERE (m.mentor_user_id=? OR ? IN ('admin','viewer')) ORDER BY CASE s.status WHEN 'pending' THEN 0 ELSE 1 END,s.created_at DESC`).bind(auth.user.id, auth.user.role).all();
   const comments = groupComments((await env.DB.prepare(`SELECT ${COMMENT_COLUMNS} FROM hrr_submission_comments c LEFT JOIN hrr_users u ON u.id=c.user_id JOIN hrr_submissions s ON s.id=c.submission_id JOIN hrr_missions m ON m.id=s.mission_id WHERE (m.mentor_user_id=? OR ? IN ('admin','viewer')) ORDER BY c.created_at`).bind(auth.user.id, auth.user.role).all()).results);
@@ -512,12 +532,14 @@ async function submissionDocument(request, env, submissionId) {
   const row = await env.DB.prepare('SELECT f.name,f.data,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submission_files f JOIN hrr_submissions s ON s.id=f.submission_id JOIN hrr_missions m ON m.id=s.mission_id WHERE f.submission_id=?').bind(submissionId).first();
   const allowed = row && (['admin', 'viewer'].includes(auth.user.role) || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
   if (!allowed) return json({ error: 'Document not found' }, 404);
-  return json({ name: row.name, data: row.data });
+  const parts = (await env.DB.prepare('SELECT data FROM hrr_submission_file_parts WHERE submission_id=? ORDER BY part').bind(submissionId).all()).results || [];
+  return json({ name: row.name, data: row.data || parts.map((p) => p.data).join('') });
 }
 
 async function submissionImage(request, env, submissionId) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
-  const row = await env.DB.prepare('SELECT s.evidence_image,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
+  const position = Number.parseInt(new URL(request.url).searchParams.get('i') || '0', 10) || 0;
+  const row = await env.DB.prepare('SELECT i.data evidence_image,s.student_user_id,s.team_id,m.mentor_user_id,m.season_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id LEFT JOIN hrr_submission_images i ON i.submission_id=s.id AND i.position=? WHERE s.id=?').bind(position, submissionId).first();
   const allowed = row && (['admin', 'viewer'].includes(auth.user.role) || row.mentor_user_id === auth.user.id || row.student_user_id === auth.user.id || (await teamOf(env, auth.user.id, row.season_id)) === row.team_id);
   if (!row || !row.evidence_image || !allowed) return json({ error: 'Image not found' }, 404);
   return json({ image: row.evidence_image });
@@ -616,7 +638,7 @@ async function notifications(request, env, roles = ['student']) {
 async function history(request, env) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const season = await currentSeason(env); if (!season) return json({ history: [], approvedPoints: 0 });
-  const rows = await env.DB.prepare(`SELECT s.id,s.id submission_id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.student_user_id,s.evidence_url,s.evidence_text,(s.evidence_image<>'') has_evidence_image,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
+  const rows = await env.DB.prepare(`SELECT s.id,s.id submission_id,s.edited_at,(SELECT name FROM hrr_submission_files f WHERE f.submission_id=s.id) document_name,s.student_user_id,s.evidence_url,s.evidence_text,${IMAGE_COUNT} has_evidence_image,s.mission_id,s.status,s.review_note,s.created_at submitted_at,s.reviewed_at,
       m.mission_number,m.kind,m.title,m.description,m.category,m.points + s.bonus_points points,s.bonus_points,m.scope,m.deadline,m.start_date,m.end_date,m.status mission_status,m.created_at published_at,
       u.display_name mentor_name,u.email mentor_email
     FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id

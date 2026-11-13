@@ -269,3 +269,6 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 .drive-box .primary-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;justify-self:start}
 .drive-box small{color:var(--muted);font-size:12px;line-height:1.5}
 @media(max-width:760px){.drive-box .primary-button{justify-self:stretch}}
+/* Several evidence photos */
+.evidence-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.evidence-gallery .evidence-image{width:100%;margin:0}

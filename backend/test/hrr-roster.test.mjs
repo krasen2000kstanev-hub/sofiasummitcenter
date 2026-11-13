@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv, parseRoster } from '../src/hrr.js';
+import { evidenceImages, evidenceImagesValid, isEvidenceDocument, parseCsv, parseRoster } from '../src/hrr.js';
 
 test('parseRoster reads the main team block and stops before side lists', () => {
   const csv = 'Екип №,Име 1,Имейл,Тел,Име 2,Имейл,Тел,,Компания,Позиция\n'
@@ -123,4 +123,16 @@ test('evidence documents: office/pdf/txt data URLs only, and review emails read 
   assert.match(reviewEmail('Pleggi', 'approved', 'Браво', 3).text, /3 т\..*Браво/s);
   assert.match(reviewEmail('Pleggi', 'rejected', '', 0).subject, /корекция/);
   assert.match(reviewEmail('Pleggi', 'feedback', 'Добави линк', 0).text, /Добави линк/);
+});
+
+test('up to 5 evidence photos; the old single-photo field still works; documents up to 4 MB', () => {
+  const photo = 'data:image/jpeg;base64,AAAA';
+  assert.deepEqual(evidenceImages({ evidenceImage: photo }), [photo]);
+  assert.deepEqual(evidenceImages({ evidenceImages: [photo, ''] }), [photo]);
+  assert.equal(evidenceImagesValid(Array(5).fill(photo)), true);
+  assert.equal(evidenceImagesValid(Array(6).fill(photo)), false);
+  assert.equal(evidenceImagesValid(['data:text/html;base64,AAAA']), false);
+  const doc = (bytes) => ({ name: 'cv.pdf', data: `data:application/pdf;base64,${'A'.repeat(Math.ceil(bytes / 3) * 4)}` });
+  assert.equal(isEvidenceDocument(doc(4 * 1024 * 1024)), true);
+  assert.equal(isEvidenceDocument(doc(4.3 * 1024 * 1024)), false);
 });
