@@ -18,7 +18,7 @@ HRR_ROSTER_SHEET_ID = "1KQmI2hdv8pNTzA2eTnZAaU8whP-NJep3k2CSGB0dKRY"
 # Team folders in Drive: shared by the owner's Apps Script (/api/hrr/drive/sync). HRR_DRIVE_ONLY = pilot team ids; empty = all teams.
 HRR_DRIVE_OWNER = "hr.rushforpractice@gmail.com"
 HRR_DRIVE_ROOT_ID = "1LKqGhzvvD-dtfpGHickXRmHC1x7Q00T8"
-HRR_DRIVE_ONLY = "hrr_team_season-9_unss_41"
+HRR_DRIVE_ONLY = ""
 HRR_APPLICATIONS_SHEET_ID = "1t1Y00W82tCpU2313oGg9f1t7hNWQM3qqCtvF1ybgnt4"
 HRR_COGNITO_ISSUER = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_r8g1DavAk"
 HRR_COGNITO_CLIENT_ID = "6bvki55do8vt4vmp98nhnglhlo"
