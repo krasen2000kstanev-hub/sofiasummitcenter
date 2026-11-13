@@ -293,3 +293,12 @@ html.zoom-open,html.zoom-open body{overflow:hidden}
 .evidence-gallery{margin-top:10px}
 .evidence-gallery[hidden]{display:none}
 .evidence-gallery .evidence-image{width:auto;max-width:100%;justify-self:start}
+/* Review queue: look at one team */
+.team-picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;font-weight:700;font-size:13px;color:var(--ink)}
+.team-picker select{padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;font-weight:400;color:var(--ink);background:var(--surface);min-width:0;max-width:100%}
+.team-overview{display:grid;gap:10px;padding:14px;margin:0 0 14px;border:1px solid var(--line);border-left:4px solid var(--purple);border-radius:14px;background:var(--surface)}
+.team-overview-member{display:grid;gap:6px}
+.team-overview-member>span{display:flex;flex-wrap:wrap;gap:6px}
+.mission-chip{display:inline-flex;gap:4px;align-items:center;padding:5px 9px;border-radius:99px;font-size:12px;border:1px solid var(--line);background:var(--page);color:var(--ink);overflow-wrap:anywhere}
+.mission-chip.approved{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.mission-chip.rejected{border-color:var(--orange);background:var(--orange-soft);color:#d86627}

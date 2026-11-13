@@ -236,23 +236,24 @@ async function teamLookup(request, env, url) {
   const team = await env.DB.prepare('SELECT id,name,university FROM hrr_teams WHERE id=?').bind(`hrr_team_${season.slug}_${short.toLowerCase()}_${number}`).first();
   if (!team) return json({ error: 'Няма такъв екип в сезона.' }, 404);
   const members = ((await env.DB.prepare('SELECT u.id,u.display_name FROM hrr_team_members tm JOIN hrr_users u ON u.id=tm.user_id WHERE tm.team_id=? AND tm.season_id=? AND tm.active=1 ORDER BY u.display_name').bind(team.id, season.id).all()).results) || [];
-  const awards = ((await env.DB.prepare('SELECT b.points,b.reason,b.created_at,u.display_name FROM hrr_bonus_awards b LEFT JOIN hrr_users u ON u.id=b.user_id WHERE b.team_id=? ORDER BY b.created_at DESC LIMIT 10').bind(team.id).all()).results) || [];
+  const awards = ((await env.DB.prepare('SELECT b.points,b.reason,b.created_at,b.kind,u.display_name FROM hrr_bonus_awards b LEFT JOIN hrr_users u ON u.id=b.user_id WHERE b.team_id=? ORDER BY b.created_at DESC LIMIT 10').bind(team.id).all()).results) || [];
   return json({ team, members, awards });
 }
 
 async function awardBonus(request, env) {
   const auth = await requireUser(request, env, ['admin']); if (auth.response) return auth.response;
   const season = await currentSeason(env); const body = await request.json();
-  const points = Math.round(Number(body.points)); const reason = clean(body.reason, 200); const teamId = clean(body.teamId, 120); const userId = clean(body.userId, 120);
+  const points = Math.round(Number(body.points)); const reason = clean(body.reason, 200); const teamId = clean(body.teamId, 120); const userId = clean(body.userId, 120); const kind = body.kind === 'mission' ? 'mission' : 'activity';
+  const label = kind === 'mission' ? 'Точки от мисии' : 'Точки активност';
   if (!season || !Number.isFinite(points) || !points || Math.abs(points) > 1000) return json({ error: 'Въведи точки между -1000 и 1000 (без 0).' }, 400);
   if (!reason) return json({ error: 'Напиши причина за бонуса.' }, 400);
   const team = await env.DB.prepare('SELECT id,name,university FROM hrr_teams WHERE id=? AND season_id=?').bind(teamId, season.id).first();
   if (!team) return json({ error: 'Няма такъв екип в сезона.' }, 404);
   if (userId && !await env.DB.prepare('SELECT 1 FROM hrr_team_members WHERE team_id=? AND user_id=? AND season_id=? AND active=1').bind(team.id, userId, season.id).first()) return json({ error: 'Този човек не е в екипа.' }, 400);
-  await env.DB.prepare('INSERT INTO hrr_bonus_awards (id,season_id,team_id,user_id,points,reason,created_by,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(id('hrr_bonus'), season.id, team.id, userId || null, points, reason, auth.user.id, now()).run();
+  await env.DB.prepare('INSERT INTO hrr_bonus_awards (id,season_id,team_id,user_id,points,reason,created_by,created_at,kind) VALUES (?,?,?,?,?,?,?,?,?)').bind(id('hrr_bonus'), season.id, team.id, userId || null, points, reason, auth.user.id, now(), kind).run();
   const recipients = userId ? [userId] : (((await env.DB.prepare('SELECT user_id FROM hrr_team_members WHERE team_id=? AND season_id=? AND active=1').bind(team.id, season.id).all()).results) || []).map((r) => r.user_id);
-  for (const recipient of recipients) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), recipient, 'bonus', points > 0 ? `Точки активност +${points}` : `Корекция на точки активност ${points}`, reason, now()).run();
-  return json({ ok: true, team: `${team.university} · ${team.name}`, points });
+  for (const recipient of recipients) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), recipient, 'bonus', points > 0 ? `${label} +${points}` : `Корекция: ${label.toLowerCase()} ${points}`, reason, now()).run();
+  return json({ ok: true, team: `${team.university} · ${team.name}`, points, kind });
 }
 
 // Manual fix for students who log in with an email that is not in the sheet: map that email to their team.
@@ -369,8 +370,8 @@ async function ranking(env) {
 
 function missionPointsByTeam(env, season) {
   return env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
-      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) missions_points,
-      COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id),0) activity_points,
+      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) + COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id AND b.kind='mission'),0) missions_points,
+      COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id AND b.kind='activity'),0) activity_points,
       COALESCE(SUM(CASE WHEN a.scope='team' THEN 1 ELSE a.completed_count END),0) missions_completed
     FROM hrr_teams t
     LEFT JOIN (
@@ -648,7 +649,7 @@ async function history(request, env) {
     LEFT JOIN hrr_users u ON u.id=m.mentor_user_id
     WHERE (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) AND m.season_id=? ORDER BY COALESCE(s.reviewed_at,s.created_at) DESC LIMIT 100`).bind(auth.user.id, await teamOf(env, auth.user.id, season.id), season.id).all();
   const myTeam = await teamOf(env, auth.user.id, season.id);
-  const bonuses = ((await env.DB.prepare('SELECT points,reason,created_at,user_id FROM hrr_bonus_awards WHERE season_id=? AND (user_id=? OR (user_id IS NULL AND team_id=?)) ORDER BY created_at DESC').bind(season.id, auth.user.id, myTeam).all()).results || []);
+  const bonuses = ((await env.DB.prepare('SELECT points,reason,created_at,user_id,kind FROM hrr_bonus_awards WHERE season_id=? AND (user_id=? OR (user_id IS NULL AND team_id=?)) ORDER BY created_at DESC').bind(season.id, auth.user.id, myTeam).all()).results || []);
   const points = (rows.results || []).filter((row) => row.status === 'approved').reduce((total, row) => total + Number(row.points || 0), 0) + bonuses.reduce((total, row) => total + Number(row.points || 0), 0);
   const comments = groupComments((await env.DB.prepare(`SELECT ${COMMENT_COLUMNS} FROM hrr_submission_comments c LEFT JOIN hrr_users u ON u.id=c.user_id WHERE c.submission_id IN (SELECT s.id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE (s.student_user_id=? OR (m.scope='team' AND s.team_id=?)) AND m.season_id=?) ORDER BY c.created_at`).bind(auth.user.id, myTeam, season.id).all()).results);
   return json({ history: (rows.results || []).map(maskMission).map((row) => ({ ...row, comments: comments.get(row.id) || [] })), bonuses, approvedPoints: points });

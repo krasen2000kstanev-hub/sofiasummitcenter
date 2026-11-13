@@ -181,3 +181,5 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 ## HR:Rush activity points (13 Nov 2026)
 
 - Points given through the admin form („Точки активност на екип или на човек от екипа“, table `hrr_bonus_awards`) are activity points, not mission points. The 5-minute sync writes them to column E „Точки Активност“ of the ranking tab. Approved missions and the mentor's bonus on approval go to column F. The ranking API returns `activityPoints` next to `missionsPoints`.
+- Since migration 0035, every manual award has a `kind` set by the admin form: `activity` (the default) goes to column E and `mission` goes to column F, through `missions_points`.
+- The review queue has a „Виж по екип“ picker. Choosing a team shows which mission each member sent and its status, and lists only that team's submissions below.
