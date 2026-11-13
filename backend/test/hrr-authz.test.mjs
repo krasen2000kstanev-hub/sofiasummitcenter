@@ -168,3 +168,8 @@ test('a platform session is only handed out for a Google sign-in, and an unknown
   assert.equal((await call('/api/hrr/auth/session', 'Bearer hrrs_abc')).status, 400);
   assert.equal((await call('/api/hrr/me', 'Bearer hrrs_abc')).status, 401);
 });
+
+test('changing a bonus after approval is for mentors and admins only', async () => {
+  assert.equal((await request('mentor/submissions/s1/bonus', 'student', 'POST')).status, 403);
+  assert.equal((await request('mentor/submissions/s1/bonus', 'viewer', 'POST')).status, 403);
+});

@@ -583,6 +583,19 @@ async function review(request, env, submissionId) {
   return json({ ok: true, status, bonusPoints: bonus });
 }
 
+// Fix a forgotten or wrong bonus on an already approved submission; the ranking and sheet pick it up on the next sync.
+async function setSubmissionBonus(request, env, submissionId) {
+  const auth = await requireUser(request, env, ['mentor', 'admin']); if (auth.response) return auth.response;
+  const bonus = bonusPoints((await request.json()).bonusPoints);
+  const submission = await env.DB.prepare('SELECT s.status,s.student_user_id,s.bonus_points,m.title,m.mentor_user_id FROM hrr_submissions s JOIN hrr_missions m ON m.id=s.mission_id WHERE s.id=?').bind(submissionId).first();
+  if (!submission || (auth.user.role !== 'admin' && submission.mentor_user_id !== auth.user.id)) return json({ error: 'Submission not found' }, 404);
+  if (submission.status !== 'approved') return json({ error: 'Бонус се променя само на одобрена мисия.' }, 409);
+  if (Number(submission.bonus_points || 0) === bonus) return json({ ok: true, bonusPoints: bonus });
+  await env.DB.prepare('UPDATE hrr_submissions SET bonus_points=? WHERE id=?').bind(bonus, submissionId).run();
+  await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), submission.student_user_id, 'bonus', bonus ? `Бонус +${bonus} т. към мисия` : 'Бонусът към мисия е премахнат', submission.title, now()).run();
+  return json({ ok: true, bonusPoints: bonus });
+}
+
 async function markNotificationsRead(request, env) {
   const auth = await requireUser(request, env); if (auth.response) return auth.response;
   await env.DB.prepare('UPDATE hrr_notifications SET read_at=? WHERE user_id=? AND read_at IS NULL').bind(now(), auth.user.id).run();
@@ -755,6 +768,7 @@ export async function handleHrr(request, env, url) {
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/image$/.test(url.pathname)) return submissionImage(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/document$/.test(url.pathname)) return submissionDocument(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/review$/.test(url.pathname)) return review(request, env, url.pathname.split('/')[5]);
+  if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/bonus$/.test(url.pathname)) return setSubmissionBonus(request, env, url.pathname.split('/')[5]);
   if (request.method === 'POST' && /^\/api\/hrr\/mentor\/submissions\/[^/]+\/feedback$/.test(url.pathname)) return feedback(request, env, url.pathname.split('/')[5]);
   if (request.method === 'GET' && url.pathname === '/api/hrr/notifications') return notifications(request, env);
   if (request.method === 'POST' && url.pathname === '/api/hrr/notifications/read') return markNotificationsRead(request, env);
