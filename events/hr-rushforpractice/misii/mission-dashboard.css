@@ -302,3 +302,12 @@ html.zoom-open,html.zoom-open body{overflow:hidden}
 .mission-chip{display:inline-flex;gap:4px;align-items:center;padding:5px 9px;border-radius:99px;font-size:12px;border:1px solid var(--line);background:var(--page);color:var(--ink);overflow-wrap:anywhere}
 .mission-chip.approved{border-color:var(--green);background:var(--green-soft);color:var(--green)}
 .mission-chip.rejected{border-color:var(--orange);background:var(--orange-soft);color:#d86627}
+/* Foldable panels and a separate, folded „Проверени“ section */
+.fold-button{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;line-height:1;cursor:pointer;margin-left:8px}
+.fold-button:hover{border-color:var(--purple);color:var(--purple)}
+.panel.folded>:not(.panel-heading){display:none!important}
+.panel.folded>.panel-heading{margin-bottom:0}
+.mentor-submission{scroll-margin-top:96px}
+.reviewed-block{margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
+.reviewed-block>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ink);padding:8px 0;list-style-position:inside}
+.reviewed-block>summary:hover{color:var(--purple)}
