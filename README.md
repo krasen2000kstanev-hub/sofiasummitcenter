@@ -177,3 +177,7 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - A Google ID token is valid for only one hour, so students had to sign in again every time. Now the page swaps the Google sign-in once for a 60-day platform session through `POST /api/hrr/auth/session`. The session token looks like `hrrs_…`, and only its SHA-256 is kept in `hrr_sessions` (migration 0034).
 - On every request the role is read again from `hrr_mentor_allowlist`, and blocked emails are refused. Granting or removing panel access therefore works without a new sign-in.
 - "Изход" calls `POST /api/hrr/auth/logout`, which deletes the session.
+
+## HR:Rush activity points (13 Nov 2026)
+
+- Points given through the admin form („Точки активност на екип или на човек от екипа“, table `hrr_bonus_awards`) are activity points, not mission points. The 5-minute sync writes them to column E „Точки Активност“ of the ranking tab. Approved missions and the mentor's bonus on approval go to column F. The ranking API returns `activityPoints` next to `missionsPoints`.

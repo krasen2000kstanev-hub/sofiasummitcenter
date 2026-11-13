@@ -136,3 +136,11 @@ test('up to 5 evidence photos; the old single-photo field still works; documents
   assert.equal(isEvidenceDocument(doc(4 * 1024 * 1024)), true);
   assert.equal(isEvidenceDocument(doc(4.3 * 1024 * 1024)), false);
 });
+
+test('activity points go to column E and mission points to F', async () => {
+  const { missionSheetUpdates } = await import('../src/hrr.js');
+  const rows = [['Място'], ['1', 'СУ', 'Екип 11', 'X', '', '4'], ['2', 'НБУ', 'Екип 1', 'Y', '10', '0']];
+  assert.deepEqual(missionSheetUpdates(rows, new Map([['СУ::Екип 11', 4], ['НБУ::Екип 1', 0]]), 'T', new Map([['СУ::Екип 11', 10], ['НБУ::Екип 1', 10]])), [
+    { range: "'T'!E2", values: [[10]] },
+  ]);
+});

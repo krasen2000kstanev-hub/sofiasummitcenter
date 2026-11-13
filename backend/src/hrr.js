@@ -251,7 +251,7 @@ async function awardBonus(request, env) {
   if (userId && !await env.DB.prepare('SELECT 1 FROM hrr_team_members WHERE team_id=? AND user_id=? AND season_id=? AND active=1').bind(team.id, userId, season.id).first()) return json({ error: 'Този човек не е в екипа.' }, 400);
   await env.DB.prepare('INSERT INTO hrr_bonus_awards (id,season_id,team_id,user_id,points,reason,created_by,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(id('hrr_bonus'), season.id, team.id, userId || null, points, reason, auth.user.id, now()).run();
   const recipients = userId ? [userId] : (((await env.DB.prepare('SELECT user_id FROM hrr_team_members WHERE team_id=? AND season_id=? AND active=1').bind(team.id, season.id).all()).results) || []).map((r) => r.user_id);
-  for (const recipient of recipients) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), recipient, 'bonus', points > 0 ? `Бонус +${points} т.` : `Корекция ${points} т.`, reason, now()).run();
+  for (const recipient of recipients) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), recipient, 'bonus', points > 0 ? `Точки активност +${points}` : `Корекция на точки активност ${points}`, reason, now()).run();
   return json({ ok: true, team: `${team.university} · ${team.name}`, points });
 }
 
@@ -351,7 +351,7 @@ let rankingMemo = { at: 0, body: null }; // ponytail: per-isolate, saves even th
 
 export async function refreshRanking(env) {
   const season = await currentSeason(env);
-  const teams = season ? ((await missionPointsByTeam(env, season)).results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })) : [];
+  const teams = season ? ((await missionPointsByTeam(env, season)).results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), activityPoints: Number(row.activity_points || 0), missionsCompleted: Number(row.missions_completed || 0) })) : [];
   const body = JSON.stringify({ season: season?.slug || null, teams, updatedAt: now() });
   await env.DB.prepare('INSERT INTO hrr_ranking_snapshot (id,body,updated_at) VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body,updated_at=excluded.updated_at').bind(body, now()).run();
   rankingMemo = { at: Date.now(), body };
@@ -369,7 +369,8 @@ async function ranking(env) {
 
 function missionPointsByTeam(env, season) {
   return env.DB.prepare(`SELECT t.id team_id,t.name team_name,t.university,t.city,
-      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) + COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id),0) missions_points,
+      COALESCE(SUM(CASE WHEN a.scope='team' THEN a.points ELSE a.points*a.completed_count END + a.bonus),0) missions_points,
+      COALESCE((SELECT SUM(b.points) FROM hrr_bonus_awards b WHERE b.team_id=t.id),0) activity_points,
       COALESCE(SUM(CASE WHEN a.scope='team' THEN 1 ELSE a.completed_count END),0) missions_completed
     FROM hrr_teams t
     LEFT JOIN (
@@ -383,22 +384,24 @@ function missionPointsByTeam(env, season) {
 
 const RANKING_GID = 0; // „Обща класация на екипи“; found by gid so renaming the tab does not break the sync
 
-// Rows of „Обща класация“ (A rank, B university, C team, F mission points) → cell updates for teams whose F differs.
-export function missionSheetUpdates(rows, pointsByTeam, tab) {
+// Rows of „Обща класация“ (A rank, B university, C team, E activity points, F mission points) → cell updates where E or F differs.
+export function missionSheetUpdates(rows, pointsByTeam, tab, activityByTeam = new Map()) {
   const updates = [];
   rows.forEach((row, index) => {
     if (!/^\d+$/.test(String(row[0] || '').trim())) return;
-    const points = pointsByTeam.get(`${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`);
-    if (points === undefined || Number(row[5] || 0) === points) return;
-    updates.push({ range: `'${tab}'!F${index + 1}`, values: [[points]] });
+    const key = `${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`;
+    const activity = activityByTeam.get(key), points = pointsByTeam.get(key);
+    if (activity !== undefined && Number(row[4] || 0) !== activity) updates.push({ range: `'${tab}'!E${index + 1}`, values: [[activity]] });
+    if (points !== undefined && Number(row[5] || 0) !== points) updates.push({ range: `'${tab}'!F${index + 1}`, values: [[points]] });
   });
   return updates;
 }
 
-// Approved mission points from the site → column F of the season sheet, so the sheet total and the public ranking include them.
+// Activity points (organizer awards) → column E and approved mission points → column F of the season sheet, so the sheet total and the public ranking include them.
 export async function syncMissionPointsToSheet(env, sheetId, teams) {
   if (!sheetId || !teams?.length) return { skipped: true };
   const pointsByTeam = new Map(teams.map((r) => [`${r.university}::${r.team_name}`, Number(r.missions_points || 0)]));
+  const activityByTeam = new Map(teams.map((r) => [`${r.university}::${r.team_name}`, Number(r.activity_points || 0)]));
   const token = await googleAccessToken(env);
   const base = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}`;
   const meta = await fetch(`${base}?fields=sheets.properties(sheetId,title)`, { headers: { authorization: `Bearer ${token}` } });
@@ -407,7 +410,7 @@ export async function syncMissionPointsToSheet(env, sheetId, teams) {
   if (!tab) return { error: 'Ranking tab (gid 0) not found' };
   const read = await fetch(`${base}/values/${encodeURIComponent(`'${tab}'!A1:F400`)}`, { headers: { authorization: `Bearer ${token}` } });
   if (!read.ok) return { error: `Could not read ${tab} (${read.status})` };
-  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam, tab);
+  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam, tab, activityByTeam);
   if (!data.length) return { ok: true, updated: 0 };
   const write = await fetch(`${base}/values:batchUpdate`, { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
   return write.ok ? { ok: true, updated: data.length } : { error: `Could not write ${tab} (${write.status})` };
