@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мисии | HR:Rush for Practice</title>
   <meta name="description" content="Mission control за HR:Rush for Practice.">
-  <link rel="stylesheet" href="mission-dashboard.css?v=20261113-teams">
+  <link rel="stylesheet" href="mission-dashboard.css?v=20261113-zoom">
   <script src="../hrr-theme.js?v=2"></script>
   <script src="auth-config.js?v=google1"></script>
 </head>
@@ -214,6 +214,9 @@
     const byTeam = items => [...items.reduce((map, s) => map.set(s.team_id || s.id, [...(map.get(s.team_id || s.id) || []), s]), new Map()).values()].sort((a, b) => b.filter(s => s.status === 'pending').length - a.filter(s => s.status === 'pending').length);
     const teamBundle = items => { if (items.length < 2) return items.map(hrrSubmissionRow).join(''); const waiting = items.filter(s => s.status === 'pending'); return `<div class="team-bundle"><div class="team-bundle-head"><b>👥 ${esc(teamLabel(items[0]))}</b><small>${items.length} изпращания от екипа${waiting.length ? ` · ${waiting.length} чакат` : ''}</small>${waiting.length > 1 ? `<span class="review-actions bundle-actions"><button class="primary-button" type="button" data-approve-team="${esc(waiting.map(s => s.id).join(','))}">Одобри всички (${waiting.length})</button></span>` : ''}</div>${items.map(hrrSubmissionRow).join('')}</div>`; };
     document.addEventListener('click', async event => { const button = event.target.closest('[data-approve-team]'); if (!button) return; const ids = button.dataset.approveTeam.split(','); if (!confirm(`Да одобря всичките ${ids.length} изпращания от екипа? Обратната връзка и бонус точките от полетата се изпращат към всеки.`)) return; button.disabled = true; try { for (const id of ids) await api(`/api/hrr/mentor/submissions/${id}/review`, { method: 'POST', body: JSON.stringify({ status: 'approved', note: document.querySelector(`[data-note="${id}"]`)?.value || '', bonusPoints: Number(document.querySelector(`[data-bonus="${id}"]`)?.value || 0) }) }); } catch (error) { alert(error.message); } await loadMentorPanel(); });
+    // Tap a photo to see it full screen; tap again or Esc to close.
+    document.addEventListener('click', event => { const zoomed = event.target.closest('.photo-zoom'); if (zoomed) { zoomed.remove(); return; } const photo = event.target.closest('.evidence-image'); if (!photo) return; const view = document.createElement('div'); view.className = 'photo-zoom'; view.setAttribute('role', 'dialog'); view.setAttribute('aria-label', 'Снимка в цял размер'); view.append(Object.assign(document.createElement('img'), { src: photo.src, alt: photo.alt })); document.body.append(view); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') document.querySelector('.photo-zoom')?.remove(); });
     function renderSubmissions() {
       const box = document.querySelector('#mentorSubmissions');
       const drafts = [...box.querySelectorAll('[data-note],[data-bonus]')].map(el => [el.dataset.note ? `[data-note="${el.dataset.note}"]` : `[data-bonus="${el.dataset.bonus}"]`, el.value]);
