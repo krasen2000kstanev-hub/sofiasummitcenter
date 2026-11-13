@@ -171,3 +171,9 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - A submission can carry up to 5 photos. The browser compresses each one to 1 MB or less. Photos are stored one row each in `hrr_submission_images`; migration 0033 moved the old `evidence_image` values there. `GET /api/hrr/mentor/submissions/:id/image?i=N` returns photo N. In the lists, `has_image` and `has_evidence_image` now give the photo count.
 - Documents can be up to 4 MB. R2 is not enabled and a D1 row holds at most 2 MB, so the data URL is split into roughly 1 MB parts in `hrr_submission_file_parts`. `hrr_submission_files` keeps the file name and type.
 - When a student edits a submission without choosing new photos, the old photos stay. Choosing new photos replaces all of them.
+
+## HR:Rush remembered sign-in (13 Nov 2026)
+
+- A Google ID token is valid for only one hour, so students had to sign in again every time. Now the page swaps the Google sign-in once for a 60-day platform session through `POST /api/hrr/auth/session`. The session token looks like `hrrs_…`, and only its SHA-256 is kept in `hrr_sessions` (migration 0034).
+- On every request the role is read again from `hrr_mentor_allowlist`, and blocked emails are refused. Granting or removing panel access therefore works without a new sign-in.
+- "Изход" calls `POST /api/hrr/auth/logout`, which deletes the session.

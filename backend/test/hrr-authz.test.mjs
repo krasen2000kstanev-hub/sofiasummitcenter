@@ -161,3 +161,10 @@ test('browsers may PATCH and DELETE every HR:Rush route (editing a submission fa
   assert.match(methods('/api/hrr/submissions/s1'), /PATCH/);
   assert.match(methods('/api/hrr/mentor/missions/m1'), /DELETE/);
 });
+
+test('a platform session is only handed out for a Google sign-in, and an unknown session is refused', async () => {
+  const fake = { ...envFor('student'), DB: { prepare: () => ({ bind() { return this; }, async first() { return null; }, async run() { return {}; }, async all() { return { results: [] }; } }) } };
+  const call = (path, auth) => handleHrr(new Request(`https://api.test${path}`, { method: path.endsWith('session') ? 'POST' : 'GET', headers: { authorization: auth } }), fake, new URL(`https://api.test${path}`));
+  assert.equal((await call('/api/hrr/auth/session', 'Bearer hrrs_abc')).status, 400);
+  assert.equal((await call('/api/hrr/me', 'Bearer hrrs_abc')).status, 401);
+});

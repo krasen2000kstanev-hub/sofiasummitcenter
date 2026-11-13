@@ -54,9 +54,36 @@ export async function verifyHrrAccessToken(token, env) {
 // Organizer-blocked addresses (e.g. a duplicate account of a student), comma-separated in HRR_BLOCKED_EMAILS.
 export const isBlockedEmail = (env, email) => String(env.HRR_BLOCKED_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean).includes(String(email).trim().toLowerCase());
 
+// Platform session (60 days) handed out after one Google sign-in; only its SHA-256 is stored.
+export const SESSION_PREFIX = 'hrrs_';
+const SESSION_DAYS = 60;
+const sha256 = async (value) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+
+export async function createSession(env, user) {
+  const token = SESSION_PREFIX + [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const timestamp = new Date().toISOString();
+  await env.DB.prepare('DELETE FROM hrr_sessions WHERE expires_at<?').bind(timestamp).run();
+  await env.DB.prepare('INSERT INTO hrr_sessions (token_hash,user_id,expires_at,created_at) VALUES (?,?,?,?)').bind(await sha256(token), user.id, new Date(Date.now() + SESSION_DAYS * 86400000).toISOString(), timestamp).run();
+  return token;
+}
+
+export async function deleteSession(env, token) {
+  if (String(token).startsWith(SESSION_PREFIX)) await env.DB.prepare('DELETE FROM hrr_sessions WHERE token_hash=?').bind(await sha256(token)).run();
+}
+
+// The role is re-read from the allowlist on every request, so granting or removing panel access applies without signing in again.
+async function sessionUser(token, env) {
+  const user = await env.DB.prepare('SELECT u.* FROM hrr_sessions s JOIN hrr_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?').bind(await sha256(token), new Date().toISOString()).first();
+  if (!user) throw new Error('Expired or invalid token');
+  if (isBlockedEmail(env, user.email)) throw new Error('Този имейл не е разрешен за HR:Rush. Влез с имейла, с който си в екипа.');
+  const allowlist = await env.DB.prepare('SELECT role FROM hrr_mentor_allowlist WHERE email=? AND active=1').bind(String(user.email).toLowerCase()).first();
+  return { ...user, role: allowlist?.role || 'student' };
+}
+
 export async function hrrUser(request, env) {
   const header = request.headers.get('Authorization') || '';
   if (!header.startsWith('Bearer ')) return null;
+  if (header.slice(7).startsWith(SESSION_PREFIX)) return sessionUser(header.slice(7), env);
   const claims = await verifyHrrAccessToken(header.slice(7), env);
   const email = String(claims.email || claims['cognito:username'] || claims.username || '').trim().toLowerCase();
   if (!email) throw new Error('Token has no email');

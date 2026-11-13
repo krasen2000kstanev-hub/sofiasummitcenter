@@ -1,4 +1,4 @@
-import { hrrUser, isStudentPreviewUser, isBlockedEmail } from './hrr-auth.js';
+import { hrrUser, isStudentPreviewUser, isBlockedEmail, createSession, deleteSession, SESSION_PREFIX } from './hrr-auth.js';
 import { googleAccessToken } from './hrr-applications.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', ...headers } });
@@ -733,6 +733,13 @@ export async function handleHrr(request, env, url) {
     return new Response(await response.text(), { status: response.status, headers: { 'content-type': 'application/json; charset=utf-8' } });
   }
   if (request.method === 'GET' && url.pathname === '/api/hrr/me') return me(request, env);
+  // Swap a 1-hour Google sign-in for a remembered 60-day session; logging out deletes it.
+  if (request.method === 'POST' && url.pathname === '/api/hrr/auth/session') {
+    if (String(request.headers.get('Authorization') || '').slice(7).startsWith(SESSION_PREFIX)) return json({ error: 'Влез с Google.' }, 400);
+    const auth = await requireUser(request, env); if (auth.response) return auth.response;
+    return json({ token: await createSession(env, auth.user) });
+  }
+  if (request.method === 'POST' && url.pathname === '/api/hrr/auth/logout') { await deleteSession(env, String(request.headers.get('Authorization') || '').slice(7)); return json({ ok: true }); }
   if (request.method === 'POST' && url.pathname === '/api/hrr/teams/join') return joinTeam(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/team') return team(request, env);
   if (request.method === 'GET' && url.pathname === '/api/hrr/missions') return missions(request, env);
