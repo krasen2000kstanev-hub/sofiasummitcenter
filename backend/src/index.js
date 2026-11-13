@@ -3,7 +3,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import arialFont from '../assets/arial.ttf';
 import { cors } from './cors.js';
-import { handleHrr, syncRoster, syncMissionPointsToSheet } from './hrr.js';
+import { handleHrr, syncRoster, syncMissionPointsToSheet, refreshRanking } from './hrr.js';
 import { handleHrrApplications, processHrrApplicationOutbox } from './hrr-applications.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
@@ -416,8 +416,8 @@ export default {
     ctx.waitUntil(processHrrApplicationOutbox(env));
     // Season roster sheet → team emails, so students land in their team on first Google login.
     if (env.HRR_ROSTER_SHEET_ID) ctx.waitUntil(syncRoster(env, env.HRR_ROSTER_SHEET_ID).then((r) => { if (r.error) console.warn('Roster sync failed', r.error); }));
-    // Approved mission points → column F of the season sheet (needs the sheet shared with the service account as Editor).
-    if (env.HRR_ROSTER_SHEET_ID) ctx.waitUntil(syncMissionPointsToSheet(env, env.HRR_ROSTER_SHEET_ID).then((r) => { if (r.error) console.warn('Mission points sync failed', r.error); }).catch((error) => console.warn('Mission points sync failed', error.message)));
+    // Ranking snapshot for /api/hrr/ranking, then approved mission points → column F of the season sheet (needs the sheet shared with the service account as Editor).
+    ctx.waitUntil(refreshRanking(env).then((teams) => syncMissionPointsToSheet(env, env.HRR_ROSTER_SHEET_ID, teams)).then((r) => { if (r.error) console.warn('Mission points sync failed', r.error); }).catch((error) => console.warn('Mission points sync failed', error.message)));
   }
 };
 

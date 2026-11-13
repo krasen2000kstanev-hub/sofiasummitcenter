@@ -328,20 +328,26 @@ async function me(request, env) {
   return json({ user: auth.user, team, canPreview: isStudentPreviewUser(auth.user), driveRoot: auth.user.role === 'admin' ? env.HRR_DRIVE_ROOT_ID || null : null });
 }
 
-// ponytail: per-isolate memory cache (Cache API is a no-op on workers.dev); points lag up to 5 min
-let rankingCache = { at: 0, body: null };
-async function ranking(env) {
-  if (rankingCache.body && Date.now() - rankingCache.at < 300_000) return new Response(rankingCache.body, { headers: { 'content-type': 'application/json; charset=utf-8' } });
-  const response = await rankingFromDb(env);
-  if (response.ok) rankingCache = { at: Date.now(), body: await response.clone().text() };
-  return response;
+// The cron stores the computed ranking in one row; the public endpoint reads only that row (1 row read instead of ~1,100).
+const RANKING_MAX_AGE_MS = 10 * 60 * 1000; // cron runs every 5 min; recompute on read only if it stalled
+let rankingMemo = { at: 0, body: null }; // ponytail: per-isolate, saves even the 1-row read for 60s
+
+export async function refreshRanking(env) {
+  const season = await currentSeason(env);
+  const teams = season ? ((await missionPointsByTeam(env, season)).results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })) : [];
+  const body = JSON.stringify({ season: season?.slug || null, teams, updatedAt: now() });
+  await env.DB.prepare('INSERT INTO hrr_ranking_snapshot (id,body,updated_at) VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body,updated_at=excluded.updated_at').bind(body, now()).run();
+  rankingMemo = { at: Date.now(), body };
+  return teams;
 }
 
-async function rankingFromDb(env) {
-  const season = await currentSeason(env);
-  if (!season) return json({ season: null, teams: [], updatedAt: now() });
-  const rows = await missionPointsByTeam(env, season);
-  return json({ season: season.slug, teams: (rows.results || []).map(row => ({ ...row, missionsPoints: Number(row.missions_points || 0), missionsCompleted: Number(row.missions_completed || 0) })), updatedAt: now() });
+async function ranking(env) {
+  if (!rankingMemo.body || Date.now() - rankingMemo.at > 60_000) {
+    const row = await env.DB.prepare('SELECT body,updated_at FROM hrr_ranking_snapshot WHERE id=1').first();
+    if (row && Date.now() - Date.parse(row.updated_at) < RANKING_MAX_AGE_MS) rankingMemo = { at: Date.now(), body: row.body };
+    else await refreshRanking(env);
+  }
+  return new Response(rankingMemo.body, { headers: { 'content-type': 'application/json; charset=utf-8' } });
 }
 
 function missionPointsByTeam(env, season) {
@@ -373,9 +379,9 @@ export function missionSheetUpdates(rows, pointsByTeam, tab) {
 }
 
 // Approved mission points from the site → column F of the season sheet, so the sheet total and the public ranking include them.
-export async function syncMissionPointsToSheet(env, sheetId) {
-  const season = await currentSeason(env); if (!season || !sheetId) return { skipped: true };
-  const pointsByTeam = new Map(((await missionPointsByTeam(env, season)).results || []).map((r) => [`${r.university}::${r.team_name}`, Number(r.missions_points || 0)]));
+export async function syncMissionPointsToSheet(env, sheetId, teams) {
+  if (!sheetId || !teams?.length) return { skipped: true };
+  const pointsByTeam = new Map(teams.map((r) => [`${r.university}::${r.team_name}`, Number(r.missions_points || 0)]));
   const token = await googleAccessToken(env);
   const base = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}`;
   const meta = await fetch(`${base}?fields=sheets.properties(sheetId,title)`, { headers: { authorization: `Bearer ${token}` } });
