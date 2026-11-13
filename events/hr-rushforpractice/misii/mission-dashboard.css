@@ -287,3 +287,5 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 html.zoom-open,html.zoom-open body{overflow:hidden}
 .photo-zoom-close{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:51;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(10,14,28,.75);color:#fff;font-size:30px;line-height:1;display:grid;place-items:center;cursor:pointer}
 .photo-zoom-close:hover,.photo-zoom-close:focus-visible{background:rgba(255,255,255,.18)}
+.team-bundle{scroll-margin-top:96px}
+.mentor-submission small.sent-at{display:block;margin-top:3px;color:var(--muted)}
