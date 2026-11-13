@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { generateKeyPairSync, sign } from 'node:crypto';
 import { after, test } from 'node:test';
 import { handleHrr } from '../src/hrr.js';
+import { cors } from '../src/cors.js';
 
 const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwk = { ...publicKey.export({ format: 'jwk' }), kid: 'hrr-authz-test', use: 'sig', alg: 'RS256' };
@@ -153,4 +154,10 @@ test('drive sync answers only the Drive owner', async () => {
   assert.equal((await call(envFor('admin'))).status, 403);
   assert.equal((await call({ ...envFor('admin'), HRR_DRIVE_OWNER: 'owner@example.test' })).status, 403);
   assert.equal((await call({ ...envFor('admin'), HRR_DRIVE_OWNER: 'owner@example.test' }, { authorization: 'Bearer someone-else' })).status, 403);
+});
+
+test('browsers may PATCH and DELETE every HR:Rush route (editing a submission failed the CORS preflight)', () => {
+  const methods = (path) => cors(new Request(`https://api.test${path}`, { headers: { Origin: 'https://sofiasummit.bg' } }))['access-control-allow-methods'];
+  assert.match(methods('/api/hrr/submissions/s1'), /PATCH/);
+  assert.match(methods('/api/hrr/mentor/missions/m1'), /DELETE/);
 });
