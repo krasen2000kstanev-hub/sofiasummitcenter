@@ -272,3 +272,10 @@ body[data-role=viewer] #missionCreateForm,body[data-role=viewer] [data-edit-miss
 /* Several evidence photos */
 .evidence-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .evidence-gallery .evidence-image{width:100%;margin:0}
+/* Teammates who sent the same mission, reviewed together */
+.team-bundle{border:1px solid var(--line);border-left:4px solid var(--purple);border-radius:14px;padding:6px 12px 2px;margin:10px 0;background:var(--surface)}
+.team-bundle-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 0}
+.team-bundle-head small{color:var(--muted);font-size:12px}
+.team-bundle-head .bundle-actions{margin-left:auto;display:flex}
+.team-bundle>.mentor-submission:first-of-type{border-top:1px solid var(--line)}
+@media(max-width:760px){.team-bundle{padding:4px 8px 0}.team-bundle-head .bundle-actions{margin-left:0;flex-basis:100%}.team-bundle-head .primary-button{width:100%}}

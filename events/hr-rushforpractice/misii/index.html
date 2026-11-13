@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мисии | HR:Rush for Practice</title>
   <meta name="description" content="Mission control за HR:Rush for Practice.">
-  <link rel="stylesheet" href="mission-dashboard.css?v=20261113-photos">
+  <link rel="stylesheet" href="mission-dashboard.css?v=20261113-teams">
   <script src="../hrr-theme.js?v=2"></script>
   <script src="auth-config.js?v=google1"></script>
 </head>
@@ -208,6 +208,12 @@
     let mentorMissions = [], mentorDirectory = [];
     // Review queue segmented by mission: chips filter, groups keep pending counts; typed feedback survives re-render.
     let hrrSubmissions = [], hrrSubmissionRow = () => '', submissionFilter = 'all';
+    // Teammates who both sent the same mission are shown together, with one button to approve them all.
+    const TEAM_UNI = { nbu: 'НБУ', su: 'СУ', unss: 'УНСС', uzf: 'УЗФ', unibit: 'УниБИТ' };
+    const teamLabel = s => [TEAM_UNI[(String(s.team_id).match(/_(nbu|su|unss|uzf|unibit)_\d+$/) || [])[1]], s.team_name].filter(Boolean).join(' · ');
+    const byTeam = items => [...items.reduce((map, s) => map.set(s.team_id || s.id, [...(map.get(s.team_id || s.id) || []), s]), new Map()).values()].sort((a, b) => b.filter(s => s.status === 'pending').length - a.filter(s => s.status === 'pending').length);
+    const teamBundle = items => { if (items.length < 2) return items.map(hrrSubmissionRow).join(''); const waiting = items.filter(s => s.status === 'pending'); return `<div class="team-bundle"><div class="team-bundle-head"><b>👥 ${esc(teamLabel(items[0]))}</b><small>${items.length} изпращания от екипа${waiting.length ? ` · ${waiting.length} чакат` : ''}</small>${waiting.length > 1 ? `<span class="review-actions bundle-actions"><button class="primary-button" type="button" data-approve-team="${esc(waiting.map(s => s.id).join(','))}">Одобри всички (${waiting.length})</button></span>` : ''}</div>${items.map(hrrSubmissionRow).join('')}</div>`; };
+    document.addEventListener('click', async event => { const button = event.target.closest('[data-approve-team]'); if (!button) return; const ids = button.dataset.approveTeam.split(','); if (!confirm(`Да одобря всичките ${ids.length} изпращания от екипа? Обратната връзка и бонус точките от полетата се изпращат към всеки.`)) return; button.disabled = true; try { for (const id of ids) await api(`/api/hrr/mentor/submissions/${id}/review`, { method: 'POST', body: JSON.stringify({ status: 'approved', note: document.querySelector(`[data-note="${id}"]`)?.value || '', bonusPoints: Number(document.querySelector(`[data-bonus="${id}"]`)?.value || 0) }) }); } catch (error) { alert(error.message); } await loadMentorPanel(); });
     function renderSubmissions() {
       const box = document.querySelector('#mentorSubmissions');
       const drafts = [...box.querySelectorAll('[data-note],[data-bonus]')].map(el => [el.dataset.note ? `[data-note="${el.dataset.note}"]` : `[data-bonus="${el.dataset.bonus}"]`, el.value]);
@@ -220,7 +226,7 @@
       const ordered = [...groups].sort((a, b) => pending(b[1].items) - pending(a[1].items));
       const shown = submissionFilter === 'all' ? ordered : [[submissionFilter, groups.get(submissionFilter)]];
       box.innerHTML = `<div class="submission-filters">${chip('all', 'Всички', hrrSubmissions)}${ordered.map(([key, g]) => chip(key, g.title, g.items)).join('')}</div>`
-        + shown.map(([, g]) => `<h3 class="submission-group">${esc(g.title)} <small>${pending(g.items)} чакат · ${g.items.length} общо</small></h3>${g.items.map(hrrSubmissionRow).join('')}`).join('');
+        + shown.map(([, g]) => `<h3 class="submission-group">${esc(g.title)} <small>${pending(g.items)} чакат · ${g.items.length} общо</small></h3>${byTeam(g.items).map(teamBundle).join('')}`).join('');
       for (const [selector, value] of drafts) { const el = box.querySelector(selector); if (el && value) el.value = value; }
     }
     document.addEventListener('click', event => { const button = event.target.closest('[data-submission-filter]'); if (!button) return; submissionFilter = button.dataset.submissionFilter; renderSubmissions(); });
