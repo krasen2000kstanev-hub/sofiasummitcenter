@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Програма · Nail Business Re:Start</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800;900&family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: стилът на sofiasummit.bg/events/nail-business-restart — тъмна шапка, хартиен фон, бели редове, син акцент. Една светла тема, както сайта. */
+:root{
+  --ink:#0b0b0d; --on-ink:#f3f1f2; --on-ink-muted:#aca6ae;
+  --paper:#faf8f5; --paper-2:#ffffff; --text:#0a0a0c; --muted:#6f6a72;
+  --blue:#1e8cae; --blue-2:#0e5c74; --line:rgba(17,16,19,.12);
+  --display:"Unbounded", system-ui, sans-serif;
+  --body:"Manrope", -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.45}
+.pad{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:1040px;margin:0 auto}
+
+.top{background:var(--ink);color:var(--on-ink);padding-block:28px 30px}
+.logo{font-family:var(--display);font-weight:900;font-size:clamp(30px,8vw,44px);line-height:.98;text-transform:uppercase;margin:0}
+.logo span{color:var(--blue)}
+.meta{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-ink-muted);margin-top:14px}
+
+.tabs-band{background:var(--paper);position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;padding-block:12px;border-bottom:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tabs button{font-family:var(--body);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--line);border-radius:4px;padding:12px 8px;background:var(--paper-2);color:var(--text);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.tabs button:focus-visible{outline:2px solid var(--blue-2);outline-offset:2px}
+
+main{padding-block:26px 48px}
+.cols{display:grid;gap:36px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-weight:600}
+h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,6.5vw,36px);letter-spacing:-.01em;margin:4px 0 16px;line-height:1.05}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+
+.s{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:14px}
+.time{background:var(--blue);color:#fff;border-radius:6px;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;padding:6px 8px;min-width:56px;text-align:center}
+.txt{min-width:0}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.title{font-weight:700;font-size:16px;line-height:1.3;overflow-wrap:anywhere;margin-top:2px}
+.by{color:var(--blue);font-weight:600;font-size:13px;margin-top:3px}
+.s.now{border:2px solid var(--blue);padding:13px}
+.now-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--on-ink);border-radius:3px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+
+.b{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--muted);padding:2px 4px;font-variant-numeric:tabular-nums}
+.b::before,.b::after{content:"";height:1px;background:var(--line);flex:1}
+.b.lunch{background:var(--ink);color:var(--on-ink);border-radius:4px;padding:12px 14px;letter-spacing:.06em;text-transform:uppercase}
+.b.lunch::before,.b.lunch::after{display:none}
+.b.now{color:var(--blue);font-weight:600}
+
+footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;color:var(--muted)}
+footer a{color:var(--blue);font-weight:600}
+
+@media (max-width:859px){
+  .top{padding-block:18px 18px}
+  .logo{font-size:28px}
+  .meta{margin-top:8px;font-size:11px}
+  main{padding-block:18px 36px}
+  h2{display:none}            /* бутонът горе вече казва коя програма е */
+  .kicker{margin-bottom:12px}
+  .s{gap:12px;padding:12px}
+  .s.now{padding:11px}
+  .time{min-width:52px;font-size:14px;padding:5px 6px}
+  .title{font-size:15.5px}
+  .tabs button{padding:13px 6px;font-size:13px}
+  .s.now, .b.now{scroll-margin-top:80px}
+}
+@media (min-width:860px){
+  .tabs-band{display:none}
+  .cols{grid-template-columns:1fr 1fr}
+  .track[hidden]{display:block!important}
+}
+@media (prefers-reduced-motion:no-preference){.tabs button{transition:background .15s,color .15s}}
+</style>
+</head>
+<body>
+
+<div class="top pad"><div class="wrap">
+  <p class="logo">Nail Business<br><span>Re:Start</span></p>
+  <div class="meta">15 ноември 2026 · Програма на деня</div>
+</div></div>
+
+<div class="tabs-band pad"><div class="wrap tabs" role="tablist" aria-label="Програма">
+  <button id="tab-main" role="tab" aria-selected="true" aria-controls="main" data-t="main">Програма</button>
+  <button id="tab-master" role="tab" aria-selected="false" aria-controls="master" data-t="master">Мастър класове</button>
+</div></div>
+
+<main class="pad"><div class="wrap cols">
+  <section class="track" id="main" role="tabpanel" aria-labelledby="tab-main"></section>
+  <section class="track" id="master" role="tabpanel" aria-labelledby="tab-master" hidden></section>
+</div></main>
+
+<footer class="pad"><div class="wrap">Часовете може леко да се изместят. Повече за събитието: <a href="../">sofiasummit.bg</a></div></footer>
+
+<script>
+// Ден на събитието: в този ден текущата сесия се отбелязва „Сега“.
+const EVENT_DATE = "2026-11-15";
+
+// [час, заглавие, тип, лектор]
+const DATA = {
+  main: { kicker: "Основна зала", title: "Програма", items: [
+    ["9:00","Откриване и представяне"],
+    ["9:30","Комбиниран маникюр","Практика","Ирина Кулик"],
+    ["10:10","Почивка"],
+    ["10:25","Брандинг в социалните мрежи","Лекция"],
+    ["10:55","Почивка"],
+    ["11:10","Вградени дизайни с горни форми","Практика","Илияна Колева"],
+    ["11:50","Почивка"],
+    ["12:05","Правилна работа с продуктите на Mirellia. Работа с гел типсове","Практика","Златина Димитрова"],
+    ["12:45","Обедна почивка"],
+    ["13:30","Успешно видео съдържание","Лекция"],
+    ["14:00","Почивка"],
+    ["14:15","Френч и червено. Форма квадрат","Практика","Лина Валериева"],
+    ["14:55","Почивка"],
+    ["15:10","AI за съдържание","Лекция"],
+    ["15:40","Почивка"],
+    ["15:55","Бързи салонни дизайни","Практика","Ирен Костова"]
+  ]},
+  master: { kicker: "VIP програма", title: "Мастър класове", items: [
+    ["9:30","AI за маникюристи","Мастър клас","Огнян Апостолов"],
+    ["10:20","Почивка"],
+    ["10:40","Изграждане без пилене","Мастър клас","Ирина Кулик"],
+    ["11:30","Почивка"],
+    ["11:50","Как да позиционираме бранда си в социалните мрежи","Мастър клас","Елена Георгиева"],
+    ["12:40","Обедна почивка"],
+    ["13:30","Експресно изграждане с горни форми","Мастър клас","Златина Димитрова"],
+    ["14:20","Почивка"],
+    ["14:40","Как да направим видео съдържанието ни успешно","Мастър клас","Борислава Иванова"],
+    ["15:30","Почивка"],
+    ["15:50","3D за всеки: Crystal Flower","Мастър клас","Илияна Колева"]
+  ]}
+};
+
+const toMin = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const hhmm = n => `${Math.floor(n/60)}:${String(n%60).padStart(2,"0")}`;
+
+function nowMin(){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  if(`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}` !== EVENT_DATE) return -1;
+  return d.getHours()*60 + d.getMinutes();
+}
+
+function render(){
+  const n = nowMin();
+  for (const key in DATA){
+    const {kicker, title, items} = DATA[key];
+    let html = `<div class="kicker">${kicker}</div><h2>${title}</h2><ol>`;
+    items.forEach(([t, name, type, by], i) => {
+      const start = toMin(t), next = items[i+1] ? toMin(items[i+1][0]) : null;
+      // ponytail: последната сесия няма край в програмата, приемаме 45 мин
+      const end = next ?? start + 45;
+      const isNow = n >= start && n < end;
+      const badge = isNow ? '<span class="now-badge">Сега</span>' : '';
+      if (/почивка/i.test(name)){
+        html += `<li class="b${/обедна/i.test(name)?' lunch':''}${isNow?' now':''}">${name} · ${end-start} мин${badge}</li>`;
+      } else {
+        const tag = [type, next ? `до ${hhmm(next)} · ${end-start} мин` : null].filter(Boolean).join(" · ");
+        html += `<li class="s${isNow?' now':''}"><div class="time">${t}</div><div class="txt"><div class="tag">${tag}</div><div class="title">${name}${badge}</div>${by?`<div class="by">${by}</div>`:''}</div></li>`;
+      }
+    });
+    document.getElementById(key).innerHTML = html + "</ol>";
+  }
+}
+
+function show(key){
+  if(!DATA[key]) key = "main";
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.t === key));
+  document.querySelectorAll(".track").forEach(s => s.hidden = s.id !== key);
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  show(b.dataset.t);
+  try { history.replaceState(null, "", "#" + b.dataset.t); } catch(e) {}
+}));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+render();
+show(location.hash.slice(1));
+setInterval(render, 60000);
+
+// На телефон: ако нещо тече в момента, превърти до него
+const cur = document.querySelector(".track:not([hidden]) .now");
+if (cur) cur.scrollIntoView({block: "center"});
+</script>
+</body>
+</html>
