@@ -457,6 +457,24 @@ async function missions(request, env) {
   return json({ missions: studentView ? (rows.results || []).map(maskMission) : rows.results || [] });
 }
 
+const htmlText = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Email the mission's mentor about a new submission. A mail failure never blocks the submission itself.
+export async function emailMentor(env, mission, studentName) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM || !mission.mentor_user_id) return;
+  try {
+    const mentor = await env.DB.prepare('SELECT email,display_name FROM hrr_users WHERE id=?').bind(mission.mentor_user_id).first();
+    if (!mentor?.email) return;
+    const link = `${env.PUBLIC_SITE_URL || 'https://sofiasummit.bg'}/events/hr-rushforpractice/misii/?portal=mentor`;
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST', headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ from: env.EMAIL_FROM, to: [mentor.email], subject: `Ново изпълнение: ${mission.title}`,
+        html: `<p>Здравейте${mentor.display_name ? `, ${htmlText(mentor.display_name.split(/\s+/)[0])}` : ''}!</p><p><b>${htmlText(studentName)}</b> предаде мисията „${htmlText(mission.title)}“ в HR:Rush.</p><p><a href="${htmlText(link)}">Отвори менторския панел и провери</a></p><p style="color:#666;font-size:13px">Влез със същия имейл, на който получи това писмо.</p>` })
+    });
+    if (!response.ok) console.warn('Mentor email failed', response.status);
+  } catch (error) { console.warn('Mentor email failed', error.message); }
+}
+
 async function submit(request, env, missionId) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const mission = await env.DB.prepare("SELECT * FROM hrr_missions WHERE id=? AND status='active'").bind(missionId).first();
@@ -478,6 +496,7 @@ async function submit(request, env, missionId) {
   if (images.length) await saveImages(env, submissionId, images);
   if (evidenceDocument) await saveDocument(env, submissionId, evidenceDocument);
   await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), mission.mentor_user_id, 'submission', 'Ново изпълнение на мисия', `${auth.user.display_name} изпрати доказателство за „${mission.title}“.`, now()).run();
+  await emailMentor(env, mission, auth.user.display_name);
   return json({ ok: true, submissionId }, 201);
 }
 
