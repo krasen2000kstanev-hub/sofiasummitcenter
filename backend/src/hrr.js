@@ -409,12 +409,28 @@ export async function syncMissionPointsToSheet(env, sheetId, teams) {
   if (!meta.ok) return { error: `Could not read sheet tabs (${meta.status})` };
   const tab = ((await meta.json()).sheets || []).find((s) => s.properties?.sheetId === RANKING_GID)?.properties.title;
   if (!tab) return { error: 'Ranking tab (gid 0) not found' };
-  const read = await fetch(`${base}/values/${encodeURIComponent(`'${tab}'!A1:F400`)}`, { headers: { authorization: `Bearer ${token}` } });
-  if (!read.ok) return { error: `Could not read ${tab} (${read.status})` };
-  const data = missionSheetUpdates((await read.json()).values || [], pointsByTeam, tab, activityByTeam);
-  if (!data.length) return { ok: true, updated: 0 };
-  const write = await fetch(`${base}/values:batchUpdate`, { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
-  return write.ok ? { ok: true, updated: data.length } : { error: `Could not write ${tab} (${write.status})` };
+  const readRows = async () => { const read = await fetch(`${base}/values/${encodeURIComponent(`'${tab}'!A1:N400`)}`, { headers: { authorization: `Bearer ${token}` } }); if (!read.ok) throw new Error(`Could not read ${tab} (${read.status})`); return (await read.json()).values || []; };
+  let rows; try { rows = await readRows(); } catch (error) { return { error: error.message }; }
+  const data = missionSheetUpdates(rows, pointsByTeam, tab, activityByTeam);
+  if (data.length) {
+    const write = await fetch(`${base}/values:batchUpdate`, { method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }) });
+    if (!write.ok) return { error: `Could not write ${tab} (${write.status})` };
+    try { rows = await readRows(); } catch (error) { return { error: error.message }; } // the sheet recalculates N after E/F change
+  }
+  await env.DB.prepare('INSERT INTO hrr_sheet_snapshot (id,body,updated_at) VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body,updated_at=excluded.updated_at').bind(JSON.stringify(sheetTeamRows(rows)), now()).run();
+  return { ok: true, updated: data.length };
+}
+
+// The ranking tab as the sheet shows it: E activity, F missions, G–M candidate counts, N the sheet's own total. The portal shows these, so it never differs from the sheet.
+const SHEET_FIELDS = { activity: 4, missions: 5, pleggi: 6, found: 7, easy: 8, medium: 9, hard: 10, interviews: 11, hired: 12, total: 13 };
+export function sheetTeamRows(rows) {
+  const teams = {};
+  for (const row of rows) {
+    if (!/^\d+$/.test(String(row[0] || '').trim())) continue;
+    const key = `${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`;
+    if (!teams[key]) teams[key] = Object.fromEntries(Object.entries(SHEET_FIELDS).map(([name, i]) => [name, Number(String(row[i] ?? '').replace(',', '.')) || 0]));
+  }
+  return teams;
 }
 
 async function joinTeam(request, env) {
@@ -441,7 +457,9 @@ async function team(request, env) {
     WHERE s.team_id=? AND s.status='approved' AND m.scope='team' AND m.season_id=? GROUP BY s.mission_id,m.points
   ) approved_team_missions`).bind(membership.id, season.id).first();
   const teamBonus = await env.DB.prepare('SELECT COALESCE(SUM(points),0) points FROM hrr_bonus_awards WHERE team_id=? AND user_id IS NULL').bind(membership.id).first();
-  return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) + Number(teamBonus?.points || 0) });
+  const snapshot = await env.DB.prepare('SELECT body FROM hrr_sheet_snapshot WHERE id=1').first();
+  const sheet = snapshot ? JSON.parse(snapshot.body)[`${membership.university}::${membership.name}`] || null : null;
+  return json({ team: membership, members: members.results || [], teamPoints: Number(teamPoints?.points || 0) + Number(teamBonus?.points || 0), sheet });
 }
 
 // Team missions are shared: a submission by either member counts as the whole team's.
