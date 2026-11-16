@@ -52,6 +52,9 @@ export async function verifyHrrAccessToken(token, env) {
 }
 
 // Organizer-blocked addresses (e.g. a duplicate account of a student), comma-separated in HRR_BLOCKED_EMAILS.
+// One person with two Google addresses: HRR_EMAIL_ALIASES="second@x.com=main@y.com,..." signs the second one into the main account.
+export const mainEmail = (env, email) => Object.fromEntries(String(env.HRR_EMAIL_ALIASES || '').split(',').map((pair) => pair.split('=').map((e) => e.trim().toLowerCase())).filter(([from, to]) => from && to))[email] || email;
+
 export const isBlockedEmail = (env, email) => String(env.HRR_BLOCKED_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean).includes(String(email).trim().toLowerCase());
 
 // Platform session (60 days) handed out after one Google sign-in; only its SHA-256 is stored.
@@ -85,7 +88,7 @@ export async function hrrUser(request, env) {
   if (!header.startsWith('Bearer ')) return null;
   if (header.slice(7).startsWith(SESSION_PREFIX)) return sessionUser(header.slice(7), env);
   const claims = await verifyHrrAccessToken(header.slice(7), env);
-  const email = String(claims.email || claims['cognito:username'] || claims.username || '').trim().toLowerCase();
+  const email = mainEmail(env, String(claims.email || claims['cognito:username'] || claims.username || '').trim().toLowerCase());
   if (!email) throw new Error('Token has no email');
   if (isBlockedEmail(env, email)) throw new Error('Този имейл не е разрешен за HR:Rush. Влез с имейла, с който си в екипа.');
   const allowlist = await env.DB.prepare('SELECT role FROM hrr_mentor_allowlist WHERE email=? AND active=1').bind(email).first();
