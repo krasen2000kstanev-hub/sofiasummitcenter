@@ -195,3 +195,11 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - **Sheet editing rules.** Columns G–M can be typed by hand. E and F are overwritten by the site every 5 minutes. A–C identify the team (do not rename). N is the total formula; 25 rows use 3× Pleggi instead of 2× — the site shows whatever the sheet computes.
 - **Migrations added:** 0036 (duplicate mentor merge), 0037 (`hrr_sheet_snapshot`). Tests: `cd backend && npm test` (42).
 
+
+## HR:Rush — Drive tables (16 Nov 2026)
+
+These live in Google Drive, not in this repo; the site does not read them.
+
+- **Team tables** (one per „Екип N - <университет>“ folder, 137): column A „Име“ was added before „Телефон“.
+- **Company tables** (folder „Компании“, 16, one per company): column J „Трудност“ (лесна / средна / трудна) sits next to I „Сфера“ (the candidate's position). Values come from the positions sheet „Информация за позициите“, column D. A candidate listed for several positions gets the hardest one. The columns after J moved one to the right.
+- Any script that reads these tables by column number (e.g. `cv-check.gs`, not run yet) must be checked against the new layout before it runs.
