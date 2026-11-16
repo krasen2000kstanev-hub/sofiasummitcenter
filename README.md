@@ -184,3 +184,14 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 - Since migration 0035, every manual award has a `kind` set by the admin form: `activity` (the default) goes to column E and `mission` goes to column F, through `missions_points`.
 - The review queue has a „Виж по екип“ picker. Choosing a team shows which mission each member sent and its status, and lists only that team's submissions below.
 - `POST /api/hrr/mentor/submissions/:id/bonus` changes the bonus on an already approved submission. It is for the mission's mentor or an admin. The student gets an in-platform notification, and the ranking and sheet pick the change up on the next sync.
+
+## HR:Rush — mentor emails, one source for points (16 Nov 2026)
+
+- **Mentor email on every submission.** `emailMentor()` in `backend/src/hrr.js` sends the mission's mentor a Resend email (who sent it, which mission, link to `misii/?portal=mentor`). A mail failure is logged and never blocks the submission. It goes to the email the mentor signs in with.
+- **A mentor sees only submissions of missions where they are `mentor_user_id`.** A mission created by an admin stays with the admin until the admin picks a mentor in „Редактирай“. Check this first when a mentor says submissions do not show.
+- **Duplicate mentor accounts.** Migration 0036 moved one mentor's missions, inbox, comments and sessions from the seeded account to the one he signs in with. `HRR_EMAIL_ALIASES` (Cloudflare variable, `second@x=main@y,…`, not in the repo because it is public) signs a second Google address into the main account.
+- **Every team number comes from the sheet.** The ranking page shows column N (total), E (activity) and F (missions) of „Обща класация на екипи“ as they are; it no longer overrides them with live API numbers. „Откъде идват точките“ shows Мисии + Активност + Кандидати (N − E − F, so the sheet's own formula decides) with the candidate counts G–M under it.
+- **Student portal „Моят отбор“** shows the sheet total and the same breakdown. The cron writes E/F, re-reads A:N and stores it in `hrr_sheet_snapshot` (migration 0037); `GET /api/hrr/team` returns it as `sheet`. An approved mission reaches the sheet, and so the site, within 5 minutes. Personal points („Одобрени точки“, individual points) still come from the database, because the sheet has no per-student points.
+- **Sheet editing rules.** Columns G–M can be typed by hand. E and F are overwritten by the site every 5 minutes. A–C identify the team (do not rename). N is the total formula; 25 rows use 3× Pleggi instead of 2× — the site shows whatever the sheet computes.
+- **Migrations added:** 0036 (duplicate mentor merge), 0037 (`hrr_sheet_snapshot`). Tests: `cd backend && npm test` (42).
+
