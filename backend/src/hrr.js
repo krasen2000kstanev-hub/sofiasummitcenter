@@ -386,12 +386,26 @@ function missionPointsByTeam(env, season) {
 const RANKING_GID = 0; // „Обща класация на екипи“; found by gid so renaming the tab does not break the sync
 
 // Rows of „Обща класация“ (A rank, B university, C team, E activity points, F mission points) → cell updates where E or F differs.
+// A row may name several teams: „НБУ / СУ“ + „Екип 43 / Екип 21“ → НБУ::Екип 43 and СУ::Екип 21; one side may be single („НБУ / СУ“ + „Екип 1“).
+// A team that also has its own row stays only there, so nothing is counted twice.
+export function sheetRowKeys(rows) {
+  const split = (v) => { const parts = String(v || '').split('/').map((s) => s.trim()).filter(Boolean); return parts.length ? parts : ['']; };
+  const keys = rows.map((row) => {
+    if (!/^\d+$/.test(String(row[0] || '').trim())) return [];
+    const unis = split(row[1]), names = split(row[2]);
+    return Array.from({ length: Math.max(unis.length, names.length) }, (_, i) => `${unis[Math.min(i, unis.length - 1)]}::${names[Math.min(i, names.length - 1)]}`);
+  });
+  const own = new Set(keys.filter((k) => k.length === 1).flat());
+  return keys.map((k) => (k.length > 1 ? k.filter((key) => !own.has(key)) : k));
+}
+
+const sumFor = (map, keys) => (keys.some((k) => map.has(k)) ? keys.reduce((total, k) => total + (map.get(k) || 0), 0) : undefined);
+
 export function missionSheetUpdates(rows, pointsByTeam, tab, activityByTeam = new Map()) {
-  const updates = [];
+  const updates = [], rowKeys = sheetRowKeys(rows);
   rows.forEach((row, index) => {
-    if (!/^\d+$/.test(String(row[0] || '').trim())) return;
-    const key = `${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`;
-    const activity = activityByTeam.get(key), points = pointsByTeam.get(key);
+    if (!rowKeys[index].length) return;
+    const activity = sumFor(activityByTeam, rowKeys[index]), points = sumFor(pointsByTeam, rowKeys[index]);
     if (activity !== undefined && Number(row[4] || 0) !== activity) updates.push({ range: `'${tab}'!E${index + 1}`, values: [[activity]] });
     if (points !== undefined && Number(row[5] || 0) !== points) updates.push({ range: `'${tab}'!F${index + 1}`, values: [[points]] });
   });
@@ -424,12 +438,10 @@ export async function syncMissionPointsToSheet(env, sheetId, teams) {
 // The ranking tab as the sheet shows it: E activity, F missions, G–M candidate counts, N the sheet's own total. The portal shows these, so it never differs from the sheet.
 const SHEET_FIELDS = { activity: 4, missions: 5, pleggi: 6, found: 7, easy: 8, medium: 9, hard: 10, interviews: 11, hired: 12, total: 13 };
 export function sheetTeamRows(rows) {
-  const teams = {};
-  for (const row of rows) {
-    if (!/^\d+$/.test(String(row[0] || '').trim())) continue;
-    const key = `${String(row[1] || '').trim()}::${String(row[2] || '').trim()}`;
-    if (!teams[key]) teams[key] = Object.fromEntries(Object.entries(SHEET_FIELDS).map(([name, i]) => [name, Number(String(row[i] ?? '').replace(',', '.')) || 0]));
-  }
+  const teams = {}, rowKeys = sheetRowKeys(rows);
+  rows.forEach((row, index) => {
+    for (const key of rowKeys[index]) if (!teams[key]) teams[key] = Object.fromEntries(Object.entries(SHEET_FIELDS).map(([name, i]) => [name, Number(String(row[i] ?? '').replace(',', '.')) || 0]));
+  });
   return teams;
 }
 

@@ -16,3 +16,24 @@ test('sheetTeamRows keeps the sheet numbers as they are, per university and team
   assert.equal(teams['НБУ::Екип 31'].total, 31);
   assert.equal(teams['НБУ::Екип 31'].activity, 0);
 });
+
+test('a row naming two universities or teams matches the team that has no row of its own', async () => {
+  const { missionSheetUpdates } = await import('../src/hrr.js');
+  const rows = [
+    ['Място'],
+    ['27', 'НБУ / СУ', 'Екип 1', 'Фикосота', '', '20'],
+    ['80', 'СУ', 'Екип 1', 'Кауфланд', '', '1'],
+    ['124', 'НБУ / СУ', 'Екип 43 / Екип 21', 'Плеги / Глово', '6', ''],
+    ['6', 'СУ', 'Екип 21', 'Глово', '', '28'],
+  ];
+  const points = new Map([['НБУ::Екип 1', 26], ['СУ::Екип 1', 1], ['НБУ::Екип 43', 3], ['СУ::Екип 21', 28]]);
+  assert.deepEqual(missionSheetUpdates(rows, points, 'T'), [
+    { range: "'T'!F2", values: [[26]] },
+    { range: "'T'!F4", values: [[3]] },
+  ]);
+  const teams = sheetTeamRows(rows);
+  assert.equal(teams['НБУ::Екип 1'].missions, 20);
+  assert.equal(teams['СУ::Екип 1'].missions, 1);
+  assert.equal(teams['НБУ::Екип 43'].activity, 6);
+  assert.equal(teams['СУ::Екип 21'].missions, 28);
+});
