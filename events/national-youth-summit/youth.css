@@ -1,0 +1,101 @@
+/* Национален младежки Summit: само разликите спрямо шаблона. Цветовете са в :root на styles.css. */
+.skip-link{position:absolute;left:12px;top:-60px;z-index:50;background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px}
+.skip-link:focus-visible{top:12px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+
+.brand-mark{width:52px;height:52px;flex:0 0 52px;border-radius:14px;font-size:18px;background:var(--ink);color:var(--yellow)}
+.site-footer .brand-mark{background:var(--ink);color:var(--yellow)}
+.site-footer .brand-name{font-size:14px}
+
+.hero-copy h1{font-size:clamp(3.2rem,7vw,6.6rem)!important;text-wrap:balance}
+.hero-copy h1 em{color:var(--yellow)}
+.eyebrow-dot{background:var(--yellow)}
+.hero-gallery .hero-slide img{object-position:60% 50%}
+
+.youth-program{list-style:none;counter-reset:step;margin:0 0 28px;padding:0;display:grid;gap:14px}
+.youth-program li{counter-increment:step;display:grid;grid-template-columns:44px 1fr;gap:2px 14px;align-items:start}
+.youth-program li::before{content:"0" counter(step);grid-row:span 2;font:600 22px/1 'Montserrat',sans-serif;color:var(--coral)}
+.youth-program strong{font:600 19px/1.2 'Montserrat',sans-serif;color:var(--ink)}
+.youth-program span{color:var(--muted);font-size:15px}
+
+.youth-poster{background:var(--ink)!important}
+.youth-poster img{object-fit:contain!important;object-position:50% 50%!important}
+
+.guest-photo{background:#e6e1f4}
+.guest-photo img{width:100%;height:100%;object-fit:cover}
+
+.payment-note a,.form-status a{color:var(--coral);font-weight:700}
+.registration-form button[disabled]{opacity:.6;cursor:progress}
+
+@media(max-width:680px){.hero-copy h1{font-size:clamp(2.6rem,11vw,3.6rem)!important;line-height:.95!important}.brand-mark{width:44px;height:44px;flex-basis:44px;font-size:16px}.youth-program strong{font-size:17px}}
+.hero .button-primary{background:var(--yellow);color:var(--ink);box-shadow:5px 5px 0 #fff}
+.hero .button-primary:hover,.hero .button-primary:focus-visible{background:var(--coral);color:#fff}
+.story h2 span,.story .section-label,.story-card small{color:var(--yellow)!important}
+.site-footer{background:var(--ink)!important}.site-footer p,.site-footer a,.site-footer .brand-name{color:#fff!important}.site-footer .brand-mark{background:var(--yellow)!important;color:var(--ink)!important}
+.event-meta strong{display:block}
+/* Лектори: 3 карти в ред, кръгли снимки (изворите са малки, така остават остри) */
+.guests .guest-track.youth-speakers{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;overflow:visible!important;transform:none!important}
+.youth-speakers .guest-card{flex:none!important;width:auto!important;min-width:0!important;height:auto!important;display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 28px 30px!important;border-radius:28px;background:#fff;border:1px solid var(--line);opacity:1!important;transform:none!important}
+.youth-speakers .guest-photo{width:180px!important;height:180px!important;min-height:0!important;flex:none;border-radius:50%!important;overflow:hidden;border:5px solid var(--yellow);box-shadow:0 0 0 5px #fff,0 0 0 7px var(--coral);margin:0 0 26px!important;background:#e6e1f4}
+.youth-speakers .guest-photo img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:50% 35%!important;filter:none!important;transform:none!important}
+.youth-speakers h3{order:0;margin:0 0 12px!important;font:600 26px/1.08 'Montserrat',sans-serif!important;letter-spacing:-.03em;color:var(--ink)}
+.youth-speakers h3 br{display:block}
+.youth-speakers .guest-topic{margin:0!important;color:var(--muted)!important;font:500 15px/1.45 'Inter',sans-serif!important;max-width:28ch}
+.youth-socials{display:flex;gap:10px;justify-content:center;margin-top:18px}
+.youth-socials:empty{display:none}
+.youth-socials a{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;font:700 14px 'Inter',sans-serif;text-decoration:none}
+.youth-socials a:hover,.youth-socials a:focus-visible{background:var(--coral)}
+.guests:has(.youth-speakers) .guest-controls{display:none!important}
+@media(max-width:860px){.guests .guest-track.youth-speakers{grid-template-columns:1fr;gap:18px}.youth-speakers .guest-photo{width:150px!important;height:150px!important}}
+/* Плакатът като HTML (вместо screenshot-а с лентата за zoom) */
+.youth-poster{padding:0!important;overflow:hidden}
+.yp{position:relative;height:100%;min-height:100%;display:flex;flex-direction:column;gap:18px;padding:30px 28px 28px;color:#fff;background:linear-gradient(180deg,rgba(20,26,74,.92),rgba(20,26,74,.97)),url("assets/events/venue-hall.jpg") center/cover;isolation:isolate}
+.yp::before,.yp::after{content:"";position:absolute;z-index:-1;background:var(--coral);clip-path:polygon(0 0,100% 0,0 100%)}
+.yp::before{left:0;top:0;width:90px;height:150px}
+.yp::after{right:0;bottom:0;width:90px;height:150px;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.yp p{margin:0}
+.yp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.yp-title{font:italic 700 clamp(24px,2.6vw,34px)/.95 'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:-.02em;transform:rotate(-3deg)}
+.yp-title strong{display:inline-block;font-size:1.55em;font-style:normal;border-bottom:5px solid var(--yellow);padding-bottom:4px}
+.yp-badge{flex:none;background:var(--yellow);color:var(--ink);font:800 15px/1.05 'Montserrat',sans-serif;text-transform:uppercase;text-align:center;padding:12px 14px;transform:rotate(-6deg);border-radius:6px}
+.yp-tagline{font:italic 500 17px 'Inter',sans-serif;color:#dcd8ff;border-left:3px solid var(--yellow);padding-left:12px}
+.yp-formats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.yp-formats li{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font:700 12.5px/1.2 'Inter',sans-serif}
+.yp-formats svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.yp-label{align-self:flex-start;background:var(--coral);font:italic 700 15px 'Montserrat',sans-serif;padding:6px 14px;transform:skewX(-10deg)}
+.yp-speakers{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.yp-speakers li{display:flex;align-items:center;gap:12px;background:rgba(109,40,217,.55);border-left:4px solid var(--yellow);padding:8px 12px 8px 8px}
+.yp-speakers img{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none}
+.yp-speakers span{display:flex;flex-direction:column;font-size:12.5px;color:#e4e0ff}
+.yp-speakers strong{color:#fff;font:700 15px/1.2 'Montserrat',sans-serif}
+.yp-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;border-top:1px solid #ffffff55;border-bottom:3px solid var(--yellow);padding:10px 0;font:italic 700 15px 'Montserrat',sans-serif}
+.yp-banner{margin-top:auto!important;background:var(--yellow);color:var(--ink);font:italic 800 16px/1.15 'Montserrat',sans-serif;text-transform:uppercase;text-align:center;padding:14px 16px;transform:rotate(-1.5deg)}
+@media(max-width:480px){.yp{padding:24px 18px}.yp-formats li{font-size:11.5px}.yp-meta{font-size:14px}}
+.youth-poster{position:relative;z-index:3;height:auto!important;min-height:0!important;align-self:stretch}.youth-poster .yp{height:auto}
+.next-speaker-card:has(.youth-poster) .next-speaker-panel{grid-column:1/span 6;padding-right:40px;border-radius:0;background:none}.next-speaker-card .youth-poster{grid-column:7/-1;aspect-ratio:auto!important}@media(max-width:760px){.next-speaker-card:has(.youth-poster) .next-speaker-panel,.next-speaker-card .youth-poster{grid-column:1}.next-speaker-card:has(.youth-poster) .next-speaker-panel{padding-right:0}}
+/* Иконки на социалните мрежи */
+.youth-socials{flex-wrap:wrap}
+.youth-socials svg{width:18px;height:18px;fill:currentColor}
+.youth-socials svg.stroke{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.youth-socials svg .dot{fill:currentColor;stroke:none}
+/* Организатор: Мисия 100 */
+.youth-organizer{display:grid;grid-template-columns:minmax(160px,260px) 1fr;gap:32px;align-items:center;margin-top:48px;padding:28px;background:#fff;border:1px solid var(--line);border-radius:24px}
+.youth-organizer-logo img{display:block;width:100%;height:auto}
+.youth-organizer-label{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--coral)}
+.youth-organizer h3{margin:0 0 8px;font:600 32px/1 'Montserrat',sans-serif;letter-spacing:-.03em}
+.youth-organizer p{color:var(--muted);margin:0}
+.youth-organizer .youth-socials{justify-content:flex-start}
+.youth-footer-org{display:flex;align-items:center;gap:14px;line-height:1.4}
+.youth-footer-org img{width:78px;height:auto}
+@media(max-width:680px){.youth-organizer{grid-template-columns:1fr;gap:20px;padding:22px}.youth-organizer-logo{max-width:240px}}
+/* Лого в хедъра и футъра: бялото лого на Мисия 100 в тъмносиньо поле */
+.youth-brand-logo{width:auto!important;flex:0 0 auto!important;padding:6px 12px;display:grid;place-items:center;background:var(--ink)!important}
+.youth-brand-logo img{display:block;height:40px;width:auto}
+.site-footer .youth-brand-logo{background:#fff1!important}
+@media(max-width:680px){.youth-brand-logo{padding:5px 10px}.youth-brand-logo img{height:32px}}
+/* Видим фокус на полетата (шаблонът го маха с outline:none) */
+.registration-form input:focus-visible{outline:3px solid var(--yellow)!important;outline-offset:3px}
+.registration-form input[type=checkbox]:focus-visible{outline-offset:2px}
+/* Заглавията: курсив като на плаката */
+.hero-copy h1,.section h2{font-style:italic;font-weight:800}
+@media(max-width:680px){.guests h2{font-size:clamp(2rem,10vw,2.6rem)!important;max-width:100%;overflow-wrap:anywhere}}

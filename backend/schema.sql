@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS attendees (
   full_name TEXT NOT NULL,
   email TEXT,
   phone TEXT,
+  organization TEXT,
   ticket_token TEXT UNIQUE,
   checked_in_at TEXT,
   UNIQUE(order_id, attendee_no)

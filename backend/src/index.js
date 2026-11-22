@@ -5,6 +5,7 @@ import arialFont from '../assets/arial.ttf';
 import { cors } from './cors.js';
 import { handleHrr, syncRoster, syncMissionPointsToSheet, refreshRanking } from './hrr.js';
 import { handleHrrApplications, processHrrApplicationOutbox } from './hrr-applications.js';
+import { handleFreeRegistration } from './free-registrations.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
@@ -163,6 +164,40 @@ async function generateTicketPdf(env, order, attendee, event, ticketUrl) {
   return pdf.save();
 }
 
+async function generateFreeTicketPdf(env, event, attendee, ticketUrl) {
+  const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  const font = await pdf.embedFont(new Uint8Array(arialFont), { subset: true });
+  const page = pdf.addPage([595, 842]);
+  const navy = rgb(0.078, 0.102, 0.29);
+  const orange = rgb(1, 0.478, 0.102);
+  const purple = rgb(0.427, 0.157, 0.851);
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: rgb(0.96, 0.953, 0.984) });
+  page.drawRectangle({ x: 0, y: 742, width: 595, height: 100, color: navy });
+  page.drawRectangle({ x: 0, y: 0, width: 595, height: 50, color: purple });
+  const centered = (text, y, size, color = navy) => page.drawText(String(text), { x: (595 - font.widthOfTextAtSize(String(text), size)) / 2, y, size, font, color });
+  const starts = new Date(event.starts_at);
+  centered(event.name.toUpperCase(), 795, 22, rgb(1, 1, 1));
+  centered('БЕЗПЛАТНО УЧАСТИЕ', 765, 12, orange);
+  centered('БИЛЕТ', 680, 30);
+  centered(attendee.full_name, 630, 18);
+  centered(attendee.organization || '', 604, 12, purple);
+  centered('КОД НА БИЛЕТА', 562, 11);
+  centered(attendee.ticket_token, 524, 36, orange);
+  // QR → страницата за проверка: показва дали регистрацията е потвърдена. Без QR билетът пак се праща.
+  try {
+    const qr = await pdf.embedJpg(await fetchQrJpeg(env, ticketUrl));
+    page.drawImage(qr, { x: (595 - 170) / 2, y: 330, width: 170, height: 170 });
+  } catch (error) { console.error('[ticket-qr]', error); }
+  centered(`ДАТА: ${starts.toLocaleDateString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long' })}`, 280, 13);
+  centered(`ЧАС: ${starts.toLocaleTimeString('bg-BG', { timeZone: 'Europe/Sofia', hour: '2-digit', minute: '2-digit' })} ч. · регистрация от 9:30 ч.`, 256, 13);
+  centered(`МЯСТО: ${event.venue}`, 232, 13);
+  centered(`АДРЕС: ${EVENT_ADDRESS}`, 208, 11);
+  centered('Покажете QR кода на входа.', 150, 12);
+  centered('Този имейл е генериран автоматично. Моля, не отговаряйте на него.', 20, 8, rgb(1, 1, 1));
+  return pdf.save();
+}
+
 async function sendAttendeeTicketEmail(env, order, attendee, event, force = false) {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return { status: 'skipped', attendeeId: attendee.id };
   const recipient = clean(attendee.email, 160).toLowerCase() || order.buyer_email;
@@ -305,7 +340,7 @@ async function finalizeOrder(orderId, reference, env, ctx) {
 
 function ticketPage(order, attendee, event) {
   const used = Boolean(attendee.checked_in_at);
-  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет — ${html(event.name)}</title><style>:root{--ink:#0b0b0d;--paper:#faf8f5;--cyan:#1e8cae;--orange:#e2542a}body{font-family:Arial,sans-serif;background:var(--ink);color:#17151a;padding:24px}.ticket{max-width:640px;margin:auto;background:var(--paper);border-top:8px solid var(--cyan);border-bottom:4px solid var(--orange);padding:32px;box-shadow:0 12px 30px #0005}h1{margin:0 0 12px;font-size:28px;color:var(--ink)}.status{color:var(--cyan);font-weight:700;letter-spacing:.08em}.meta{line-height:1.9;margin-top:24px}.code{font:700 16px monospace;background:#eaf6fa;padding:12px;border-radius:4px;display:inline-block;word-break:break-all}.used{color:var(--orange);font-weight:700}</style><main class="ticket"><h1>${html(event.name)}</h1><p class="status">${used ? 'БИЛЕТЪТ Е ВЕЧЕ ИЗПОЛЗВАН' : 'РЕГИСТРАЦИЯ ПОТВЪРДЕНА'}</p><div class="meta"><strong>Участник:</strong> ${html(attendee.full_name)}<br><strong>Билет:</strong> ${html(event.ticket_name || 'Билет')}<br><strong>Дата:</strong> ${html(event.starts_at)}<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Адрес:</strong> ${html(EVENT_ADDRESS)}<br><strong>Поръчка:</strong> ${html(order.id)}</div><p class="code">${html(attendee.ticket_token)}</p>${used ? `<p class="used">Чекиран на ${html(attendee.checked_in_at)}</p>` : '<p>Покажете този билет при регистрация на събитието.</p>'}</main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет — ${html(event.name)}</title><style>:root{--ink:#0b0b0d;--paper:#faf8f5;--cyan:#1e8cae;--orange:#e2542a}body{font-family:Arial,sans-serif;background:var(--ink);color:#17151a;padding:24px}.ticket{max-width:640px;margin:auto;background:var(--paper);border-top:8px solid var(--cyan);border-bottom:4px solid var(--orange);padding:32px;box-shadow:0 12px 30px #0005}h1{margin:0 0 12px;font-size:28px;color:var(--ink)}.status{color:var(--cyan);font-weight:700;letter-spacing:.08em}.meta{line-height:1.9;margin-top:24px}.code{font:700 16px monospace;background:#eaf6fa;padding:12px;border-radius:4px;display:inline-block;word-break:break-all}.used{color:var(--orange);font-weight:700}</style><main class="ticket"><h1>${html(event.name)}</h1><p class="status">${used ? 'БИЛЕТЪТ Е ВЕЧЕ ИЗПОЛЗВАН' : 'РЕГИСТРАЦИЯ ПОТВЪРДЕНА'}</p><div class="meta"><strong>Участник:</strong> ${html(attendee.full_name)}<br>${attendee.organization ? `<strong>Организация:</strong> ${html(attendee.organization)}<br>` : ''}<strong>Билет:</strong> ${html(event.ticket_name || 'Билет')}<br><strong>Дата:</strong> ${html(new Date(event.starts_at).toLocaleString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'long', timeStyle: 'short' }))} ч.<br><strong>Място:</strong> ${html(event.venue)}<br><strong>Адрес:</strong> ${html(EVENT_ADDRESS)}<br><strong>Поръчка:</strong> ${html(order.id)}</div><p class="code">${html(attendee.ticket_token)}</p>${used ? `<p class="used">Чекиран на ${html(attendee.checked_in_at)}</p>` : '<p>Покажете този билет при регистрация на събитието.</p>'}</main>` , { headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
 export default {
@@ -316,6 +351,8 @@ export default {
       try {
       const applicationResponse = await handleHrrApplications(request, env, ctx, url, headers);
       if (applicationResponse) return applicationResponse;
+      const freeResponse = await handleFreeRegistration(request, env, ctx, url, headers, (event, attendee, ticketUrl) => generateFreeTicketPdf(env, event, attendee, ticketUrl));
+      if (freeResponse) return freeResponse;
       const hrrResponse = await handleHrr(request, env, url);
       if (hrrResponse) return new Response(hrrResponse.body, { status: hrrResponse.status, headers: { ...Object.fromEntries(hrrResponse.headers), ...headers } });
       if (request.method === 'GET' && url.pathname === '/api/health') return json({ ok: true, service: 'sofiasummit-events-api' }, 200, headers);
@@ -333,7 +370,7 @@ export default {
       if (request.method === 'GET' && url.pathname.startsWith('/api/tickets/')) {
         const token = clean(url.pathname.split('/').pop(), 100);
         const row = await env.DB.prepare("SELECT o.*,a.*,e.name event_name,e.starts_at,e.venue,t.name ticket_name FROM attendees a JOIN orders o ON o.id=a.order_id JOIN events e ON e.id=o.event_id JOIN ticket_types t ON t.id=o.ticket_type_id WHERE a.ticket_token=? AND o.status='paid'").bind(token).first();
-        if (!row) return new Response('Ticket not found', { status: 404 });
+        if (!row) return new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Няма регистрация</title><body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#b42318;color:#fff;font:700 28px Arial,sans-serif;text-align:center;padding:24px"><div>✕<br>НЯМА ТАКАВА РЕГИСТРАЦИЯ<p style="font:400 16px Arial">Билетът не е намерен или не е потвърден.</p></div>', { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
         return ticketPage(row, row, { name: row.event_name, starts_at: row.starts_at, venue: row.venue, ticket_name: row.ticket_name });
       }
       if (url.pathname.startsWith('/api/admin/')) {
