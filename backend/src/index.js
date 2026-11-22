@@ -5,7 +5,7 @@ import arialFont from '../assets/arial.ttf';
 import { cors } from './cors.js';
 import { handleHrr, syncRoster, syncMissionPointsToSheet, refreshRanking } from './hrr.js';
 import { handleHrrApplications, processHrrApplicationOutbox } from './hrr-applications.js';
-import { handleFreeRegistration } from './free-registrations.js';
+import { handleFreeRegistration, syncFreeRegistrationSheets } from './free-registrations.js';
 
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), {
   status,
@@ -451,6 +451,7 @@ export default {
   },
   async scheduled(_controller, env, ctx) {
     ctx.waitUntil(processHrrApplicationOutbox(env));
+    ctx.waitUntil(syncFreeRegistrationSheets(env).catch((error) => console.warn('Free registration sheet sync failed', error.message)));
     // Season roster sheet → team emails, so students land in their team on first Google login.
     if (env.HRR_ROSTER_SHEET_ID) ctx.waitUntil(syncRoster(env, env.HRR_ROSTER_SHEET_ID).then((r) => { if (r.error) console.warn('Roster sync failed', r.error); }));
     // Ranking snapshot for /api/hrr/ranking, then approved mission points → column F of the season sheet (needs the sheet shared with the service account as Editor).

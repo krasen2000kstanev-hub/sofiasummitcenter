@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { DatabaseSync } from 'node:sqlite';
 import { afterEach, test } from 'node:test';
-import { handleFreeRegistration } from '../src/free-registrations.js';
+import { handleFreeRegistration, syncFreeRegistrationSheet, freeRegistrationSheets } from '../src/free-registrations.js';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
@@ -94,4 +94,20 @@ test('спира при пълен капацитет', async () => {
   env.DB.raw.exec("UPDATE events SET capacity = 1 WHERE slug = 'national-youth-summit'");
   assert.equal((await run(env, body)).status, 201);
   assert.equal((await run(env, { ...body, email: 'other@example.com' })).status, 409);
+});
+
+test('таблицата: пише заглавие + всички регистрации и чисти старите редове', async () => {
+  const { env, calls } = await setup();
+  await run(env, body);
+  await run(env, { ...body, email: 'second@example.com', fullName: 'Втори' });
+  calls.length = 0;
+  const count = await syncFreeRegistrationSheet(env, 'national-youth-summit', 'SHEET1', 'tok');
+  assert.equal(count, 2);
+  const put = calls.find((c) => c.options.method === 'PUT');
+  assert.match(put.url, /SHEET1\/values\/A1%3AI3/);
+  const { values } = JSON.parse(put.options.body);
+  assert.equal(values[0][0], '№');
+  assert.deepEqual(values.slice(1).map((r) => [r[0], r[3], r[7]]), [[1, 'Тест Участник', 'Да'], [2, 'Втори', 'Да']]);
+  assert.ok(calls.some((c) => c.url.includes(encodeURIComponent('A4:I') + ':clear')));
+  assert.deepEqual(freeRegistrationSheets({ FREE_REG_SHEETS: 'a=1, b=2' }), [['a', '1'], ['b', '2']]);
 });

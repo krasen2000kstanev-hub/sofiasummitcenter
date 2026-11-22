@@ -4,6 +4,8 @@ const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(d
   status,
   headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers }
 });
+import { googleAccessToken } from './hrr-applications.js';
+
 const now = () => new Date().toISOString();
 const clean = (value, max) => String(value ?? '').trim().slice(0, max);
 const html = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -96,6 +98,44 @@ export async function handleFreeRegistration(request, env, ctx, url, headers, ma
   ctx.waitUntil(Promise.allSettled([
     sendTicket(env, event, order, attendee, makePdf, url.origin),
     forwardToGoogleForm(slug, values)
-  ]).then((results) => results.forEach((r) => { if (r.status === 'rejected') console.error('[free-registration]', r.reason); })));
+  ]).then((results) => results.forEach((r) => { if (r.status === 'rejected') console.error('[free-registration]', r.reason); }))
+    .then(() => syncFreeRegistrationSheets(env, slug)).catch((error) => console.error('[free-registration-sheet]', error.message)));
   return json({ ok: true, message: 'Регистрацията е потвърдена. Билетът идва на посочения имейл до няколко минути.' }, 201, headers);
+}
+
+// Google таблица с всички регистрации: FREE_REG_SHEETS = "slug=sheetId,slug2=sheetId2".
+// Всеки път се презаписва целият лист от базата, затова таблицата сама се оправя след грешка или изтриване.
+// ponytail: пълен презапис на всеки 5 минути; при хиляди редове → само новите редове.
+const SHEET_HEADER = ['№', 'Дата и час на регистрация', 'Организация', 'Име', 'Телефон', 'Имейл', 'Код на билета', 'Билетът е изпратен', 'Влязъл на събитието'];
+const sofiaTime = (iso) => iso ? new Date(iso).toLocaleString('bg-BG', { timeZone: 'Europe/Sofia', dateStyle: 'short', timeStyle: 'short' }) : '';
+
+export function freeRegistrationSheets(env) {
+  return String(env.FREE_REG_SHEETS || '').split(',').map((pair) => pair.trim().split('=')).filter(([slug, id]) => slug && id);
+}
+
+export async function syncFreeRegistrationSheet(env, slug, sheetId, token) {
+  const rows = (await env.DB.prepare(`SELECT o.created_at, a.organization, a.full_name, a.phone, a.email, a.ticket_token, a.checked_in_at,
+      (SELECT status FROM email_log WHERE attendee_id = a.id AND email_type = 'ticket' ORDER BY sent_at DESC LIMIT 1) email_status
+    FROM attendees a JOIN orders o ON o.id = a.order_id JOIN events e ON e.id = o.event_id
+    WHERE e.slug = ? AND o.status = 'paid' ORDER BY o.created_at`).bind(slug).all()).results || [];
+  const values = [SHEET_HEADER, ...rows.map((r, i) => [i + 1, sofiaTime(r.created_at), r.organization || '', r.full_name, r.phone || '', r.email || '', r.ticket_token,
+    r.email_status === 'sent' ? 'Да' : r.email_status === 'failed' ? 'Грешка' : 'Чака', r.checked_in_at ? sofiaTime(r.checked_in_at) : ''])];
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}/values`;
+  const auth = { authorization: `Bearer ${token}`, 'content-type': 'application/json' };
+  // Без име на лист: A1 е първият лист, каквото и да е името му.
+  const write = await fetch(`${base}/${encodeURIComponent(`A1:I${values.length}`)}?valueInputOption=RAW`, { method: 'PUT', headers: auth, body: JSON.stringify({ values }) });
+  if (!write.ok) throw new Error(`Google Sheets write failed (${write.status})`);
+  const clear = await fetch(`${base}/${encodeURIComponent(`A${values.length + 1}:I`)}:clear`, { method: 'POST', headers: auth, body: '{}' });
+  if (!clear.ok) throw new Error(`Google Sheets clear failed (${clear.status})`);
+  return rows.length;
+}
+
+export async function syncFreeRegistrationSheets(env, onlySlug = null) {
+  const targets = freeRegistrationSheets(env).filter(([slug]) => !onlySlug || slug === onlySlug);
+  if (!targets.length) return;
+  const token = await googleAccessToken(env);
+  for (const [slug, sheetId] of targets) {
+    try { await syncFreeRegistrationSheet(env, slug, sheetId, token); }
+    catch (error) { console.error('[free-registration-sheet]', slug, error.message); }
+  }
 }
