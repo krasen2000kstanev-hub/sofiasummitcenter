@@ -250,7 +250,11 @@
       // Waiting submissions first; reviewed ones go to a separate „Проверени“ section, folded by default.
       const part = (done) => shown.map(([, g]) => [g, g.items.filter(s => (s.status === 'pending') !== done)]).filter(([, items]) => items.length).map(([g, items]) => `<h3 class="submission-group">${esc(g.title)} <small>${items.length} ${done ? 'проверени' : 'чакат'}</small></h3>${byTeam(items).map(teamBundle).join('')}`).join('');
       const reviewedCount = shown.reduce((n, [, g]) => n + g.items.filter(s => s.status !== 'pending').length, 0);
-      box.innerHTML = teamPicker + teamSummary + `<div class="submission-filters">${chip('all', 'Всички', list)}${ordered.map(([key, g]) => chip(key, g.title, g.items)).join('')}</div>`
+      // Chips show only missions with something to review; fully reviewed missions fold into „Завършени“.
+      const waitingMissions = ordered.filter(([, g]) => pending(g.items)), doneMissions = ordered.filter(([, g]) => !pending(g.items));
+      const doneOpen = doneMissions.some(([key]) => key === submissionFilter);
+      box.innerHTML = teamPicker + teamSummary + `<div class="submission-filters">${chip('all', 'Всички', list)}${waitingMissions.map(([key, g]) => chip(key, g.title, g.items)).join('')}</div>`
+        + (doneMissions.length ? `<details class="done-missions"${doneOpen ? ' open' : ''}><summary>✓ Завършени (${doneMissions.length})</summary><div class="submission-filters">${doneMissions.map(([key, g]) => chip(key, g.title, g.items)).join('')}</div></details>` : '')
         + (part(false) || '<p class="muted-label">Няма чакащи изпълнения. 🎉</p>')
         + (reviewedCount ? `<details class="reviewed-block"${reviewedOpen ? ' open' : ''}><summary>✓ Проверени (${reviewedCount})</summary>${part(true)}</details>` : '');
       for (const [selector, value] of drafts) { const el = box.querySelector(selector); if (el && value) el.value = value; }
