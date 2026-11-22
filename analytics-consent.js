@@ -107,7 +107,7 @@
       } else if (target.id === 'calc-cta') {
         name = 'calculator_inquiry_click';
         params.space = document.getElementById('calc-space') ? document.getElementById('calc-space').value : '';
-      } else if (target.getAttribute('href') === '#apply') {
+      } else if (target.getAttribute('href') === '#apply' || target.getAttribute('href') === '#register') {
         name = 'registration_click';
       } else if (target.getAttribute('href') === '#mentors') {
         name = 'mentor_click';
@@ -119,6 +119,11 @@
 
       if (name) track(name, params);
     });
+
+    // Event pages: the registration form leads to the DSK payment page.
+    document.addEventListener('submit', function (event) {
+      if (event.target && event.target.id === 'registration-form') track('ticket_checkout', { page: location.pathname });
+    }, true);
 
     var hrFeedback = document.querySelector('[aria-labelledby="hr-feedback-heading"]');
     if (hrFeedback && 'IntersectionObserver' in window) {
