@@ -19,6 +19,9 @@ HRR_ROSTER_SHEET_ID = "1KQmI2hdv8pNTzA2eTnZAaU8whP-NJep3k2CSGB0dKRY"
 HRR_DRIVE_OWNER = "hr.rushforpractice@gmail.com"
 HRR_DRIVE_ROOT_ID = "1LKqGhzvvD-dtfpGHickXRmHC1x7Q00T8"
 HRR_DRIVE_ONLY = ""
+# Company tables (folder „Компании“) get „Трудност“ from „Информация за позициите“ every 5 min.
+HRR_COMPANIES_FOLDER_ID = "1f6AlGeQBZBJbmIVhrDDpuUrz8IaxqyyF"
+HRR_POSITIONS_SHEET_ID = "1oGPFCltkmMIm3pvk-XuPP4eEfULR8e0dEJgXu7Z5n-g"
 # Безплатни регистрации → Google таблица (споделена като Editor с hrr-applications-writer).
 FREE_REG_SHEETS = "national-youth-summit=14cAbKRNxXlENswb_JaiSSO3IMZlSYDdkA0JUul8D99M"
 HRR_APPLICATIONS_SHEET_ID = "1t1Y00W82tCpU2313oGg9f1t7hNWQM3qqCtvF1ybgnt4"
