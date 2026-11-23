@@ -201,5 +201,14 @@ The student portal at `/events/hr-rushforpractice/misii/` shows the signed-in st
 These live in Google Drive, not in this repo; the site does not read them.
 
 - **Team tables** (one per „Екип N - <университет>“ folder, 137): column A „Име“ was added before „Телефон“.
-- **Company tables** (folder „Компании“, 16, one per company): column J „Трудност“ (лесна / средна / трудна) sits next to I „Сфера“ (the candidate's position). Values come from the positions sheet „Информация за позициите“, column D. A candidate listed for several positions gets the hardest one. The columns after J moved one to the right.
+- **Company tables** (folder „Компании“, 16, one per company): column J „Трудност“ (лесна / средна / трудна) sits next to I „Сфера“ (the candidate's position). Since 23 Nov the worker fills it — see below. The columns after J moved one to the right.
 - Any script that reads these tables by column number (e.g. `cv-check.gs`, not run yet) must be checked against the new layout before it runs.
+
+## HR:Rush — sheet sync and company difficulty (22–23 Nov 2026)
+
+- **Rows with two teams in „Обща класация на екипи“** (e.g. „НБУ / СУ“ + „Екип 1“, „НБУ / СУ“ + „Екип 43 / Екип 21“) are now matched too (`sheetRowKeys` in `backend/src/hrr.js`). Each such row maps to the team(s) that have no row of their own, so nothing is counted twice. The sheet itself was not changed. 6 activity points that were typed by hand on the „Екип 43 / Екип 21“ row were added on the site for НБУ Екип 43 so the sync keeps them.
+- **Mission reviews** (`misii/`): the filter chips show only missions with waiting submissions; fully reviewed missions fold into „✓ Завършени (N)“.
+- **„Трудност“ in the company tables is automatic** (`backend/src/hrr-difficulty.js`, every 5 min in the cron): the worker lists the folder `HRR_COMPANIES_FOLDER_ID` (Drive API), reads `HRR_POSITIONS_SHEET_ID` („Позиции“, A company, B position, D level) and fills J from I „Сфера“. Each listed position is looked up in the same company first, then in all companies; several → the hardest. It writes only empty cells or cells with an outdated level; other text is never overwritten; no match → left for a person. Column J has a лесна / средна / трудна dropdown.
+- **Needs:** Google Drive API enabled in the Google Cloud project `hr-rush-for-practice` (done 23 Nov) and the folder shared with `hrr-applications-writer@…` (it is). New company tables in the folder are picked up on their own.
+- Points for missions reach column F within 5 minutes of approval (checked in the sheet's version history for 17–18 Nov).
+
