@@ -62,14 +62,14 @@ function base64url(bytes) {
   return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-export async function googleAccessToken(env) {
+export async function googleAccessToken(env, scope = 'https://www.googleapis.com/auth/spreadsheets') {
   const account = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}');
   if (!account.client_email || !account.private_key) throw new Error('Google Sheets backend credential is not configured');
   const issuedAt = Math.floor(Date.now() / 1000);
   const encode = (value) => base64url(new TextEncoder().encode(JSON.stringify(value)));
   const unsigned = `${encode({ alg: 'RS256', typ: 'JWT' })}.${encode({
     iss: account.client_email,
-    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    scope,
     aud: 'https://oauth2.googleapis.com/token',
     iat: issuedAt,
     exp: issuedAt + 3600
