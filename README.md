@@ -212,3 +212,9 @@ These live in Google Drive, not in this repo; the site does not read them.
 - **Needs:** Google Drive API enabled in the Google Cloud project `hr-rush-for-practice` (done 23 Nov) and the folder shared with `hrr-applications-writer@…` (it is). New company tables in the folder are picked up on their own.
 - Points for missions reach column F within 5 minutes of approval (checked in the sheet's version history for 17–18 Nov).
 
+
+## HR:Rush — merged teams and student emails (24 Nov 2026)
+
+- **СУ Екип 14 and СУ Екип 21 are one team now.** In „Обща класация на екипи“ the separate rows „СУ Екип 21“ and „СУ Екип 14“ were deleted; only the row „СУ“ + „Екип 14 / Екип 21“ is left, so the sync writes the sum of both teams' mission points into it (53 on 24 Nov). On the site they are still two teams; nothing changed in the database.
+- **To merge two teams:** keep one row with both names („Екип 14 / Екип 21“) and delete their own rows — while a team has its own row, the combined row gets nothing. Column E is overwritten by the site's activity awards, so any activity typed by hand must be added as „Ръчни точки“ in `misii/` (here +6 for СУ Екип 14, „Активност от общия ред с Екип 21“).
+- **Ranking page — student emails** (`ranking/index.html`): the „СУ“ tab has a second block below the roster with the same team numbers and no emails; it was overwriting the contacts of every СУ team. Rows without an email are now skipped. A row with several teams shows the students of all of them (`contactsFor`).
