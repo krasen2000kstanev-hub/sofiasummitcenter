@@ -534,7 +534,10 @@ async function submit(request, env, missionId) {
 async function updateSubmission(request, env, submissionId) {
   const auth = await requireStudent(request, env); if (auth.response) return auth.response;
   const row = await env.DB.prepare('SELECT * FROM hrr_submissions WHERE id=?').bind(submissionId).first();
-  if (!row || row.student_user_id !== auth.user.id) return json({ error: 'Изпращането не е намерено.' }, 404);
+  // A teammate may add evidence to a pending team submission (team missions have one submission per team).
+  const scope = row ? (await env.DB.prepare('SELECT scope FROM hrr_missions WHERE id=?').bind(row.mission_id).first())?.scope : '';
+  const teammate = Boolean(row) && row.student_user_id !== auth.user.id && scope === 'team' && Boolean(await env.DB.prepare('SELECT 1 FROM hrr_team_members WHERE user_id=? AND team_id=? AND active=1').bind(auth.user.id, row.team_id).first());
+  if (!row || (row.student_user_id !== auth.user.id && !teammate)) return json({ error: 'Изпращането не е намерено.' }, 404);
   if (row.status !== 'pending') return json({ error: 'Мисията вече е прегледана и не може да се променя.' }, 409);
   const body = await request.json(); const urls = parseEvidenceUrls(body.evidenceUrl); const evidenceUrl = urls.join('\n'); const evidenceText = clean(body.evidenceText, 4000);
   const images = evidenceImages(body);
@@ -545,9 +548,15 @@ async function updateSubmission(request, env, submissionId) {
   const hasDocument = body.evidenceDocument ? true : (!body.removeDocument && Boolean(await env.DB.prepare('SELECT 1 FROM hrr_submission_files WHERE submission_id=?').bind(submissionId).first()));
   if (!evidenceUrl && !evidenceText && !hasImage && !hasDocument) return json({ error: 'Добави линк, описание, снимка или документ.' }, 400);
   await env.DB.prepare('UPDATE hrr_submissions SET evidence_url=?,evidence_text=?,edited_at=? WHERE id=?').bind(evidenceUrl, evidenceText, now(), submissionId).run();
-  if (images.length || body.removeImage) await saveImages(env, submissionId, images);
-  if (body.evidenceDocument) await saveDocument(env, submissionId, body.evidenceDocument);
-  else if (body.removeDocument) await deleteDocument(env, submissionId);
+  if (teammate) {
+    // ponytail: a teammate only adds — images go after the existing ones, files are never removed.
+    if (images.length) { const start = (await env.DB.prepare('SELECT COUNT(*) n FROM hrr_submission_images WHERE submission_id=?').bind(submissionId).first())?.n || 0; for (const [i, data] of images.entries()) await env.DB.prepare('INSERT INTO hrr_submission_images (submission_id,position,data) VALUES (?,?,?)').bind(submissionId, start + i, data).run(); }
+    if (body.evidenceDocument && !(await env.DB.prepare('SELECT 1 FROM hrr_submission_files WHERE submission_id=?').bind(submissionId).first())) await saveDocument(env, submissionId, body.evidenceDocument);
+  } else {
+    if (images.length || body.removeImage) await saveImages(env, submissionId, images);
+    if (body.evidenceDocument) await saveDocument(env, submissionId, body.evidenceDocument);
+    else if (body.removeDocument) await deleteDocument(env, submissionId);
+  }
   const mission = await env.DB.prepare('SELECT title,mentor_user_id FROM hrr_missions WHERE id=?').bind(row.mission_id).first();
   if (mission?.mentor_user_id) await env.DB.prepare('INSERT INTO hrr_notifications (id,user_id,type,title,body,created_at) VALUES (?,?,?,?,?,?)').bind(id('hrr_note'), mission.mentor_user_id, 'submission_edit', 'Редактирано изпълнение', `${auth.user.display_name} промени доказателството за „${mission.title}“.`, now()).run();
   return json({ ok: true });
