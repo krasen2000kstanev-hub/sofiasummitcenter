@@ -173,3 +173,23 @@ test('changing a bonus after approval is for mentors and admins only', async () 
   assert.equal((await request('mentor/submissions/s1/bonus', 'student', 'POST')).status, 403);
   assert.equal((await request('mentor/submissions/s1/bonus', 'viewer', 'POST')).status, 403);
 });
+
+test('a teammate may add evidence to a pending team submission, others may not', async () => {
+  const withSubmission = (member, scope = 'team') => {
+    const env = envFor('student'); const base = env.DB.prepare.bind(env.DB); const writes = [];
+    env.DB.prepare = sql => { const stmt = base(sql); const first = stmt.first.bind(stmt); const run = stmt.run.bind(stmt);
+      stmt.first = async () => sql.startsWith('SELECT * FROM hrr_submissions WHERE id=?') ? { id: 's1', mission_id: 'm4', team_id: 't21', student_user_id: 'someone-else', status: 'pending' }
+        : sql.startsWith('SELECT scope FROM hrr_missions') ? { scope }
+        : sql.startsWith('SELECT 1 FROM hrr_team_members') ? (member ? { 1: 1 } : null)
+        : sql.startsWith('SELECT title,mentor_user_id') ? { title: 'Визия', mentor_user_id: 'mentor' } : first();
+      stmt.run = async () => { writes.push(sql); return run(); }; return stmt; };
+    return { env, writes };
+  };
+  const body = JSON.stringify({ evidenceUrl: 'https://example.com/eva', evidenceText: 'Пост на Ева' });
+  const ok = withSubmission(true);
+  assert.equal((await request('submissions/s1', 'student', 'PATCH', ok.env, {}, body)).status, 200);
+  assert.ok(ok.writes.some(sql => sql.startsWith('UPDATE hrr_submissions SET evidence_url')));
+  assert.ok(!ok.writes.some(sql => sql.startsWith('DELETE FROM hrr_submission_images')), 'teammate never wipes images');
+  assert.equal((await request('submissions/s1', 'student', 'PATCH', withSubmission(false).env, {}, body)).status, 404);
+  assert.equal((await request('submissions/s1', 'student', 'PATCH', withSubmission(true, 'individual').env, {}, body)).status, 404);
+});
